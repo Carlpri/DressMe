@@ -10,4 +10,288 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+
 }
+
+
+enum Role {
+  USER
+  VENDOR
+  ADMIN
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  UNISEX
+}
+
+model User {
+  id          String   @id @default(cuid())
+
+  name        String
+  email       String   @unique
+  password    String
+
+  avatar      String?
+
+  role        Role @default(USER)
+
+  vendor       Vendor?
+
+  outfits      Outfit[]
+  favorites    FavoriteProduct[]
+  savedOutfits SavedOutfit[]
+  reviews      Review[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Vendor {
+
+  id String @id @default(cuid())
+
+  shopName String
+
+  phone String
+
+  location String
+
+  logo String?
+
+  description String?
+
+  verified Boolean @default(false)
+
+  userId String @unique
+
+  user User @relation(fields:[userId], references:[id])
+
+  products Product[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+}
+
+model Category {
+
+  id String @id @default(cuid())
+
+  name String @unique
+
+  slug String @unique
+
+  products Product[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+}
+
+model Brand {
+
+  id String @id @default(cuid())
+
+  name String @unique
+
+  slug String @unique
+
+  logo String?
+
+  products Product[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+}
+
+model Product {
+
+  id String @id @default(cuid())
+
+  name String
+
+  slug String @unique
+
+  description String
+
+  price Float
+
+  gender Gender
+
+  vendorId String
+  categoryId String
+  brandId String
+
+  vendor Vendor @relation(fields:[vendorId], references:[id])
+
+  category Category @relation(fields:[categoryId], references:[id])
+
+  brand Brand @relation(fields:[brandId], references:[id])
+
+  images ProductImage[]
+
+  variants ProductVariant[]
+
+  favorites FavoriteProduct[]
+
+  reviews Review[]
+
+  outfitItems OutfitItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  
+
+}
+
+model ProductImage {
+
+  id String @id @default(cuid())
+
+  imageUrl String
+
+  isPrimary Boolean @default(false)
+
+  productId String
+
+  product Product @relation(fields:[productId], references:[id])
+
+  createdAt DateTime @default(now())
+
+}
+
+model ProductVariant {
+
+  id String @id @default(cuid())
+
+  size String
+
+  color String
+
+  stock Int
+
+  sku String @unique
+
+  productId String
+
+  product Product @relation(fields:[productId], references:[id])
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+}
+
+model Outfit {
+
+  id String @id @default(cuid())
+
+  title String
+
+  slug String @unique
+
+  description String
+
+  style String
+
+  coverImage String?
+
+  creatorId String
+
+  creator User @relation(fields:[creatorId], references:[id])
+
+  items OutfitItem[]
+
+  savedBy SavedOutfit[]
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+}
+
+model OutfitItem {
+
+  id String @id @default(cuid())
+
+  outfitId String
+
+  productId String
+
+  outfit Outfit @relation(fields:[outfitId], references:[id])
+
+  product Product @relation(fields:[productId], references:[id])
+
+  createdAt DateTime @default(now())
+
+  @@unique([outfitId, productId])
+
+}
+
+model SavedOutfit {
+
+  id String @id @default(cuid())
+
+  userId String
+
+  outfitId String
+
+  user User @relation(fields:[userId], references:[id])
+
+  outfit Outfit @relation(fields:[outfitId], references:[id])
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, outfitId])    
+
+}
+
+model FavoriteProduct {
+
+  id String @id @default(cuid())
+
+  userId String
+
+  productId String
+
+  user User @relation(fields:[userId], references:[id])
+
+  product Product @relation(fields:[productId], references:[id])
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, productId])   
+
+}
+
+model Review {
+
+  id String @id @default(cuid())
+
+  rating Int
+
+  comment String?
+
+  userId String
+
+  productId String
+
+  user User @relation(fields:[userId], references:[id])
+
+  product Product @relation(fields:[productId], references:[id])
+
+  createdAt DateTime @default(now())
+
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, productId])
+
+}
+
+
+
+
