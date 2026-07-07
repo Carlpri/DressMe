@@ -26,8 +26,9 @@ enum Gender {
 }
 
 enum AccountStatus {
-  ACTIVE
-  SUSPENDED
+  ACTIVE //Normal accounts
+  SUSPENDED //Temporarily blocked by an admin
+  DELETED //user chose to deactivate or deleted their account
 }
 
 model User {
