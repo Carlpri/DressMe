@@ -62,6 +62,8 @@ model Vendor {
 
   phone String
 
+  address String
+
   location String
 
   logo String?
