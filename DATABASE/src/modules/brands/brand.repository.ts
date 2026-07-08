@@ -9,6 +9,8 @@ export class BrandRepository {
     name: string;
     slug: string;
     logo?: string;
+    website?: string;
+    description?: string;
   }) {
     return prisma.brand.create({
       data,

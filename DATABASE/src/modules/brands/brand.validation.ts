@@ -11,6 +11,17 @@ export const createBrandSchema = z.object({
       .string()
       .url("Logo must be a valid URL")
       .optional(),
+
+    website: z
+      .string()
+      .url("Website must be a valid URL")
+      .optional(),
+
+    description: z
+      .string()
+      .trim()
+      .max(500)
+      .optional(),
   }),
 });
 
@@ -25,6 +36,17 @@ export const updateBrandSchema = z.object({
     logo: z
       .string()
       .url()
+      .optional(),
+
+    website: z
+      .string()
+      .url()
+      .optional(),
+
+    description: z
+      .string()
+      .trim()
+      .max(500)
       .optional(),
   }),
 });

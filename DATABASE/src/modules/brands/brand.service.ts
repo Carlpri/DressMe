@@ -65,6 +65,8 @@ export class BrandService {
       name?: string;
       slug?: string;
       logo?: string;
+      website?: string;
+      description?: string;
     } = {};
 
     if (data.name) {
@@ -88,6 +90,14 @@ export class BrandService {
 
     if (data.logo !== undefined) {
       updateData.logo = data.logo;
+    }
+
+    if (data.website !== undefined) {
+      updateData.website = data.website;
+    }
+
+    if (data.description !== undefined) {
+      updateData.description = data.description;
     }
 
     return this.repository.update(id, updateData);

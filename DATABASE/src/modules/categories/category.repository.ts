@@ -4,6 +4,7 @@ export class CategoryRepository {
   async create(data: {
     name: string;
     slug: string;
+    image?: string;
   }) {
     return prisma.category.create({
       data,
@@ -47,6 +48,7 @@ export class CategoryRepository {
   data: {
     name?: string;
     slug?: string;
+    image?: string;
   }
 ) {
   return prisma.category.update({

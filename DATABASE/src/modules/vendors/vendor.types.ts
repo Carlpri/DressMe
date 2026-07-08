@@ -5,6 +5,12 @@ export interface CreateVendorDto {
   location: string;
   logo?: string;
   description?: string;
+  coverImage?: string;
+  businessEmail?: string;
+  facebook?: string;
+  instagram?: string;
+  tiktok?: string;
+  website?: string;
 }
 
 export interface UpdateVendorDto {
@@ -14,4 +20,10 @@ export interface UpdateVendorDto {
   location?: string;
   logo?: string;
   description?: string;
+  coverImage?: string;
+  businessEmail?: string;
+  facebook?: string;
+  instagram?: string;
+  tiktok?: string;
+  website?: string;
 }

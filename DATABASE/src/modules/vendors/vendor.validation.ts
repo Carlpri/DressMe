@@ -13,6 +13,18 @@ export const createVendorSchema = z.object({
     logo: z.string().url().optional(),
 
     description: z.string().optional(),
+
+    coverImage: z.string().url().optional(),
+
+    businessEmail: z.string().email().optional(),
+
+    facebook: z.string().url().optional(),
+
+    instagram: z.string().url().optional(),
+
+    tiktok: z.string().url().optional(),
+
+    website: z.string().url().optional(),
   }),
 });
 
@@ -29,6 +41,18 @@ export const updateVendorSchema = z.object({
     logo: z.string().url().optional(),
 
     description: z.string().optional(),
+
+    coverImage: z.string().url().optional(),
+
+    businessEmail: z.string().email().optional(),
+
+    facebook: z.string().url().optional(),
+
+    instagram: z.string().url().optional(),
+
+    tiktok: z.string().url().optional(),
+
+    website: z.string().url().optional(),
   }),
 });
 

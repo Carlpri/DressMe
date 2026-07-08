@@ -6,6 +6,8 @@ import userRoutes from "./modules/users/user.routes.js";
 import categoryRoutes from "./modules/categories/category.routes.js";
 import brandRoutes from "./modules/brands/brand.routes.js";
 import vendorRotes from "./modules/vendors/vendor.routes.js";
+import productRoutes from "./modules/products/product.routes.js";
+import cartRoutes from "./modules/cart/cart.routes.js";
 
 const app = express();
 
@@ -21,6 +23,8 @@ app.use("/api/users",userRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/brands", brandRoutes);
 app.use("/api/vendors", vendorRotes); 
+app.use("/api/products", productRoutes);
+app.use("/api/cart", cartRoutes);
 
 app.use(errorHandler);
 

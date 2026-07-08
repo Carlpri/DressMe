@@ -28,6 +28,7 @@ export class CategoryService {
     return this.repository.create({
       name: data.name,
       slug,
+      image: data.image,
     });
   }
 
@@ -68,6 +69,7 @@ export class CategoryService {
     const updateData: {
       name?: string;
       slug?: string;
+      image?: string;
     } = {};
 
     if (data.name) {
@@ -88,12 +90,13 @@ export class CategoryService {
       });
     }
 
+    if (data.image !== undefined) {
+      updateData.image = data.image;
+    }
+
     return this.repository.update(
       id,
-      updateData as {
-        name: string;
-        slug: string;
-      }
+      updateData
     );
   }
 

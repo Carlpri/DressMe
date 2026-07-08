@@ -31,6 +31,12 @@ enum AccountStatus {
   DELETED //user chose to deactivate or deleted their account
 }
 
+enum ProductStatus {
+  DRAFT
+  ACTIVE
+  ARCHIVED
+}
+
 model User {
   id          String   @id @default(cuid())
 
@@ -48,6 +54,7 @@ model User {
   favorites    FavoriteProduct[]
   savedOutfits SavedOutfit[]
   reviews      Review[]
+  cart         Cart?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -70,6 +77,18 @@ model Vendor {
 
   description String?
 
+  coverImage String?
+
+  businessEmail String?
+
+  facebook String?
+
+  instagram String?
+
+  tiktok String?
+
+  website String?
+
   verified Boolean @default(false)
 
   userId String @unique
@@ -86,6 +105,8 @@ model Vendor {
 model Category {
 
   id String @id @default(cuid())
+
+  image String?
 
   name String @unique
 
@@ -110,6 +131,10 @@ model Brand {
 
   products Product[]
 
+  website String?
+
+  description String?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -126,6 +151,22 @@ model Product {
   description String
 
   price Float
+
+  stock Int @default(0)
+
+  sku String? @unique
+
+  featured Boolean @default(false)
+
+  status ProductStatus @default(DRAFT)
+
+  views Int @default(0)
+
+  sales Int @default(0)
+
+  averageRating Float @default(0)
+
+  reviewCount Int @default(0)
 
   gender Gender
 
@@ -149,9 +190,16 @@ model Product {
 
   outfitItems OutfitItem[]
 
+  cartItems CartItem[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  @@index([vendorId])
+  @@index([categoryId])
+  @@index([brandId])
+  @@index([status])
+  @@index([featured])
   
 
 }
@@ -163,12 +211,56 @@ model ProductImage {
   imageUrl String
 
   isPrimary Boolean @default(false)
+  
+  altText String?
+  
+  displayOrder Int @default(0)
 
   productId String
 
   product Product @relation(fields:[productId], references:[id])
 
   createdAt DateTime @default(now())
+
+}
+
+model Cart {
+
+  id String @id @default(cuid())
+
+  userId String @unique
+
+  user User @relation(fields:[userId], references:[id])
+
+  items CartItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+}
+
+model CartItem {
+
+  id String @id @default(cuid())
+
+  cartId String
+
+  productId String
+
+  variantId String?
+
+  quantity Int
+
+  cart Cart @relation(fields:[cartId], references:[id])
+
+  product Product @relation(fields:[productId], references:[id])
+
+  variant ProductVariant? @relation(fields:[variantId], references:[id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([cartId, productId, variantId])
 
 }
 
@@ -184,9 +276,15 @@ model ProductVariant {
 
   sku String @unique
 
+  price Float?
+
+  imageUrl String?
+
   productId String
 
   product Product @relation(fields:[productId], references:[id])
+
+  cartItems CartItem[]
 
   createdAt DateTime @default(now())
 
@@ -299,7 +397,3 @@ model Review {
   @@unique([userId, productId])
 
 }
-
-
-
-

@@ -1,0 +1,1 @@
+ALTER TABLE "Vendor" ALTER COLUMN "address" DROP DEFAULT;
