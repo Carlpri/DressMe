@@ -1,0 +1,370 @@
+{
+  "info": {
+    "name": "DressMe Addresses API",
+    "description": "Covers address creation, duplicate prevention, default selection, ownership, ordering, updates, and deletion rules.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000"
+    },
+    {
+      "key": "accessToken",
+      "value": ""
+    },
+    {
+      "key": "firstAddressId",
+      "value": ""
+    },
+    {
+      "key": "secondAddressId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "Register user",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Address Tester\",\n  \"email\": \"address.tester@example.com\",\n  \"password\": \"Password123!\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/register",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "register"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('register returns 201', function () { pm.response.to.have.status(201); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Login user",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"address.tester@example.com\",\n  \"password\": \"Password123!\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/auth/login",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('login returns 200', function () { pm.response.to.have.status(200); });",
+              "const json = pm.response.json();",
+              "if (json && json.data && json.data.token) { pm.collectionVariables.set('accessToken', json.data.token); }"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Create first address (auto default)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"Jane Doe\",\n  \"phone\": \"0712345678\",\n  \"county\": \"Nairobi\",\n  \"city\": \"Nairobi\",\n  \"area\": \"Westlands\",\n  \"street\": \"Mara Road\",\n  \"building\": \"Block A\",\n  \"label\": \"Home\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/addresses",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "addresses"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('first address created', function () { pm.response.to.have.status(201); });",
+              "const json = pm.response.json();",
+              "pm.test('first address defaults to true', function () { pm.expect(json.data.isDefault).to.eql(true); });",
+              "if (json && json.data && json.data.id) { pm.collectionVariables.set('firstAddressId', json.data.id); }"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Create second address",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"Jane Doe\",\n  \"phone\": \"0723456789\",\n  \"county\": \"Kiambu\",\n  \"city\": \"Thika\",\n  \"area\": \"CBD\",\n  \"street\": \"Kenyatta Avenue\",\n  \"building\": \"Suite 2\",\n  \"label\": \"Office\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/addresses",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "addresses"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('second address created', function () { pm.response.to.have.status(201); });",
+              "const json = pm.response.json();",
+              "pm.test('second address is not default by default', function () { pm.expect(json.data.isDefault).to.eql(false); });",
+              "if (json && json.data && json.data.id) { pm.collectionVariables.set('secondAddressId', json.data.id); }"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reject duplicate address",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"fullName\": \"Jane Doe\",\n  \"phone\": \"0712345678\",\n  \"county\": \"Nairobi\",\n  \"city\": \"Nairobi\",\n  \"area\": \"Westlands\",\n  \"street\": \"Mara Road\",\n  \"building\": \"Block A\",\n  \"label\": \"Home\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/addresses",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "addresses"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('duplicate address returns 409', function () { pm.response.to.have.status(409); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Set second address as default",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/addresses/{{secondAddressId}}/default",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "addresses",
+            "{{secondAddressId}}",
+            "default"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('set default returns 200', function () { pm.response.to.have.status(200); });",
+              "const json = pm.response.json();",
+              "pm.test('new default is marked true', function () { pm.expect(json.data.isDefault).to.eql(true); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "List addresses with default first",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/addresses",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "addresses"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('list returns 200', function () { pm.response.to.have.status(200); });",
+              "const json = pm.response.json();",
+              "pm.test('default address appears first', function () { pm.expect(json.data[0].isDefault).to.eql(true); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Update address label",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"label\": \"Parents\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/api/addresses/{{firstAddressId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "addresses",
+            "{{firstAddressId}}"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('update returns 200', function () { pm.response.to.have.status(200); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Delete address when only one remains",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/addresses/{{firstAddressId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "addresses",
+            "{{firstAddressId}}"
+          ]
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('delete last address returns 409', function () { pm.response.to.have.status(409); });"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ]
+    }
+  ]
+}

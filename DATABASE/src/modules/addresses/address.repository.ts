@@ -15,9 +15,14 @@ export class AddressRepository {
   async findAllByUser(userId: string) {
     return prisma.address.findMany({
       where: { userId },
-      orderBy: {
-        createdAt: "desc",
-      },
+      orderBy: [
+        {
+          isDefault: "desc",
+        },
+        {
+          createdAt: "desc",
+        },
+      ],
     });
   }
 

@@ -1,9 +1,12 @@
 import { z } from "zod";
 
+const phoneSchema = z.string().trim().regex(/^(?:\+254|254|0)7\d{8}$/);
+const labelSchema = z.string().trim().min(1).max(50).regex(/^[A-Za-z][A-Za-z\s'&.-]*$/);
+
 export const createAddressSchema = z.object({
   body: z.object({
     fullName: z.string().trim().min(2).max(120),
-    phone: z.string().trim().min(10).max(20),
+    phone: phoneSchema,
     county: z.string().trim().min(2).max(100),
     city: z.string().trim().min(2).max(100),
     area: z.string().trim().min(2).max(100),
@@ -13,7 +16,7 @@ export const createAddressSchema = z.object({
     landmark: z.string().trim().max(200).optional(),
     latitude: z.number().finite().optional(),
     longitude: z.number().finite().optional(),
-    label: z.string().trim().max(50).optional(),
+    label: labelSchema.optional(),
     isDefault: z.boolean().optional(),
   }),
 });
@@ -24,7 +27,7 @@ export const updateAddressSchema = z.object({
   }),
   body: z.object({
     fullName: z.string().trim().min(2).max(120).optional(),
-    phone: z.string().trim().min(10).max(20).optional(),
+    phone: phoneSchema.optional(),
     county: z.string().trim().min(2).max(100).optional(),
     city: z.string().trim().min(2).max(100).optional(),
     area: z.string().trim().min(2).max(100).optional(),
@@ -34,7 +37,7 @@ export const updateAddressSchema = z.object({
     landmark: z.string().trim().max(200).optional().nullable(),
     latitude: z.number().finite().optional().nullable(),
     longitude: z.number().finite().optional().nullable(),
-    label: z.string().trim().max(50).optional().nullable(),
+    label: labelSchema.optional().nullable(),
     isDefault: z.boolean().optional(),
   }),
 });

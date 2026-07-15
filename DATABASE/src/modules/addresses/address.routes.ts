@@ -37,6 +37,12 @@ router.get(
 );
 
 router.patch(
+  "/:id/default",
+  validate(addressIdParamSchema),
+  controller.setDefaultAddress
+);
+
+router.patch(
   "/:id",
   validate(addressIdParamSchema.merge(updateAddressSchema)),
   controller.updateAddress

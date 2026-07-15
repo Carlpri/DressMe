@@ -70,6 +70,20 @@ export class AddressController {
     );
   });
 
+  setDefaultAddress = asyncHandler(async (req, res) => {
+    const address = await addressService.setDefault(
+      req.user.userId,
+      req.params.id as string
+    );
+
+    ApiResponse.success(
+      res,
+      200,
+      "Default address updated successfully.",
+      address
+    );
+  });
+
   deleteAddress = asyncHandler(async (req, res) => {
     await addressService.delete(
       req.user.userId,
