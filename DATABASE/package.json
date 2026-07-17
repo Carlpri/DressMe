@@ -14,10 +14,6 @@
     "prisma:seed": "prisma db seed"
     
   },
-  "prisma": {
-    "seed": "tsx prisma/seed.ts"
-  },
-    
   "keywords": [],
   "author": "",
   "license": "ISC",

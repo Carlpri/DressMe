@@ -1,5 +1,5 @@
 import type { UserRole } from "../types/auth";
-import { ROUTES } from "../constants/routes";
+import { STUDIO_ROUTES } from "../constants/routes";
 
 export interface StudioRouteDefinition {
   path: string;
@@ -12,7 +12,7 @@ export interface StudioRouteDefinition {
  * Guard enforcement is intentionally introduced with the auth feature.
  */
 export const studioRoutes: StudioRouteDefinition[] = [
-  { path: ROUTES.customerDashboard, title: "Customer workspace", allowedRoles: ["USER"] },
-  { path: ROUTES.vendorDashboard, title: "Vendor workspace", allowedRoles: ["VENDOR", "ADMIN"] },
-  { path: ROUTES.adminDashboard, title: "Admin workspace", allowedRoles: ["ADMIN"] },
+  { path: STUDIO_ROUTES.customerDashboard, title: "Customer workspace", allowedRoles: ["USER"] },
+  { path: STUDIO_ROUTES.vendorDashboard, title: "Vendor workspace", allowedRoles: ["VENDOR", "ADMIN"] },
+  { path: STUDIO_ROUTES.adminDashboard, title: "Admin workspace", allowedRoles: ["ADMIN"] },
 ];

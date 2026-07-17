@@ -4,7 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import { Link, Paper, Stack, Typography } from "@mui/material";
 import { FeedbackSnackbar } from "../../components/FeedbackSnackbar";
-import { ROUTES } from "../../constants/routes";
+import { STUDIO_ROUTES } from "../../constants/routes";
 import { useAuth } from "../../hooks/useAuth";
 import type { UserRole } from "../../types/auth";
 import type { ApiErrorResponse } from "../../types/api";
@@ -14,7 +14,7 @@ import { authService } from "./auth.service";
 import type { RegisterFormValues } from "./auth.schemas";
 
 function dashboardFor(role: UserRole) {
-  return role === "ADMIN" ? ROUTES.adminDashboard : role === "VENDOR" ? ROUTES.vendorDashboard : ROUTES.customerDashboard;
+  return role === "ADMIN" ? STUDIO_ROUTES.adminDashboard : role === "VENDOR" ? STUDIO_ROUTES.vendorDashboard : STUDIO_ROUTES.customerDashboard;
 }
 
 function getErrorMessage(error: unknown) {
@@ -55,7 +55,7 @@ export function AuthPage({ mode }: { mode: "login" | "register" }) {
           <AuthForm mode={mode} isPending={mutation.isPending} onSubmit={submit} />
           <Typography variant="body2" color="text.secondary">
             {isRegister ? "Already have an account? " : "Need an account? "}
-            <Link component={RouterLink} to={isRegister ? ROUTES.login : ROUTES.register}>
+            <Link component={RouterLink} to={isRegister ? STUDIO_ROUTES.login : STUDIO_ROUTES.register}>
               {isRegister ? "Sign in" : "Register"}
             </Link>
           </Typography>

@@ -1,6 +1,6 @@
 import { Button, Paper, Stack, Typography } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
-import { ROUTES } from "../constants/routes";
+import { STUDIO_ROUTES } from "../constants/routes";
 import { PageFrame } from "./PageFrame";
 
 export function StudioWelcomePage() {
@@ -12,7 +12,7 @@ export function StudioWelcomePage() {
           <Typography color="text.secondary">
             Internal developer QA and operations console for the DressMe API.
           </Typography>
-          <Button component={RouterLink} to={ROUTES.login} variant="contained" sx={{ alignSelf: "flex-start" }}>
+          <Button component={RouterLink} to={STUDIO_ROUTES.login} variant="contained" sx={{ alignSelf: "flex-start" }}>
             Continue to sign in
           </Button>
         </Stack>

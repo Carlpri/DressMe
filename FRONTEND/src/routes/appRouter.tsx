@@ -1,7 +1,23 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
-import { ROUTES } from "../constants/routes";
+import { ROUTES, STUDIO_ROUTES } from "../constants/routes";
 import { PlaceholderPage } from "../pages/PlaceholderPage";
 import { StudioWelcomePage } from "../pages/StudioWelcomePage";
+import { AccessDeniedPage } from "../pages/AccessDeniedPage";
+import { WebLayout } from "../components/web/WebLayout";
+import { StudioLayout } from "../components/studio/StudioLayout";
+import { WebAuthPage } from "../components/web/WebAuthPage";
+import { LandingPage } from "../pages/web/LandingPage";
+import { ProductsPage } from "../pages/web/ProductsPage";
+import { ProductDetailsPage } from "../pages/web/ProductDetailsPage";
+import { CategoriesPage } from "../pages/web/CategoriesPage";
+import { BrandsPage } from "../pages/web/BrandsPage";
+import { WishlistPage } from "../pages/web/WishlistPage";
+import { ProfilePage } from "../pages/web/ProfilePage";
+import { AIStylistPage } from "../pages/web/AIStylistPage";
+import { OutfitBuilderPage } from "../pages/web/OutfitBuilderPage";
+import { CheckoutPage } from "../pages/web/CheckoutPage";
+import { OrderConfirmationPage } from "../pages/web/OrderConfirmationPage";
+import { OrderDetailsPage } from "../pages/web/OrderDetailsPage";
 import { AuthPage } from "../features/auth/AuthPage";
 import { ProtectedRoute } from "./ProtectedRoute";
 import { BackendRegistryPage } from "../features/backend-registry/BackendRegistryPage";
@@ -12,38 +28,120 @@ import { OrdersPage } from "../features/customer/OrdersPage";
 import { OutfitsPage } from "../features/customer/OutfitsPage";
 
 export const appRouter = createBrowserRouter([
-  { path: "/", element: <StudioWelcomePage /> },
   {
-    path: ROUTES.login,
-    element: <AuthPage mode="login" />,
+    path: "/",
+    element: <WebLayout />,
+    children: [
+      { index: true, element: <LandingPage /> },
+      { path: "login", element: <WebAuthPage mode="login" /> },
+      { path: "register", element: <WebAuthPage mode="register" /> },
+      { path: "products", element: <ProductsPage /> },
+      { path: "products/:slug", element: <ProductDetailsPage /> },
+      { path: "categories", element: <CategoriesPage /> },
+      { path: "categories/:slug", element: <CategoriesPage /> },
+      { path: "brands", element: <BrandsPage /> },
+      { path: "brands/:slug", element: <BrandsPage /> },
+      {
+        path: "cart",
+        element: <ProtectedRoute allowedRoles={["USER"]} />,
+        children: [{ index: true, element: <CartPage /> }]
+      },
+      {
+        path: "checkout",
+        element: <ProtectedRoute allowedRoles={["USER"]} />,
+        children: [{ index: true, element: <CheckoutPage /> }]
+      },
+      {
+        path: "order-confirmation",
+        element: <ProtectedRoute allowedRoles={["USER"]} />,
+        children: [{ index: true, element: <OrderConfirmationPage /> }]
+      },
+      {
+        path: "orders",
+        element: <ProtectedRoute allowedRoles={["USER"]} />,
+        children: [{ index: true, element: <OrdersPage /> }]
+      },
+      {
+        path: "orders/:id",
+        element: <ProtectedRoute allowedRoles={["USER"]} />,
+        children: [{ index: true, element: <OrderDetailsPage /> }]
+      },
+      { 
+        path: "profile", 
+        element: <ProtectedRoute allowedRoles={["USER"]} />,
+        children: [{ index: true, element: <ProfilePage /> }]
+      },
+      { 
+        path: "profile/addresses", 
+        element: <ProtectedRoute allowedRoles={["USER"]} />,
+        children: [{ index: true, element: <AddressesPage /> }]
+      },
+      { 
+        path: "profile/outfits", 
+        element: <ProtectedRoute allowedRoles={["USER"]} />,
+        children: [{ index: true, element: <OutfitsPage /> }]
+      },
+      { 
+        path: "ai-stylist", 
+        element: <ProtectedRoute allowedRoles={["USER"]} />,
+        children: [{ index: true, element: <AIStylistPage /> }]
+      },
+      { 
+        path: "outfit-builder", 
+        element: <ProtectedRoute allowedRoles={["USER"]} />,
+        children: [{ index: true, element: <OutfitBuilderPage /> }]
+      },
+    ],
   },
   {
-    path: ROUTES.register,
-    element: <AuthPage mode="register" />,
-  },
-  {
-    path: ROUTES.customerDashboard,
-    element: <ProtectedRoute allowedRoles={["USER"]}><CustomerWorkspace /></ProtectedRoute>,
-  },
-  { path: ROUTES.customerCart, element: <ProtectedRoute allowedRoles={["USER"]}><CartPage /></ProtectedRoute> },
-  { path: ROUTES.customerAddresses, element: <ProtectedRoute allowedRoles={["USER"]}><AddressesPage /></ProtectedRoute> },
-  { path: ROUTES.customerOrders, element: <ProtectedRoute allowedRoles={["USER"]}><OrdersPage /></ProtectedRoute> },
-  { path: ROUTES.customerOutfits, element: <ProtectedRoute allowedRoles={["USER"]}><OutfitsPage /></ProtectedRoute> },
-  {
-    path: ROUTES.vendorDashboard,
-    element: <ProtectedRoute allowedRoles={["VENDOR", "ADMIN"]}><PlaceholderPage title="Vendor workspace" description="Vendor QA tools are planned after customer workflows." /></ProtectedRoute>,
-  },
-  {
-    path: ROUTES.adminDashboard,
-    element: <ProtectedRoute allowedRoles={["ADMIN"]}><PlaceholderPage title="Admin workspace" description="Admin QA tools are planned after vendor workflows." /></ProtectedRoute>,
-  },
-  {
-    path: ROUTES.accessDenied,
-    element: <PlaceholderPage title="Access denied" description="Your current role does not have access to this workspace." />,
-  },
-  {
-    path: ROUTES.backendRegistry,
-    element: <ProtectedRoute allowedRoles={["USER", "VENDOR", "ADMIN"]}><BackendRegistryPage /></ProtectedRoute>,
+    path: "/studio",
+    element: <StudioLayout />,
+    children: [
+      { index: true, element: <StudioWelcomePage /> },
+      { path: "login", element: <AuthPage mode="login" /> },
+      { path: "register", element: <AuthPage mode="register" /> },
+      { 
+        path: "customer", 
+        element: <ProtectedRoute allowedRoles={["USER"]} />,
+        children: [{ index: true, element: <CustomerWorkspace /> }]
+      },
+      { 
+        path: "customer/cart", 
+        element: <ProtectedRoute allowedRoles={["USER"]} />,
+        children: [{ index: true, element: <CartPage /> }]
+      },
+      { 
+        path: "customer/addresses", 
+        element: <ProtectedRoute allowedRoles={["USER"]} />,
+        children: [{ index: true, element: <AddressesPage /> }]
+      },
+      { 
+        path: "customer/orders", 
+        element: <ProtectedRoute allowedRoles={["USER"]} />,
+        children: [{ index: true, element: <OrdersPage /> }]
+      },
+      { 
+        path: "customer/outfits", 
+        element: <ProtectedRoute allowedRoles={["USER"]} />,
+        children: [{ index: true, element: <OutfitsPage /> }]
+      },
+      { 
+        path: "vendor", 
+        element: <ProtectedRoute allowedRoles={["VENDOR", "ADMIN"]} />,
+        children: [{ index: true, element: <PlaceholderPage title="Vendor workspace" description="Vendor QA tools are planned after customer workflows." /> }]
+      },
+      { 
+        path: "admin", 
+        element: <ProtectedRoute allowedRoles={["ADMIN"]} />,
+        children: [{ index: true, element: <PlaceholderPage title="Admin workspace" description="Admin QA tools are planned after vendor workflows." /> }]
+      },
+      { path: "access-denied", element: <AccessDeniedPage /> },
+      { 
+        path: "system/modules", 
+        element: <ProtectedRoute allowedRoles={["USER", "VENDOR", "ADMIN"]} />,
+        children: [{ index: true, element: <BackendRegistryPage /> }]
+      },
+    ],
   },
   { path: "*", element: <Navigate to="/" replace /> },
 ]);
