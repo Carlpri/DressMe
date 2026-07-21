@@ -531,3 +531,41 @@ model OrderItem {
   @@index([orderId])
   @@index([productId])
 }
+
+model SiteSettings {
+  id                    String   @id @default(cuid())
+
+  siteName              String
+  tagline               String?
+  logoUrl               String?
+  logoDarkUrl           String?
+  faviconUrl            String?
+  heroBannerUrl         String?
+
+  supportEmail          String?
+  supportPhone          String?
+  whatsapp              String?
+
+  facebook              String?
+  instagram             String?
+  tiktok                String?
+  x                     String?
+  linkedin              String?
+  youtube               String?
+
+  physicalAddress       String?
+
+  currency              String   @default("KES")
+  defaultShippingFee    Float    @default(500)
+
+  aboutUs               String?
+  privacyPolicy         String?
+  termsOfService        String?
+  refundPolicy          String?
+  shippingPolicy        String?
+
+  maintenanceMode       Boolean  @default(false)
+
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+}

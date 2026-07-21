@@ -38,6 +38,7 @@ import { ProductCard } from "../../components/shared/ProductCard";
 import { LoadingSkeleton } from "../../components/shared/LoadingSkeleton";
 import { ROUTES } from "../../constants/routes";
 import { Link as RouterLink } from "react-router-dom";
+import { useFormatCurrency } from "../../utils/currency";
 
 export function ProductDetailsPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -54,6 +55,7 @@ export function ProductDetailsPage() {
     limit: 4,
   });
   const { data: reviews } = useReviews(product?.id || "");
+  const formatCurrency = useFormatCurrency();
 
   const addToCart = useAddToCart();
   const addToFavorites = useAddToFavorites();
@@ -254,7 +256,7 @@ export function ProductDetailsPage() {
 
               <Stack direction="row" spacing={2} alignItems="baseline">
                 <Typography variant="h4" sx={{ fontWeight: 700, color: "primary.main" }}>
-                  KES {displayPrice.toLocaleString()}
+                  {formatCurrency(displayPrice)}
                 </Typography>
                 {product.averageRating > 0 && (
                   <Stack direction="row" spacing={1} alignItems="center">

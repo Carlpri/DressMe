@@ -22,6 +22,7 @@ import { AuthPage } from "../features/auth/AuthPage";
 import { ProtectedRoute } from "./ProtectedRoute";
 import { BackendRegistryPage } from "../features/backend-registry/BackendRegistryPage";
 import { CustomerWorkspace } from "../features/customer/CustomerWorkspace";
+import { AdminSettingsPage } from "../features/admin/AdminSettingsPage";
 import { CartPage } from "../features/customer/CartPage";
 import { AddressesPage } from "../features/customer/AddressesPage";
 import { OrdersPage } from "../features/customer/OrdersPage";
@@ -130,10 +131,13 @@ export const appRouter = createBrowserRouter([
         element: <ProtectedRoute allowedRoles={["VENDOR", "ADMIN"]} />,
         children: [{ index: true, element: <PlaceholderPage title="Vendor workspace" description="Vendor QA tools are planned after customer workflows." /> }]
       },
-      { 
-        path: "admin", 
+      {
+        path: "admin",
         element: <ProtectedRoute allowedRoles={["ADMIN"]} />,
-        children: [{ index: true, element: <PlaceholderPage title="Admin workspace" description="Admin QA tools are planned after vendor workflows." /> }]
+        children: [
+          { index: true, element: <PlaceholderPage title="Admin workspace" description="Admin QA tools are planned after vendor workflows." /> },
+          { path: "settings", element: <AdminSettingsPage /> }
+        ]
       },
       { path: "access-denied", element: <AccessDeniedPage /> },
       { 

@@ -21,6 +21,7 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import PersonIcon from "@mui/icons-material/Person";
 import { ROUTES } from "../../constants/routes";
 import { useAuth } from "../../hooks/useAuth";
+import { useSiteSettingsContext } from "../../contexts/SiteSettingsContext";
 
 const NAVIGATION_ITEMS = [
   { label: "Products", path: ROUTES.customerDashboard },
@@ -35,6 +36,7 @@ export function WebHeader() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
   const { user, isAuthenticated } = useAuth();
+  const { settings } = useSiteSettingsContext();
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -94,7 +96,7 @@ export function WebHeader() {
                   fontSize: { xs: "1.5rem", md: "1.75rem" },
                 }}
               >
-                DressMe
+                {settings?.siteName || "DressMe"}
               </Typography>
             </Link>
           </Box>

@@ -30,6 +30,7 @@ export const STUDIO_ROUTES = {
   customerOutfits: "/studio/customer/outfits",
   vendorDashboard: "/studio/vendor",
   adminDashboard: "/studio/admin",
+  adminSettings: "/studio/admin/settings",
   accessDenied: "/studio/access-denied",
   backendRegistry: "/studio/system/modules",
 } as const;

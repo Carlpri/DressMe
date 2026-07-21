@@ -1,0 +1,32 @@
+-- CreateTable
+CREATE TABLE "public"."SiteSettings" (
+    "id" TEXT NOT NULL,
+    "siteName" TEXT NOT NULL,
+    "tagline" TEXT,
+    "logoUrl" TEXT,
+    "logoDarkUrl" TEXT,
+    "faviconUrl" TEXT,
+    "heroBannerUrl" TEXT,
+    "supportEmail" TEXT,
+    "supportPhone" TEXT,
+    "whatsapp" TEXT,
+    "facebook" TEXT,
+    "instagram" TEXT,
+    "tiktok" TEXT,
+    "x" TEXT,
+    "linkedin" TEXT,
+    "youtube" TEXT,
+    "physicalAddress" TEXT,
+    "currency" TEXT NOT NULL DEFAULT 'KES',
+    "defaultShippingFee" DOUBLE PRECISION NOT NULL DEFAULT 500,
+    "aboutUs" TEXT,
+    "privacyPolicy" TEXT,
+    "termsOfService" TEXT,
+    "refundPolicy" TEXT,
+    "shippingPolicy" TEXT,
+    "maintenanceMode" BOOLEAN NOT NULL DEFAULT false,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "SiteSettings_pkey" PRIMARY KEY ("id")
+);

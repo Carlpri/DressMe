@@ -8,6 +8,13 @@ const cartInclude = {
           images: true,
           brand: true,
           category: true,
+          vendor: {
+            select: {
+              id: true,
+              shopName: true,
+              phone: true,
+            },
+          },
         },
       },
       variant: true,

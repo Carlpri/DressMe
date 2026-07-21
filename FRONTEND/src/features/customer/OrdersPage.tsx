@@ -21,6 +21,7 @@ import { useOrders } from "../../hooks/useOrders";
 import { LoadingSkeleton } from "../../components/shared/LoadingSkeleton";
 import { ROUTES } from "../../constants/routes";
 import type { Order } from "../../hooks/useOrders";
+import { useFormatCurrency } from "../../utils/currency";
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -58,6 +59,7 @@ const getStatusIcon = (status: string) => {
 
 export function OrdersPage() {
   const { data: orders, isLoading, error, refetch } = useOrders();
+  const formatCurrency = useFormatCurrency();
 
   return (
     <Container maxWidth="xl" sx={{ py: 8 }}>
@@ -124,7 +126,7 @@ export function OrdersPage() {
                               Total
                             </Typography>
                             <Typography sx={{ fontWeight: 500 }}>
-                              KES {order.total.toLocaleString()}
+                              {formatCurrency(order.total)}
                             </Typography>
                           </Box>
                           <Box>
@@ -176,7 +178,7 @@ export function OrdersPage() {
                                     {item.productName}
                                   </Typography>
                                   <Typography variant="caption" color="text.secondary">
-                                    Qty: {item.quantity} · KES {item.price.toLocaleString()}
+                                    Qty: {item.quantity} · {formatCurrency(item.price)}
                                   </Typography>
                                 </Box>
                               </Stack>

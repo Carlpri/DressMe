@@ -4,6 +4,7 @@ import InstagramIcon from "@mui/icons-material/Instagram";
 import TwitterIcon from "@mui/icons-material/Twitter";
 import { Link as RouterLink } from "react-router-dom";
 import { ROUTES } from "../../constants/routes";
+import { useSiteSettingsContext } from "../../contexts/SiteSettingsContext";
 
 const FOOTER_LINKS = {
   Company: [
@@ -32,6 +33,7 @@ const FOOTER_LINKS = {
 
 export function WebFooter() {
   const theme = useTheme();
+  const { settings } = useSiteSettingsContext();
 
   return (
     <Box
@@ -59,14 +61,13 @@ export function WebFooter() {
                   color: "#00C896",
                 }}
               >
-                DressMe
+                {settings?.siteName || "DressMe"}
               </Typography>
               <Typography
                 variant="body2"
                 sx={{ color: "rgba(255, 255, 255, 0.7)", lineHeight: 1.6 }}
               >
-                Your Style. Powered by AI. Inspired by You. Discover fashion that
-                speaks to your unique personality.
+                {settings?.tagline || "Your Style. Powered by AI. Inspired by You."}
               </Typography>
             </Box>
 
@@ -124,40 +125,52 @@ export function WebFooter() {
               variant="body2"
               sx={{ color: "rgba(255, 255, 255, 0.5)" }}
             >
-              © 2026 DressMe. All rights reserved.
+              © 2026 {settings?.siteName || "DressMe"}. All rights reserved.
             </Typography>
 
             <Stack direction="row" spacing={2}>
-              <Link
-                href="#"
-                sx={{
-                  color: "rgba(255, 255, 255, 0.7)",
-                  transition: "color 0.2s",
-                  "&:hover": { color: "#00C896" },
-                }}
-              >
-                <FacebookIcon />
-              </Link>
-              <Link
-                href="#"
-                sx={{
-                  color: "rgba(255, 255, 255, 0.7)",
-                  transition: "color 0.2s",
-                  "&:hover": { color: "#00C896" },
-                }}
-              >
-                <InstagramIcon />
-              </Link>
-              <Link
-                href="#"
-                sx={{
-                  color: "rgba(255, 255, 255, 0.7)",
-                  transition: "color 0.2s",
-                  "&:hover": { color: "#00C896" },
-                }}
-              >
-                <TwitterIcon />
-              </Link>
+              {settings?.facebook && (
+                <Link
+                  href={settings.facebook}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  sx={{
+                    color: "rgba(255, 255, 255, 0.7)",
+                    transition: "color 0.2s",
+                    "&:hover": { color: "#00C896" },
+                  }}
+                >
+                  <FacebookIcon />
+                </Link>
+              )}
+              {settings?.instagram && (
+                <Link
+                  href={settings.instagram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  sx={{
+                    color: "rgba(255, 255, 255, 0.7)",
+                    transition: "color 0.2s",
+                    "&:hover": { color: "#00C896" },
+                  }}
+                >
+                  <InstagramIcon />
+                </Link>
+              )}
+              {settings?.x && (
+                <Link
+                  href={settings.x}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  sx={{
+                    color: "rgba(255, 255, 255, 0.7)",
+                    transition: "color 0.2s",
+                    "&:hover": { color: "#00C896" },
+                  }}
+                >
+                  <TwitterIcon />
+                </Link>
+              )}
             </Stack>
           </Stack>
         </Stack>

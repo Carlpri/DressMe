@@ -23,6 +23,7 @@ import { useOrder } from "../../hooks/useOrders";
 import { LoadingSkeleton } from "../../components/shared/LoadingSkeleton";
 import { ROUTES } from "../../constants/routes";
 import { Link as RouterLink } from "react-router-dom";
+import { useFormatCurrency } from "../../utils/currency";
 
 const getStatusColor = (status: string) => {
   switch (status) {
@@ -62,6 +63,7 @@ export function OrderDetailsPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { data: order, isLoading, error } = useOrder(id || "");
+  const formatCurrency = useFormatCurrency();
 
   if (isLoading) {
     return (
@@ -207,11 +209,11 @@ export function OrderDetailsPage() {
                                 Qty: {item.quantity}
                               </Typography>
                               <Typography variant="body2" color="text.secondary">
-                                KES {item.price.toLocaleString()} each
+                                {formatCurrency(item.price)} each
                               </Typography>
                             </Box>
                             <Typography sx={{ fontWeight: 600 }}>
-                              KES {(item.price * item.quantity).toLocaleString()}
+                              {formatCurrency(item.price * item.quantity)}
                             </Typography>
                           </Stack>
                         );
@@ -235,7 +237,7 @@ export function OrderDetailsPage() {
                   <Stack spacing={2}>
                     <Stack direction="row" justifyContent="space-between">
                       <Typography color="text.secondary">Subtotal</Typography>
-                      <Typography>KES {order.total.toLocaleString()}</Typography>
+                      <Typography>{formatCurrency(order.subtotal)}</Typography>
                     </Stack>
                     <Stack direction="row" justifyContent="space-between">
                       <Typography color="text.secondary">Shipping</Typography>
@@ -247,7 +249,7 @@ export function OrderDetailsPage() {
                         Total
                       </Typography>
                       <Typography variant="h6" sx={{ fontWeight: 700, color: "primary.main" }}>
-                        KES {order.total.toLocaleString()}
+                        {formatCurrency(order.total)}
                       </Typography>
                     </Stack>
                   </Stack>

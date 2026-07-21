@@ -26,11 +26,13 @@ import { useVendors } from "../../hooks/useVendors";
 import { ROUTES } from "../../constants/routes";
 import { ProductCard } from "../../components/shared/ProductCard";
 import { LoadingSkeleton } from "../../components/shared/LoadingSkeleton";
+import { useSiteSettingsContext } from "../../contexts/SiteSettingsContext";
 
 export function LandingPage() {
   const theme = useTheme();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
+  const { settings } = useSiteSettingsContext();
 
   const { data: trendingProducts, isLoading: trendingLoading } = useProducts({
     featured: true,
@@ -66,6 +68,11 @@ export function LandingPage() {
           justifyContent: "center",
           overflow: "hidden",
           bgcolor: "#111827",
+          ...(settings?.heroBannerUrl && {
+            backgroundImage: `url(${settings.heroBannerUrl})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+          }),
         }}
       >
         <Box
@@ -91,13 +98,7 @@ export function LandingPage() {
                 letterSpacing: -0.02,
               }}
             >
-              Your Style.
-              <br />
-              <Box component="span" sx={{ color: "#00C896" }}>
-                Powered by AI.
-              </Box>
-              <br />
-              Inspired by You.
+              {settings?.tagline || "Your Style. Powered by AI. Inspired by You."}
             </Typography>
 
             <Typography

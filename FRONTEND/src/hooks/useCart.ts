@@ -11,6 +11,12 @@ export interface CartItem {
     name: string;
     slug: string;
     price: number;
+    vendorId?: string;
+    vendor?: {
+      id: string;
+      shopName: string;
+      phone: string;
+    };
     images: Array<{ imageUrl: string; isPrimary: boolean }>;
     variants?: Array<{ id: string; size: string; color: string; price?: number }>;
   };

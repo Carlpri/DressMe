@@ -12,6 +12,7 @@ import { seedFavorites } from "./seeds/favorites.js";
 import { seedReviews } from "./seeds/reviews.js";
 import { seedOutfits } from "./seeds/outfits.js";
 import { seedSavedOutfits } from "./seeds/savedOutfits.js";
+import { seedSiteSettings } from "./seeds/siteSettings.js";
 
 // Load environment variables for configurable seed counts.
 dotenv.config();
@@ -62,6 +63,7 @@ async function main() {
   logSeedConfiguration(seedConfig);
   const startTime = Date.now();
 
+  await seedSiteSettings(prisma);
   const userIds = await seedUsers(prisma, seedConfig.users);
   const vendorIds = await seedVendors(prisma, userIds, seedConfig.vendors);
   const brandIds = await seedBrands(prisma, seedConfig.brands);

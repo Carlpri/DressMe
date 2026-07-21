@@ -23,6 +23,7 @@ import { ROUTES } from "../../constants/routes";
 import type { Product } from "../../types/product";
 import { useAddToCart } from "../../hooks/useCart";
 import { useAddToFavorites, useRemoveFromFavorites } from "../../hooks/useFavorites";
+import { useFormatCurrency } from "../../utils/currency";
 
 interface ProductCardProps {
   product: Product;
@@ -33,6 +34,7 @@ export function ProductCard({ product }: ProductCardProps) {
   const [isFavorited, setIsFavorited] = useState(false);
   const [showCartSuccess, setShowCartSuccess] = useState(false);
   const [showFavoriteSuccess, setShowFavoriteSuccess] = useState(false);
+  const formatCurrency = useFormatCurrency();
 
   const addToCart = useAddToCart();
   const addToFavorites = useAddToFavorites();
@@ -226,7 +228,7 @@ export function ProductCard({ product }: ProductCardProps) {
                   color: "primary.main",
                 }}
               >
-                KES {product.price.toLocaleString()}
+                {formatCurrency(product.price)}
               </Typography>
               {hasDiscount && (
                 <Typography
@@ -234,7 +236,7 @@ export function ProductCard({ product }: ProductCardProps) {
                   color="text.secondary"
                   sx={{ textDecoration: "line-through" }}
                 >
-                  KES {(product.price * 1.2).toLocaleString()}
+                  {formatCurrency(product.price * 1.2)}
                 </Typography>
               )}
             </Stack>

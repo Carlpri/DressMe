@@ -21,18 +21,23 @@ import { useCart, useUpdateCartItem, useRemoveFromCart } from "../../hooks/useCa
 import { LoadingSkeleton } from "../../components/shared/LoadingSkeleton";
 import { ROUTES } from "../../constants/routes";
 import { Link as RouterLink } from "react-router-dom";
+import { useSiteSettingsContext } from "../../contexts/SiteSettingsContext";
+import { useFormatCurrency } from "../../utils/currency";
 
 export function CartPage() {
   const { data: cart, isLoading, error, refetch } = useCart();
   const updateItem = useUpdateCartItem();
   const removeItem = useRemoveFromCart();
+  const { settings } = useSiteSettingsContext();
+  const formatCurrency = useFormatCurrency();
 
   const items = cart?.items || [];
   const subtotal = items.reduce(
     (sum, item) => sum + (item.variant?.price || item.product.price) * item.quantity,
     0
   );
-  const shipping = subtotal > 5000 ? 0 : 500;
+  const defaultShippingFee = settings?.defaultShippingFee || 500;
+  const shipping = subtotal > 5000 ? 0 : defaultShippingFee;
   const total = subtotal + shipping;
 
   const handleQuantityChange = (itemId: string, newQuantity: number) => {
@@ -168,7 +173,7 @@ export function CartPage() {
                                 </Typography>
                               )}
                               <Typography variant="body2" color="text.secondary">
-                                KES {price.toLocaleString()}
+                                {formatCurrency(price)}
                               </Typography>
                             </Stack>
                           </Grid>
@@ -205,7 +210,7 @@ export function CartPage() {
 
                           <Grid size={{ xs: 6, md: 2 }}>
                             <Typography sx={{ fontWeight: 600 }}>
-                              KES {itemTotal.toLocaleString()}
+                              {formatCurrency(itemTotal)}
                             </Typography>
                           </Grid>
                         </Grid>
@@ -227,12 +232,12 @@ export function CartPage() {
                     <Stack spacing={2}>
                       <Stack direction="row" justifyContent="space-between">
                         <Typography color="text.secondary">Subtotal</Typography>
-                        <Typography>KES {subtotal.toLocaleString()}</Typography>
+                        <Typography>{formatCurrency(subtotal)}</Typography>
                       </Stack>
                       <Stack direction="row" justifyContent="space-between">
                         <Typography color="text.secondary">Shipping</Typography>
                         <Typography>
-                          {shipping === 0 ? "Free" : `KES ${shipping.toLocaleString()}`}
+                          {shipping === 0 ? "Free" : formatCurrency(shipping)}
                         </Typography>
                       </Stack>
                       <Divider />
@@ -241,7 +246,7 @@ export function CartPage() {
                           Total
                         </Typography>
                         <Typography variant="h6" sx={{ fontWeight: 700, color: "primary.main" }}>
-                          KES {total.toLocaleString()}
+                          {formatCurrency(total)}
                         </Typography>
                       </Stack>
                     </Stack>

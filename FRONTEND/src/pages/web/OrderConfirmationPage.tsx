@@ -16,11 +16,13 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 import { ROUTES } from "../../constants/routes";
 import type { Order } from "../../hooks/useOrders";
+import { useFormatCurrency } from "../../utils/currency";
 
 export function OrderConfirmationPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const order = location.state?.order as Order | undefined;
+  const formatCurrency = useFormatCurrency();
 
   if (!order) {
     return (
@@ -117,7 +119,7 @@ export function OrderConfirmationPage() {
                         {item.product.name} × {item.quantity}
                       </Typography>
                       <Typography variant="body2">
-                        KES {(item.price * item.quantity).toLocaleString()}
+                        {formatCurrency(item.price * item.quantity)}
                       </Typography>
                     </Stack>
                   ) : null
@@ -136,7 +138,7 @@ export function OrderConfirmationPage() {
                   Total
                 </Typography>
                 <Typography variant="h6" sx={{ fontWeight: 700, color: "primary.main" }}>
-                  KES {order.total.toLocaleString()}
+                  {formatCurrency(order.total)}
                 </Typography>
               </Stack>
             </Stack>

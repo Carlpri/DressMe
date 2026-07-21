@@ -13,6 +13,7 @@ import reviewRoutes from "./modules/reviews/review.routes.js";
 import outfitRoutes from "./modules/outfits/outfit.routes.js";
 import addressRoutes from "./modules/addresses/address.routes.js";
 import orderRoutes from "./modules/orders/order.routes.js";
+import siteSettingsRoutes from "./modules/site-settings/site-settings.routes.js";
 
 const app = express();
 
@@ -36,6 +37,7 @@ app.use("/api/reviews", reviewRoutes);
 app.use("/api/outfits", outfitRoutes);
 app.use("/api/addresses", addressRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/settings", siteSettingsRoutes);
 
 app.use(errorHandler);
 
