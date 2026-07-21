@@ -282,8 +282,13 @@ export class ProductService {
       gender: this.parseEnum(query.gender, Gender),
       status: this.parseEnum(query.status, ProductStatus),
       featured: this.parseBoolean(query.featured),
+      isTrending: this.parseBoolean(query.isTrending),
+      isNewArrival: this.parseBoolean(query.isNewArrival),
+      isBestSeller: this.parseBoolean(query.isBestSeller),
       priceMin: this.parseNumber(query.priceMin),
       priceMax: this.parseNumber(query.priceMax),
+      size: this.parseString(query.size),
+      color: this.parseString(query.color),
       search: this.parseString(query.search),
       sort: this.parseSort(query.sort),
     };

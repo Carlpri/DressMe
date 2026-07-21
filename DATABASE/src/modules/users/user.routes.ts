@@ -13,8 +13,14 @@ const controller = new UserController();
 router.get(
   "/me",
   authenticate,
-  authorize(Role.ADMIN),
   controller.getProfile
+);
+
+router.get(
+  "/",
+  authenticate,
+  authorize(Role.ADMIN),
+  controller.getAllUsers
 );
 
 

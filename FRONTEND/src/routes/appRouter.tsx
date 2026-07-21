@@ -28,6 +28,16 @@ import { AddressesPage } from "../features/customer/AddressesPage";
 import { OrdersPage } from "../features/customer/OrdersPage";
 import { OutfitsPage } from "../features/customer/OutfitsPage";
 
+import { AdminLayout } from "../components/admin/AdminLayout";
+import { AdminDashboardPage } from "../pages/admin/AdminDashboardPage";
+import { AdminProductsPage } from "../pages/admin/AdminProductsPage";
+import { AdminMediaPage } from "../pages/admin/AdminMediaPage";
+import { AdminCategoriesPage } from "../pages/admin/AdminCategoriesPage";
+import { AdminBrandsPage } from "../pages/admin/AdminBrandsPage";
+import { AdminOrdersPage } from "../pages/admin/AdminOrdersPage";
+import { AdminCustomersPage } from "../pages/admin/AdminCustomersPage";
+import { AdminReviewsPage } from "../pages/admin/AdminReviewsPage";
+
 export const appRouter = createBrowserRouter([
   {
     path: "/",
@@ -44,53 +54,73 @@ export const appRouter = createBrowserRouter([
       { path: "brands/:slug", element: <BrandsPage /> },
       {
         path: "cart",
-        element: <ProtectedRoute allowedRoles={["USER"]} />,
+        element: <ProtectedRoute allowedRoles={["USER", "ADMIN"]} />,
         children: [{ index: true, element: <CartPage /> }]
       },
       {
         path: "checkout",
-        element: <ProtectedRoute allowedRoles={["USER"]} />,
+        element: <ProtectedRoute allowedRoles={["USER", "ADMIN"]} />,
         children: [{ index: true, element: <CheckoutPage /> }]
       },
       {
         path: "order-confirmation",
-        element: <ProtectedRoute allowedRoles={["USER"]} />,
+        element: <ProtectedRoute allowedRoles={["USER", "ADMIN"]} />,
         children: [{ index: true, element: <OrderConfirmationPage /> }]
       },
       {
         path: "orders",
-        element: <ProtectedRoute allowedRoles={["USER"]} />,
+        element: <ProtectedRoute allowedRoles={["USER", "ADMIN"]} />,
         children: [{ index: true, element: <OrdersPage /> }]
       },
       {
         path: "orders/:id",
-        element: <ProtectedRoute allowedRoles={["USER"]} />,
+        element: <ProtectedRoute allowedRoles={["USER", "ADMIN"]} />,
         children: [{ index: true, element: <OrderDetailsPage /> }]
       },
       { 
         path: "profile", 
-        element: <ProtectedRoute allowedRoles={["USER"]} />,
+        element: <ProtectedRoute allowedRoles={["USER", "ADMIN"]} />,
         children: [{ index: true, element: <ProfilePage /> }]
       },
       { 
         path: "profile/addresses", 
-        element: <ProtectedRoute allowedRoles={["USER"]} />,
+        element: <ProtectedRoute allowedRoles={["USER", "ADMIN"]} />,
         children: [{ index: true, element: <AddressesPage /> }]
       },
       { 
         path: "profile/outfits", 
-        element: <ProtectedRoute allowedRoles={["USER"]} />,
+        element: <ProtectedRoute allowedRoles={["USER", "ADMIN"]} />,
         children: [{ index: true, element: <OutfitsPage /> }]
       },
       { 
         path: "ai-stylist", 
-        element: <ProtectedRoute allowedRoles={["USER"]} />,
+        element: <ProtectedRoute allowedRoles={["USER", "ADMIN"]} />,
         children: [{ index: true, element: <AIStylistPage /> }]
       },
       { 
         path: "outfit-builder", 
-        element: <ProtectedRoute allowedRoles={["USER"]} />,
+        element: <ProtectedRoute allowedRoles={["USER", "ADMIN"]} />,
         children: [{ index: true, element: <OutfitBuilderPage /> }]
+      },
+    ],
+  },
+  {
+    path: "/admin",
+    element: <ProtectedRoute allowedRoles={["ADMIN"]} />,
+    children: [
+      {
+        element: <AdminLayout />,
+        children: [
+          { index: true, element: <AdminDashboardPage /> },
+          { path: "products", element: <AdminProductsPage /> },
+          { path: "media", element: <AdminMediaPage /> },
+          { path: "categories", element: <AdminCategoriesPage /> },
+          { path: "brands", element: <AdminBrandsPage /> },
+          { path: "orders", element: <AdminOrdersPage /> },
+          { path: "customers", element: <AdminCustomersPage /> },
+          { path: "reviews", element: <AdminReviewsPage /> },
+          { path: "settings", element: <AdminSettingsPage /> },
+        ],
       },
     ],
   },
@@ -103,27 +133,27 @@ export const appRouter = createBrowserRouter([
       { path: "register", element: <AuthPage mode="register" /> },
       { 
         path: "customer", 
-        element: <ProtectedRoute allowedRoles={["USER"]} />,
+        element: <ProtectedRoute allowedRoles={["USER", "ADMIN"]} />,
         children: [{ index: true, element: <CustomerWorkspace /> }]
       },
       { 
         path: "customer/cart", 
-        element: <ProtectedRoute allowedRoles={["USER"]} />,
+        element: <ProtectedRoute allowedRoles={["USER", "ADMIN"]} />,
         children: [{ index: true, element: <CartPage /> }]
       },
       { 
         path: "customer/addresses", 
-        element: <ProtectedRoute allowedRoles={["USER"]} />,
+        element: <ProtectedRoute allowedRoles={["USER", "ADMIN"]} />,
         children: [{ index: true, element: <AddressesPage /> }]
       },
       { 
         path: "customer/orders", 
-        element: <ProtectedRoute allowedRoles={["USER"]} />,
+        element: <ProtectedRoute allowedRoles={["USER", "ADMIN"]} />,
         children: [{ index: true, element: <OrdersPage /> }]
       },
       { 
         path: "customer/outfits", 
-        element: <ProtectedRoute allowedRoles={["USER"]} />,
+        element: <ProtectedRoute allowedRoles={["USER", "ADMIN"]} />,
         children: [{ index: true, element: <OutfitsPage /> }]
       },
       { 
@@ -135,7 +165,7 @@ export const appRouter = createBrowserRouter([
         path: "admin",
         element: <ProtectedRoute allowedRoles={["ADMIN"]} />,
         children: [
-          { index: true, element: <PlaceholderPage title="Admin workspace" description="Admin QA tools are planned after vendor workflows." /> },
+          { index: true, element: <Navigate to="/admin" replace /> },
           { path: "settings", element: <AdminSettingsPage /> }
         ]
       },

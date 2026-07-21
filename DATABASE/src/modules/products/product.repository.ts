@@ -43,10 +43,14 @@ export class ProductRepository {
         slug,
         description: data.description,
         price: data.price,
+        compareAtPrice: data.compareAtPrice,
         stock: data.stock,
         sku: data.sku,
         gender: data.gender,
         featured: data.featured,
+        isTrending: data.isTrending,
+        isNewArrival: data.isNewArrival,
+        isBestSeller: data.isBestSeller,
         status: data.status,
         vendorId,
         categoryId: data.categoryId,
@@ -368,6 +372,44 @@ export class ProductRepository {
       and.push({ featured: filters.featured });
     }
 
+    if (filters.isTrending !== undefined) {
+      and.push({ isTrending: filters.isTrending });
+    }
+
+    if (filters.isNewArrival !== undefined) {
+      and.push({ isNewArrival: filters.isNewArrival });
+    }
+
+    if (filters.isBestSeller !== undefined) {
+      and.push({ isBestSeller: filters.isBestSeller });
+    }
+
+    if (filters.size) {
+      and.push({
+        variants: {
+          some: {
+            size: {
+              equals: filters.size,
+              mode: "insensitive",
+            },
+          },
+        },
+      });
+    }
+
+    if (filters.color) {
+      and.push({
+        variants: {
+          some: {
+            color: {
+              equals: filters.color,
+              mode: "insensitive",
+            },
+          },
+        },
+      });
+    }
+
     if (
       filters.priceMin !== undefined ||
       filters.priceMax !== undefined
@@ -395,6 +437,12 @@ export class ProductRepository {
               mode: "insensitive",
             },
           },
+          {
+            sku: {
+              contains: filters.search,
+              mode: "insensitive",
+            },
+          },
         ],
       });
     }
@@ -416,6 +464,8 @@ export class ProductRepository {
         return [{ price: "desc" }];
       case "popular":
         return [{ sales: "desc" }, { views: "desc" }];
+      case "rating":
+        return [{ averageRating: "desc" }, { reviewCount: "desc" }];
       case "newest":
       default:
         return [{ createdAt: "desc" }];

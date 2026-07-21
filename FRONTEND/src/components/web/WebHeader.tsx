@@ -88,16 +88,30 @@ export function WebHeader() {
                 gap: 1,
               }}
             >
-              <Typography
-                variant="h5"
-                sx={{
-                  fontWeight: 700,
-                  color: "primary.main",
-                  fontSize: { xs: "1.5rem", md: "1.75rem" },
-                }}
-              >
-                {settings?.siteName || "DressMe"}
-              </Typography>
+              {settings?.logoUrl ? (
+                <Box
+                  component="img"
+                  src={settings.logoUrl}
+                  alt={settings?.siteName || "DressMe"}
+                  sx={{
+                    height: { xs: 64, md: 96 },
+                    maxWidth: { xs: 200, md: 300 },
+                    objectFit: "contain",
+                    display: "block",
+                  }}
+                />
+              ) : (
+                <Typography
+                  variant="h5"
+                  sx={{
+                    fontWeight: 700,
+                    color: "primary.main",
+                    fontSize: { xs: "1.5rem", md: "1.75rem" },
+                  }}
+                >
+                  {settings?.siteName || "DressMe"}
+                </Typography>
+              )}
             </Link>
           </Box>
 

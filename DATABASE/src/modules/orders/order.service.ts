@@ -242,6 +242,12 @@ export class OrderService {
   }
 
   async updateOrderStatus(id: string, status: string) {
+    if (status === "CANCELLED") {
+      const order = await this.repository.findById(id);
+      if (order && order.status !== "CANCELLED") {
+        return this.cancelOrder(order.userId, id, Role.ADMIN);
+      }
+    }
     return this.repository.updateStatus(id, status);
   }
 

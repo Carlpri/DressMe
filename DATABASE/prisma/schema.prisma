@@ -35,6 +35,7 @@ enum ProductStatus {
   DRAFT
   ACTIVE
   ARCHIVED
+  HIDDEN
 }
 
 enum OrderStatus {
@@ -171,12 +172,16 @@ model Product {
   description String
 
   price Float
+  compareAtPrice Float?
 
   stock Int @default(0)
 
   sku String? @unique
 
   featured Boolean @default(false)
+  isTrending Boolean @default(false)
+  isNewArrival Boolean @default(false)
+  isBestSeller Boolean @default(false)
 
   status ProductStatus @default(DRAFT)
 
@@ -532,10 +537,10 @@ model OrderItem {
   @@index([productId])
 }
 
-model SiteSettings {
+model AppSettings {
   id                    String   @id @default(cuid())
 
-  siteName              String
+  siteName              String   @default("DressMe")
   tagline               String?
   logoUrl               String?
   logoDarkUrl           String?
@@ -544,7 +549,7 @@ model SiteSettings {
 
   supportEmail          String?
   supportPhone          String?
-  whatsapp              String?
+  whatsappNumber        String?
 
   facebook              String?
   instagram             String?
@@ -553,7 +558,19 @@ model SiteSettings {
   linkedin              String?
   youtube               String?
 
+  heroTitle             String?
+  heroSubtitle          String?
+  heroCtaText           String?
+  heroCtaLink           String?
+  featuredCategorySlug  String?
+  featuredBrandSlug     String?
+  featuredProductsLimit Int      @default(8)
+  trendingProductsLimit Int      @default(8)
+  newArrivalsLimit      Int      @default(8)
+  bestSellersLimit      Int      @default(8)
+
   physicalAddress       String?
+  businessHours         String?
 
   currency              String   @default("KES")
   defaultShippingFee    Float    @default(500)
@@ -564,8 +581,29 @@ model SiteSettings {
   refundPolicy          String?
   shippingPolicy        String?
 
+  siteTitle             String?
+  metaDescription       String?
+  metaKeywords          String?
+  ogImageUrl            String?
+  twitterCardType       String?  @default("summary_large_image")
+
   maintenanceMode       Boolean  @default(false)
+  country               String?  @default("Kenya")
+  language              String?  @default("en")
 
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
+}
+
+model MediaItem {
+  id        String   @id @default(cuid())
+  filename  String
+  url       String
+  altText   String?
+  folder    String?  @default("general")
+  mimeType  String?
+  size      Int?
+  createdBy String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

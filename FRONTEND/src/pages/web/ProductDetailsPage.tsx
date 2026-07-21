@@ -40,6 +40,12 @@ import { ROUTES } from "../../constants/routes";
 import { Link as RouterLink } from "react-router-dom";
 import { useFormatCurrency } from "../../utils/currency";
 
+import WhatsAppIcon from "@mui/icons-material/WhatsApp";
+import { WhatsAppService } from "../../services/whatsapp.service";
+import { useAppSettings } from "../../hooks/useAppSettings";
+import { useRecentlyViewed } from "../../hooks/useRecentlyViewed";
+import { useEffect } from "react";
+
 export function ProductDetailsPage() {
   const { slug } = useParams<{ slug: string }>();
   const [selectedImage, setSelectedImage] = useState(0);
@@ -50,6 +56,9 @@ export function ProductDetailsPage() {
   const [reviewComment, setReviewComment] = useState("");
 
   const { data: product, isLoading, error } = useProduct(slug || "");
+  const { settings } = useAppSettings();
+  const { recentProducts, addRecentlyViewed } = useRecentlyViewed();
+
   const { data: relatedProducts } = useProducts({
     category: product?.category.slug,
     limit: 4,
@@ -62,10 +71,17 @@ export function ProductDetailsPage() {
   const removeFromFavorites = useRemoveFromFavorites();
   const addReview = useAddReview();
 
-  const primaryImage = product?.images.find((img) => img.isPrimary) || product?.images[0];
+  useEffect(() => {
+    if (product) {
+      addRecentlyViewed(product);
+    }
+  }, [product, addRecentlyViewed]);
+
   const currentVariant = product?.variants.find((v) => v.id === selectedVariant);
   const displayPrice = currentVariant?.price || product?.price || 0;
-  const availableStock = currentVariant?.stock || product?.stock || 0;
+  const compareAtPrice = product?.compareAtPrice;
+  const availableStock = currentVariant?.stock ?? product?.stock ?? 0;
+  const savings = compareAtPrice && compareAtPrice > displayPrice ? compareAtPrice - displayPrice : 0;
 
   const handleAddToCart = () => {
     if (product) {
@@ -77,9 +93,22 @@ export function ProductDetailsPage() {
     }
   };
 
+  const handleWhatsAppInquiry = () => {
+    if (product) {
+      const whatsappNumber = settings?.whatsappNumber || "254700000000";
+      const url = WhatsAppService.generateProductInquiry(whatsappNumber, {
+        productName: product.name,
+        sku: product.sku,
+        productId: product.id,
+        selectedSize: currentVariant?.size,
+        selectedColor: currentVariant?.color,
+      });
+      window.open(url, "_blank", "noopener,noreferrer");
+    }
+  };
+
   const handleToggleFavorite = () => {
     if (product) {
-      // TODO: Check if already favorited and call appropriate mutation
       addToFavorites.mutate(product.id);
     }
   };
@@ -198,7 +227,7 @@ export function ProductDetailsPage() {
               </Box>
 
               {product.images.length > 1 && (
-                <Stack direction="row" spacing={1}>
+                <Stack direction="row" spacing={1} overflow="auto">
                   {product.images.map((image, index) => (
                     <Box
                       key={image.id}
@@ -206,6 +235,7 @@ export function ProductDetailsPage() {
                       sx={{
                         width: 80,
                         height: 80,
+                        flexShrink: 0,
                         borderRadius: 2,
                         overflow: "hidden",
                         cursor: "pointer",
@@ -234,9 +264,13 @@ export function ProductDetailsPage() {
           <Grid size={{ xs: 12, md: 6 }}>
             <Stack spacing={3}>
               <Box>
-                {product.featured && (
-                  <Chip label="Featured" color="primary" size="small" sx={{ mb: 2 }} />
-                )}
+                <Stack direction="row" spacing={1} flexWrap="wrap" sx={{ mb: 1 }}>
+                  {product.featured && <Chip label="Featured" color="primary" size="small" />}
+                  {product.isTrending && <Chip label="Trending" color="secondary" size="small" />}
+                  {product.isNewArrival && <Chip label="New Arrival" color="info" size="small" />}
+                  {product.isBestSeller && <Chip label="Best Seller" color="warning" size="small" />}
+                  {product.sku && <Chip label={`SKU: ${product.sku}`} variant="outlined" size="small" />}
+                </Stack>
                 <Typography variant="h3" sx={{ fontWeight: 700, mb: 1 }}>
                   {product.name}
                 </Typography>
@@ -254,12 +288,30 @@ export function ProductDetailsPage() {
                 </Stack>
               </Box>
 
+              {/* Pricing & Sale Badge */}
               <Stack direction="row" spacing={2} alignItems="baseline">
                 <Typography variant="h4" sx={{ fontWeight: 700, color: "primary.main" }}>
                   {formatCurrency(displayPrice)}
                 </Typography>
+                {compareAtPrice && compareAtPrice > displayPrice && (
+                  <>
+                    <Typography
+                      variant="h6"
+                      color="text.secondary"
+                      sx={{ textDecoration: "line-through" }}
+                    >
+                      {formatCurrency(compareAtPrice)}
+                    </Typography>
+                    <Chip
+                      label={`Save ${formatCurrency(savings)}`}
+                      color="error"
+                      size="small"
+                      sx={{ fontWeight: 600 }}
+                    />
+                  </>
+                )}
                 {product.averageRating > 0 && (
-                  <Stack direction="row" spacing={1} alignItems="center">
+                  <Stack direction="row" spacing={1} alignItems="center" sx={{ ml: "auto" }}>
                     <Rating value={product.averageRating} precision={0.5} readOnly size="small" />
                     <Typography variant="body2" color="text.secondary">
                       ({product.reviewCount})
@@ -300,7 +352,7 @@ export function ProductDetailsPage() {
                 </Box>
               )}
 
-              {/* Quantity */}
+              {/* Quantity & Stock Status */}
               <Box>
                 <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
                   Quantity
@@ -310,7 +362,7 @@ export function ProductDetailsPage() {
                     variant="outlined"
                     size="small"
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    disabled={quantity <= 1}
+                    disabled={quantity <= 1 || availableStock === 0}
                   >
                     -
                   </Button>
@@ -321,45 +373,77 @@ export function ProductDetailsPage() {
                     variant="outlined"
                     size="small"
                     onClick={() => setQuantity(Math.min(availableStock, quantity + 1))}
-                    disabled={quantity >= availableStock}
+                    disabled={quantity >= availableStock || availableStock === 0}
                   >
                     +
                   </Button>
                 </Stack>
-                <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                  {availableStock} in stock
-                </Typography>
+                {availableStock === 0 ? (
+                  <Typography variant="body2" color="error.main" sx={{ mt: 1, fontWeight: 600 }}>
+                    Out of Stock
+                  </Typography>
+                ) : availableStock <= 3 ? (
+                  <Typography variant="body2" color="warning.main" sx={{ mt: 1, fontWeight: 600 }}>
+                    🔥 Only {availableStock} left in stock!
+                  </Typography>
+                ) : (
+                  <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                    {availableStock} in stock
+                  </Typography>
+                )}
               </Box>
 
               {/* Actions */}
-              <Stack direction="row" spacing={2}>
+              <Stack spacing={2}>
+                <Stack direction="row" spacing={2}>
+                  <Button
+                    variant="contained"
+                    size="large"
+                    fullWidth
+                    startIcon={<ShoppingCartIcon />}
+                    onClick={handleAddToCart}
+                    disabled={availableStock === 0 || addToCart.isPending}
+                  >
+                    {availableStock === 0 ? "Out of Stock" : "Add to Cart"}
+                  </Button>
+                  <IconButton
+                    onClick={handleToggleFavorite}
+                    sx={{
+                      border: "1px solid",
+                      borderColor: "divider",
+                    }}
+                  >
+                    <FavoriteBorderIcon />
+                  </IconButton>
+                  <IconButton
+                    sx={{
+                      border: "1px solid",
+                      borderColor: "divider",
+                    }}
+                  >
+                    <ShareIcon />
+                  </IconButton>
+                </Stack>
+
+                {/* Direct WhatsApp Inquiry CTA */}
                 <Button
-                  variant="contained"
+                  variant="outlined"
                   size="large"
                   fullWidth
-                  startIcon={<ShoppingCartIcon />}
-                  onClick={handleAddToCart}
-                  disabled={availableStock === 0 || addToCart.isPending}
+                  color="success"
+                  startIcon={<WhatsAppIcon />}
+                  onClick={handleWhatsAppInquiry}
+                  sx={{
+                    borderColor: "#25D366",
+                    color: "#128C7E",
+                    "&:hover": {
+                      bgcolor: "#E8F9F1",
+                      borderColor: "#128C7E",
+                    },
+                  }}
                 >
-                  {availableStock === 0 ? "Out of Stock" : "Add to Cart"}
+                  Inquire on WhatsApp
                 </Button>
-                <IconButton
-                  onClick={handleToggleFavorite}
-                  sx={{
-                    border: "1px solid",
-                    borderColor: "divider",
-                  }}
-                >
-                  <FavoriteBorderIcon />
-                </IconButton>
-                <IconButton
-                  sx={{
-                    border: "1px solid",
-                    borderColor: "divider",
-                  }}
-                >
-                  <ShareIcon />
-                </IconButton>
               </Stack>
 
               {/* Vendor Info */}
@@ -481,6 +565,25 @@ export function ProductDetailsPage() {
                 .map((relatedProduct) => (
                   <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={relatedProduct.id}>
                     <ProductCard product={relatedProduct} />
+                  </Grid>
+                ))}
+            </Grid>
+          </Box>
+        )}
+
+        {/* Recently Viewed Products */}
+        {recentProducts.filter((p) => p.id !== product.id).length > 0 && (
+          <Box>
+            <Typography variant="h4" sx={{ fontWeight: 700, mb: 3 }}>
+              Recently Viewed
+            </Typography>
+            <Grid container spacing={3}>
+              {recentProducts
+                .filter((p) => p.id !== product.id)
+                .slice(0, 4)
+                .map((recentItem) => (
+                  <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={recentItem.id}>
+                    <ProductCard product={recentItem} />
                   </Grid>
                 ))}
             </Grid>

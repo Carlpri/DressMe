@@ -16,6 +16,10 @@ export class UserService {
     return user;
   }
 
+  async getAllUsers() {
+    return this.repository.findAll();
+  }
+
   async updateProfile(
     userId: string,
     data: updateProfileDto

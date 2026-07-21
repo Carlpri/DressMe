@@ -53,16 +53,32 @@ export function WebFooter() {
             spacing={4}
           >
             <Box sx={{ maxWidth: { xs: "100%", md: 300 } }}>
-              <Typography
-                variant="h4"
-                sx={{
-                  fontWeight: 700,
-                  mb: 2,
-                  color: "#00C896",
-                }}
-              >
-                {settings?.siteName || "DressMe"}
-              </Typography>
+              {settings?.logoDarkUrl || settings?.logoUrl ? (
+                <Box
+                  component="img"
+                  src={settings.logoDarkUrl || settings.logoUrl}
+                  alt={settings?.siteName || "DressMe"}
+                  sx={{
+                    height: 44,
+                    maxWidth: 160,
+                    objectFit: "contain",
+                    display: "block",
+                    mb: 2,
+                    filter: settings?.logoDarkUrl ? "none" : "brightness(0) invert(1)",
+                  }}
+                />
+              ) : (
+                <Typography
+                  variant="h4"
+                  sx={{
+                    fontWeight: 700,
+                    mb: 2,
+                    color: "#00C896",
+                  }}
+                >
+                  {settings?.siteName || "DressMe"}
+                </Typography>
+              )}
               <Typography
                 variant="body2"
                 sx={{ color: "rgba(255, 255, 255, 0.7)", lineHeight: 1.6 }}

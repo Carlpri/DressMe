@@ -22,6 +22,7 @@ export interface CreateProductDto {
   name: string;
   description: string;
   price: number;
+  compareAtPrice?: number;
   stock: number;
   sku: string;
   gender: Gender;
@@ -31,6 +32,9 @@ export interface CreateProductDto {
   images?: ProductImageDto[];
   variants?: ProductVariantDto[];
   featured?: boolean;
+  isTrending?: boolean;
+  isNewArrival?: boolean;
+  isBestSeller?: boolean;
   status?: ProductStatus;
 }
 
@@ -38,6 +42,7 @@ export interface UpdateProductDto {
   name?: string;
   description?: string;
   price?: number;
+  compareAtPrice?: number;
   stock?: number;
   sku?: string;
   gender?: Gender;
@@ -46,6 +51,9 @@ export interface UpdateProductDto {
   images?: ProductImageDto[];
   variants?: ProductVariantDto[];
   featured?: boolean;
+  isTrending?: boolean;
+  isNewArrival?: boolean;
+  isBestSeller?: boolean;
   status?: ProductStatus;
 }
 
@@ -57,8 +65,13 @@ export interface ProductFilters {
   gender?: Gender;
   status?: ProductStatus;
   featured?: boolean;
+  isTrending?: boolean;
+  isNewArrival?: boolean;
+  isBestSeller?: boolean;
   priceMin?: number;
   priceMax?: number;
+  size?: string;
+  color?: string;
   search?: string;
-  sort: "newest" | "oldest" | "price_asc" | "price_desc" | "popular";
+  sort: "newest" | "oldest" | "price_asc" | "price_desc" | "popular" | "rating";
 }

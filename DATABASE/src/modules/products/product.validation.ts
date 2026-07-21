@@ -45,8 +45,9 @@ const variantSchema = z.object({
 const createProductBodySchema = z
   .object({
     name: z.string().trim().min(2).max(150),
-    description: z.string().trim().min(30),
+    description: z.string().trim().min(5),
     price: priceSchema,
+    compareAtPrice: priceSchema.optional().nullable(),
     stock: z.number().int().min(0),
     sku: z.string().trim().min(2),
     gender: z.enum(Gender),
@@ -56,6 +57,9 @@ const createProductBodySchema = z
     images: z.array(imageSchema).optional(),
     variants: z.array(variantSchema).optional(),
     featured: z.boolean().optional(),
+    isTrending: z.boolean().optional(),
+    isNewArrival: z.boolean().optional(),
+    isBestSeller: z.boolean().optional(),
     status: z.enum(ProductStatus).optional(),
   })
   .refine((data) => imagesHaveExactlyOnePrimary(data.images), {
@@ -70,8 +74,9 @@ const createProductBodySchema = z
 const updateProductBodySchema = z
   .object({
     name: z.string().trim().min(2).max(150).optional(),
-    description: z.string().trim().min(30).optional(),
+    description: z.string().trim().min(5).optional(),
     price: priceSchema.optional(),
+    compareAtPrice: priceSchema.optional().nullable(),
     stock: z.number().int().min(0).optional(),
     sku: z.string().trim().min(2).optional(),
     gender: z.enum(Gender).optional(),
@@ -80,6 +85,9 @@ const updateProductBodySchema = z
     images: z.array(imageSchema).optional(),
     variants: z.array(variantSchema).optional(),
     featured: z.boolean().optional(),
+    isTrending: z.boolean().optional(),
+    isNewArrival: z.boolean().optional(),
+    isBestSeller: z.boolean().optional(),
     status: z.enum(ProductStatus).optional(),
   })
   .refine((data) => imagesHaveExactlyOnePrimary(data.images), {
@@ -109,12 +117,27 @@ export const productFilterSchema = z.object({
     status: z.enum(ProductStatus).optional(),
     featured: z
       .union([z.boolean(), z.enum(["true", "false"])])
+      .transform((val) => val === true || val === "true")
+      .optional(),
+    isTrending: z
+      .union([z.boolean(), z.enum(["true", "false"])])
+      .transform((val) => val === true || val === "true")
+      .optional(),
+    isNewArrival: z
+      .union([z.boolean(), z.enum(["true", "false"])])
+      .transform((val) => val === true || val === "true")
+      .optional(),
+    isBestSeller: z
+      .union([z.boolean(), z.enum(["true", "false"])])
+      .transform((val) => val === true || val === "true")
       .optional(),
     priceMin: z.coerce.number().min(0).finite().optional(),
     priceMax: z.coerce.number().min(0).finite().optional(),
+    size: z.string().trim().optional(),
+    color: z.string().trim().optional(),
     search: z.string().trim().min(1).optional(),
     sort: z
-      .enum(["newest", "oldest", "price_asc", "price_desc", "popular"])
+      .enum(["newest", "oldest", "price_asc", "price_desc", "popular", "rating"])
       .default("newest"),
   }),
 });

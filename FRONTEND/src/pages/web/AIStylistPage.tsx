@@ -222,9 +222,15 @@ export function AIStylistPage() {
 
               <Divider />
 
-              <Alert severity="info">
-                OpenAI-powered recommendations will replace this product search fallback in a future release.
-              </Alert>
+              <Box textAlign="center" py={2}>
+                <Chip
+                  icon={<AutoAwesomeIcon />}
+                  label="AI recommendations powered by DressMe"
+                  color="primary"
+                  variant="outlined"
+                  sx={{ fontWeight: 600, py: 2, px: 1, fontSize: "0.9rem" }}
+                />
+              </Box>
             </Stack>
           </Grid>
         </Grid>

@@ -59,10 +59,47 @@ const getStatusIcon = (status: string) => {
   }
 };
 
+import Stepper from "@mui/material/Stepper";
+import Step from "@mui/material/Step";
+import StepLabel from "@mui/material/StepLabel";
+import WhatsAppIcon from "@mui/icons-material/WhatsApp";
+import { useAppSettings } from "../../hooks/useAppSettings";
+import { WhatsAppService } from "../../services/whatsapp.service";
+
+const ORDER_STEPS = [
+  "Order Placed",
+  "Confirmed",
+  "Processing",
+  "Shipped",
+  "Delivered",
+];
+
+function getActiveStepIndex(status: string): number {
+  switch (status) {
+    case "PENDING":
+      return 0;
+    case "CONFIRMED":
+      return 1;
+    case "PROCESSING":
+    case "PACKED":
+      return 2;
+    case "SHIPPED":
+      return 3;
+    case "DELIVERED":
+      return 4;
+    case "CANCELLED":
+    case "RETURNED":
+      return -1;
+    default:
+      return 0;
+  }
+}
+
 export function OrderDetailsPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { data: order, isLoading, error } = useOrder(id || "");
+  const { settings } = useAppSettings();
   const formatCurrency = useFormatCurrency();
 
   if (isLoading) {
@@ -91,6 +128,29 @@ export function OrderDetailsPage() {
     );
   }
 
+  const activeStep = getActiveStepIndex(order.status);
+  const whatsappNumber = settings?.whatsappNumber || "254700000000";
+
+  const handleWhatsAppFollowUp = () => {
+    const url = WhatsAppService.generateOrderMessage(whatsappNumber, {
+      orderNumber: order.orderNumber,
+      customerName: order.address.fullName,
+      phone: order.address.phone,
+      city: order.address.city,
+      area: order.address.area,
+      county: order.address.county,
+      total: order.total,
+      currency: settings?.currency || "KES",
+      items: order.items.map((i) => ({
+        name: i.productName || "Product",
+        quantity: i.quantity,
+        price: i.price,
+        variantName: i.variantName || undefined,
+      })),
+    });
+    window.open(url, "_blank", "noopener,noreferrer");
+  };
+
   return (
     <Container maxWidth="xl" sx={{ py: 8 }}>
       <Stack spacing={6}>
@@ -116,24 +176,30 @@ export function OrderDetailsPage() {
           {/* Left Column - Order Info */}
           <Grid size={{ xs: 12, md: 8 }}>
             <Stack spacing={4}>
-              {/* Order Status */}
+              {/* Order Status & Progress Stepper */}
               <Card variant="outlined">
                 <CardContent>
-                  <Stack spacing={2}>
+                  <Stack spacing={3}>
                     <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                      Order Status
+                      Order Timeline Status
                     </Typography>
-                    <Stack direction="row" spacing={2} alignItems="center">
-                      <Typography variant="body2" color="text.secondary">
-                        Placed on {new Date(order.createdAt).toLocaleDateString()} at {new Date(order.createdAt).toLocaleTimeString()}
-                      </Typography>
-                    </Stack>
+
+                    {activeStep === -1 ? (
+                      <Alert severity="error">This order was cancelled.</Alert>
+                    ) : (
+                      <Stepper activeStep={activeStep} alternativeLabel>
+                        {ORDER_STEPS.map((label) => (
+                          <Step key={label}>
+                            <StepLabel>{label}</StepLabel>
+                          </Step>
+                        ))}
+                      </Stepper>
+                    )}
+
+                    <Divider />
+
                     <Typography variant="body2" color="text.secondary">
-                      {order.status === "PENDING" && "Your order is being processed."}
-                      {order.status === "PROCESSING" && "Your order is being prepared for shipment."}
-                      {order.status === "SHIPPED" && "Your order has been shipped and is on its way."}
-                      {order.status === "DELIVERED" && "Your order has been delivered."}
-                      {order.status === "CANCELLED" && "This order has been cancelled."}
+                      Placed on {new Date(order.createdAt).toLocaleDateString()} at {new Date(order.createdAt).toLocaleTimeString()}
                     </Typography>
                   </Stack>
                 </CardContent>
@@ -261,10 +327,24 @@ export function OrderDetailsPage() {
                       Need Help?
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
-                      If you have any questions about your order, please contact our support team.
+                      Need help or want to confirm payment for this order? Chat with our store team on WhatsApp.
                     </Typography>
-                    <Button variant="outlined" fullWidth>
-                      Contact Support
+                    <Button
+                      variant="contained"
+                      fullWidth
+                      color="success"
+                      startIcon={<WhatsAppIcon />}
+                      onClick={handleWhatsAppFollowUp}
+                      sx={{
+                        bgcolor: "#25D366",
+                        color: "#FFFFFF",
+                        fontWeight: 700,
+                        "&:hover": {
+                          bgcolor: "#128C7E",
+                        },
+                      }}
+                    >
+                      Chat on WhatsApp
                     </Button>
                   </Stack>
 

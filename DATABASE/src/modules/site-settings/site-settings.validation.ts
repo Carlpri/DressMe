@@ -2,127 +2,48 @@ import { z } from "zod";
 
 export const updateSiteSettingsSchema = z.object({
   body: z.object({
-    siteName: z
-      .string()
-      .trim()
-      .min(2, "Site name must be at least 2 characters")
-      .optional(),
-
-    tagline: z
-      .string()
-      .trim()
-      .max(200)
-      .optional(),
-
-    logoUrl: z
-      .string()
-      .url("Logo URL must be a valid URL")
-      .optional(),
-
-    logoDarkUrl: z
-      .string()
-      .url("Dark logo URL must be a valid URL")
-      .optional(),
-
-    faviconUrl: z
-      .string()
-      .url("Favicon URL must be a valid URL")
-      .optional(),
-
-    heroBannerUrl: z
-      .string()
-      .url("Hero banner URL must be a valid URL")
-      .optional(),
-
-    supportEmail: z
-      .string()
-      .email("Support email must be a valid email")
-      .optional(),
-
-    supportPhone: z
-      .string()
-      .trim()
-      .optional(),
-
-    whatsapp: z
-      .string()
-      .trim()
-      .optional(),
-
-    facebook: z
-      .string()
-      .url("Facebook URL must be a valid URL")
-      .optional(),
-
-    instagram: z
-      .string()
-      .url("Instagram URL must be a valid URL")
-      .optional(),
-
-    tiktok: z
-      .string()
-      .url("TikTok URL must be a valid URL")
-      .optional(),
-
-    x: z
-      .string()
-      .url("X (Twitter) URL must be a valid URL")
-      .optional(),
-
-    linkedin: z
-      .string()
-      .url("LinkedIn URL must be a valid URL")
-      .optional(),
-
-    youtube: z
-      .string()
-      .url("YouTube URL must be a valid URL")
-      .optional(),
-
-    physicalAddress: z
-      .string()
-      .trim()
-      .optional(),
-
-    currency: z
-      .string()
-      .trim()
-      .length(3, "Currency must be a 3-letter code")
-      .optional(),
-
-    defaultShippingFee: z
-      .number()
-      .min(0, "Default shipping fee must be non-negative")
-      .optional(),
-
-    aboutUs: z
-      .string()
-      .trim()
-      .optional(),
-
-    privacyPolicy: z
-      .string()
-      .trim()
-      .optional(),
-
-    termsOfService: z
-      .string()
-      .trim()
-      .optional(),
-
-    refundPolicy: z
-      .string()
-      .trim()
-      .optional(),
-
-    shippingPolicy: z
-      .string()
-      .trim()
-      .optional(),
-
-    maintenanceMode: z
-      .boolean()
-      .optional(),
+    siteName: z.string().optional().nullable(),
+    tagline: z.string().optional().nullable(),
+    logoUrl: z.string().optional().nullable(),
+    logoDarkUrl: z.string().optional().nullable(),
+    faviconUrl: z.string().optional().nullable(),
+    heroBannerUrl: z.string().optional().nullable(),
+    supportEmail: z.string().optional().nullable(),
+    supportPhone: z.string().optional().nullable(),
+    whatsappNumber: z.string().optional().nullable(),
+    facebook: z.string().optional().nullable(),
+    instagram: z.string().optional().nullable(),
+    tiktok: z.string().optional().nullable(),
+    x: z.string().optional().nullable(),
+    linkedin: z.string().optional().nullable(),
+    youtube: z.string().optional().nullable(),
+    heroTitle: z.string().optional().nullable(),
+    heroSubtitle: z.string().optional().nullable(),
+    heroCtaText: z.string().optional().nullable(),
+    heroCtaLink: z.string().optional().nullable(),
+    featuredCategorySlug: z.string().optional().nullable(),
+    featuredBrandSlug: z.string().optional().nullable(),
+    featuredProductsLimit: z.number().optional().nullable(),
+    trendingProductsLimit: z.number().optional().nullable(),
+    newArrivalsLimit: z.number().optional().nullable(),
+    bestSellersLimit: z.number().optional().nullable(),
+    physicalAddress: z.string().optional().nullable(),
+    businessHours: z.string().optional().nullable(),
+    currency: z.string().optional().nullable(),
+    defaultShippingFee: z.number().optional().nullable(),
+    aboutUs: z.string().optional().nullable(),
+    privacyPolicy: z.string().optional().nullable(),
+    termsOfService: z.string().optional().nullable(),
+    refundPolicy: z.string().optional().nullable(),
+    shippingPolicy: z.string().optional().nullable(),
+    siteTitle: z.string().optional().nullable(),
+    metaDescription: z.string().optional().nullable(),
+    metaKeywords: z.string().optional().nullable(),
+    ogImageUrl: z.string().optional().nullable(),
+    twitterCardType: z.string().optional().nullable(),
+    maintenanceMode: z.boolean().optional().nullable(),
+    country: z.string().optional().nullable(),
+    language: z.string().optional().nullable(),
   }),
 });
 

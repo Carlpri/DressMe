@@ -41,10 +41,13 @@ export function ProductCard({ product }: ProductCardProps) {
   const removeFromFavorites = useRemoveFromFavorites();
 
   const primaryImage = product.images.find((img) => img.isPrimary) || product.images[0];
-  const hasDiscount = false; // TODO: Implement discount logic when backend supports it
+  const isOutOfStock = product.stock === 0 || product.status === "HIDDEN";
+  const isLowStock = product.stock > 0 && product.stock <= 3 && product.status !== "HIDDEN";
+  const hasSalePrice = product.compareAtPrice != null && product.compareAtPrice > product.price;
+  const savings = hasSalePrice ? (product.compareAtPrice! - product.price) : 0;
 
   const handleAddToCart = () => {
-    if (product.stock > 0) {
+    if (!isOutOfStock) {
       addToCart.mutate(
         { productId: product.id, quantity: 1 },
         {
@@ -99,7 +102,7 @@ export function ProductCard({ product }: ProductCardProps) {
         >
           <Box
             component={RouterLink}
-            to={`${ROUTES.customerDashboard}/${product.slug}`}
+            to={`/products/${product.slug}`}
             sx={{
               position: "absolute",
               inset: 0,
@@ -146,21 +149,28 @@ export function ProductCard({ product }: ProductCardProps) {
             )}
           </Box>
 
-          {product.featured && (
-            <Chip
-              label="Featured"
-              size="small"
-              sx={{
-                position: "absolute",
-                top: 12,
-                left: 12,
-                bgcolor: "#00C896",
-                color: "white",
-                fontWeight: 600,
-                fontSize: "0.75rem",
-              }}
-            />
-          )}
+          <Stack
+            direction="column"
+            spacing={0.5}
+            sx={{
+              position: "absolute",
+              top: 12,
+              left: 12,
+              zIndex: 1,
+            }}
+          >
+            {isOutOfStock ? (
+              <Chip label="Out of Stock" size="small" color="error" sx={{ fontWeight: 600, fontSize: "0.7rem" }} />
+            ) : (
+              <>
+                {product.featured && <Chip label="Featured" size="small" color="primary" sx={{ fontWeight: 600, fontSize: "0.7rem" }} />}
+                {product.isTrending && <Chip label="Trending" size="small" color="secondary" sx={{ fontWeight: 600, fontSize: "0.7rem" }} />}
+                {product.isNewArrival && <Chip label="New" size="small" color="info" sx={{ fontWeight: 600, fontSize: "0.7rem" }} />}
+                {product.isBestSeller && <Chip label="Best Seller" size="small" color="warning" sx={{ fontWeight: 600, fontSize: "0.7rem" }} />}
+                {hasSalePrice && <Chip label={`Save ${formatCurrency(savings)}`} size="small" color="error" variant="outlined" sx={{ fontWeight: 700, fontSize: "0.7rem" }} />}
+              </>
+            )}
+          </Stack>
 
           <IconButton
             onClick={handleToggleFavorite}
@@ -197,7 +207,7 @@ export function ProductCard({ product }: ProductCardProps) {
             </Typography>
             <Box
               component={RouterLink}
-              to={`${ROUTES.customerDashboard}/${product.slug}`}
+              to={`/products/${product.slug}`}
               sx={{
                 textDecoration: "none",
                 "&:hover": { textDecoration: "none" },
@@ -220,26 +230,31 @@ export function ProductCard({ product }: ProductCardProps) {
               </Typography>
             </Box>
 
-            <Stack direction="row" alignItems="center" spacing={1}>
+            <Stack direction="row" alignItems="center" spacing={1} flexWrap="wrap">
               <Typography
                 variant="h6"
                 sx={{
                   fontWeight: 700,
-                  color: "primary.main",
+                  color: hasSalePrice ? "error.main" : "primary.main",
                 }}
               >
                 {formatCurrency(product.price)}
               </Typography>
-              {hasDiscount && (
+              {hasSalePrice && (
                 <Typography
                   variant="body2"
                   color="text.secondary"
                   sx={{ textDecoration: "line-through" }}
                 >
-                  {formatCurrency(product.price * 1.2)}
+                  {formatCurrency(product.compareAtPrice!)}
                 </Typography>
               )}
             </Stack>
+            {isLowStock && (
+              <Typography variant="caption" sx={{ color: "warning.main", fontWeight: 600 }}>
+                ⚡ Only {product.stock} left in stock!
+              </Typography>
+            )}
 
             {product.averageRating > 0 && (
               <Stack direction="row" alignItems="center" spacing={0.5}>
@@ -280,15 +295,16 @@ export function ProductCard({ product }: ProductCardProps) {
             variant="contained"
             size="small"
             startIcon={<ShoppingCartIcon />}
-            disabled={product.stock === 0 || addToCart.isPending}
+            disabled={isOutOfStock || addToCart.isPending}
             onClick={handleAddToCart}
             sx={{
               borderRadius: 2,
               fontWeight: 600,
               flex: 1,
+              ...(isOutOfStock && { bgcolor: "action.disabledBackground" }),
             }}
           >
-            {product.stock === 0 ? "Out of Stock" : "Add to Cart"}
+            {isOutOfStock ? "Out of Stock" : "Add to Cart"}
           </Button>
         </CardActions>
       </Card>

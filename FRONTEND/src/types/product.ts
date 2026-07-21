@@ -4,10 +4,14 @@ export interface Product {
   slug: string;
   description: string;
   price: number;
+  compareAtPrice?: number;
   stock: number;
   sku?: string;
   featured: boolean;
-  status: "DRAFT" | "ACTIVE" | "ARCHIVED";
+  isTrending?: boolean;
+  isNewArrival?: boolean;
+  isBestSeller?: boolean;
+  status: "DRAFT" | "ACTIVE" | "ARCHIVED" | "HIDDEN";
   views: number;
   sales: number;
   averageRating: number;
@@ -61,12 +65,17 @@ export interface ProductFilters {
   category?: string;
   brand?: string;
   gender?: "MALE" | "FEMALE" | "UNISEX";
-  status?: "DRAFT" | "ACTIVE" | "ARCHIVED";
+  status?: "DRAFT" | "ACTIVE" | "ARCHIVED" | "HIDDEN";
   featured?: boolean;
+  isTrending?: boolean;
+  isNewArrival?: boolean;
+  isBestSeller?: boolean;
   priceMin?: number;
   priceMax?: number;
+  size?: string;
+  color?: string;
   search?: string;
-  sort?: "newest" | "oldest" | "price_asc" | "price_desc" | "popular";
+  sort?: "newest" | "oldest" | "price_asc" | "price_desc" | "popular" | "rating";
 }
 
 export interface ProductListResponse {

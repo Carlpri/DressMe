@@ -21,6 +21,18 @@ export class UserController {
   }
 );
 
+  getAllUsers = asyncHandler(
+    async (_req, res) => {
+      const users = await userService.getAllUsers();
+      ApiResponse.success(
+        res,
+        200,
+        "Users retrieved successfully.",
+        users
+      );
+    }
+  );
+
   updateProfile = asyncHandler(
     async (req, res) => {
       const updatedUser = await userService.updateProfile(
