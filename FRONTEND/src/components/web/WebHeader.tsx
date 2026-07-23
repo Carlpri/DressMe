@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link as RouterLink, useLocation } from "react-router-dom";
 import {
   AppBar,
+  Badge,
   Box,
   Button,
   Container,
@@ -22,6 +23,7 @@ import PersonIcon from "@mui/icons-material/Person";
 import { ROUTES } from "../../constants/routes";
 import { useAuth } from "../../hooks/useAuth";
 import { useSiteSettingsContext } from "../../contexts/SiteSettingsContext";
+import { useFavorites } from "../../hooks/useFavorites";
 
 const NAVIGATION_ITEMS = [
   { label: "Products", path: ROUTES.customerDashboard },
@@ -37,6 +39,7 @@ export function WebHeader() {
   const location = useLocation();
   const { user, isAuthenticated } = useAuth();
   const { settings } = useSiteSettingsContext();
+  const { data: favorites } = useFavorites();
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -130,7 +133,9 @@ export function WebHeader() {
                   size="small"
                   sx={{ color: "text.primary" }}
                 >
-                  <FavoriteBorderIcon />
+                  <Badge badgeContent={favorites?.length || 0} color="error">
+                    <FavoriteBorderIcon />
+                  </Badge>
                 </IconButton>
                 <IconButton
                   component={RouterLink}

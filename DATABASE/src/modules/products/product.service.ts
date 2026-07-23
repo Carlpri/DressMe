@@ -27,6 +27,7 @@ export class ProductService {
     await this.ensureRelationsExist(data.categoryId, data.brandId);
     await this.ensureSkuAvailable(data.sku);
     await this.ensureVariantSkusAvailable(data.variants);
+    await this.ensureProductNotDuplicate(data.name, data.categoryId, data.brandId);
     this.ensureOnePrimaryImage(data.images);
     this.ensureUniqueVariantOptions(data.variants);
 
@@ -192,6 +193,25 @@ export class ProductService {
 
     if (product && product.id !== currentProductId) {
       throw new ApiError(409, "Product SKU already exists.");
+    }
+  }
+
+  private async ensureProductNotDuplicate(
+    name: string,
+    categoryId: string,
+    brandId: string
+  ) {
+    const existing = await this.repository.findByNameCategoryBrand(
+      name,
+      categoryId,
+      brandId
+    );
+
+    if (existing) {
+      throw new ApiError(
+        409,
+        "A product with the same name, category, and brand already exists."
+      );
     }
   }
 

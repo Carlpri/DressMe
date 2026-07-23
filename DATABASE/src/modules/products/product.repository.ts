@@ -139,6 +139,23 @@ export class ProductRepository {
     });
   }
 
+  async findByNameCategoryBrand(
+    name: string,
+    categoryId: string,
+    brandId: string
+  ) {
+    return prisma.product.findFirst({
+      where: {
+        name: {
+          equals: name,
+          mode: "insensitive",
+        },
+        categoryId,
+        brandId,
+      },
+    });
+  }
+
   async findVariantBySku(sku: string) {
     return prisma.productVariant.findUnique({
       where: { sku },

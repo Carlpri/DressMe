@@ -35,6 +35,8 @@ export function WebFooter() {
   const theme = useTheme();
   const { settings } = useSiteSettingsContext();
 
+  const logoSrc = settings?.logoDarkUrl ?? settings?.logoUrl ?? undefined;
+
   return (
     <Box
       component="footer"
@@ -53,10 +55,10 @@ export function WebFooter() {
             spacing={4}
           >
             <Box sx={{ maxWidth: { xs: "100%", md: 300 } }}>
-              {settings?.logoDarkUrl || settings?.logoUrl ? (
+              {logoSrc ? (
                 <Box
                   component="img"
-                  src={settings.logoDarkUrl || settings.logoUrl}
+                  src={logoSrc}
                   alt={settings?.siteName || "DressMe"}
                   sx={{
                     height: 44,

@@ -3,12 +3,19 @@ import { apiClient } from "../api/client";
 import type { Product } from "../types/product";
 
 export function useFavorites() {
+  const token = localStorage.getItem("dressme-studio.session");
   return useQuery({
     queryKey: ["favorites"],
     queryFn: async () => {
-      const response = await apiClient.get<{ data: Product[] }>("/favourites");
-      return response.data.data;
+      try {
+        const response = await apiClient.get<{ data: any[] }>("/favourites");
+        const items = response.data.data || [];
+        return items.map((fav: any) => (fav.product ? { ...fav.product, favoriteId: fav.id } : fav)) as Product[];
+      } catch (err) {
+        return [];
+      }
     },
+    enabled: Boolean(token),
   });
 }
 

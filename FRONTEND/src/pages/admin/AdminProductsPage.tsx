@@ -26,17 +26,17 @@ import {
   CircularProgress,
   Paper,
   Alert,
+  Snackbar,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CollectionsIcon from "@mui/icons-material/Collections";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
+import { apiClient } from "../../api/client";
 import { MediaPickerModal } from "../../components/admin/MediaPickerModal";
+import { ImageUploader } from "../../components/admin/ImageUploader";
 import { useFormatCurrency } from "../../utils/currency";
-
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
 
 export function AdminProductsPage() {
   const queryClient = useQueryClient();
@@ -46,6 +46,18 @@ export function AdminProductsPage() {
   const [editingProduct, setEditingProduct] = useState<any | null>(null);
   const [mediaPickerOpen, setMediaPickerOpen] = useState(false);
   const [mediaTarget, setMediaTarget] = useState<"primary" | "gallery">("primary");
+  const [uploadingCount, setUploadingCount] = useState(0);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [successSnackbar, setSuccessSnackbar] = useState<{
+    open: boolean;
+    message: string;
+  }>({ open: false, message: "" });
+
+  const isUploading = uploadingCount > 0;
+
+  const handleUploadingChange = (uploading: boolean) => {
+    setUploadingCount((count) => (uploading ? count + 1 : Math.max(0, count - 1)));
+  };
 
   // Form states
   const [name, setName] = useState("");
@@ -57,6 +69,7 @@ export function AdminProductsPage() {
   const [gender, setGender] = useState<"MALE" | "FEMALE" | "UNISEX">("UNISEX");
   const [categoryId, setCategoryId] = useState("");
   const [brandId, setBrandId] = useState("");
+  const [vendorId, setVendorId] = useState("");
   const [status, setStatus] = useState<"ACTIVE" | "DRAFT" | "ARCHIVED" | "HIDDEN">("ACTIVE");
   const [featured, setFeatured] = useState(false);
   const [isTrending, setIsTrending] = useState(false);
@@ -65,15 +78,10 @@ export function AdminProductsPage() {
   const [primaryImageUrl, setPrimaryImageUrl] = useState("");
   const [galleryUrls, setGalleryUrls] = useState<string[]>([]);
 
-  const getAuthHeader = () => {
-    const token = localStorage.getItem("dressme_token");
-    return token ? { Authorization: `Bearer ${token}` } : {};
-  };
-
   const { data: products = [], isLoading: productsLoading } = useQuery<any[]>({
     queryKey: ["admin-products-list"],
     queryFn: async () => {
-      const res = await axios.get(`${API_BASE_URL}/products?limit=100`, { headers: getAuthHeader() });
+      const res = await apiClient.get("/products?limit=100");
       return res.data.data.items;
     },
   });
@@ -81,7 +89,7 @@ export function AdminProductsPage() {
   const { data: categories = [] } = useQuery<any[]>({
     queryKey: ["categories-all"],
     queryFn: async () => {
-      const res = await axios.get(`${API_BASE_URL}/categories`);
+      const res = await apiClient.get("/categories");
       return res.data.data;
     },
   });
@@ -89,7 +97,15 @@ export function AdminProductsPage() {
   const { data: brands = [] } = useQuery<any[]>({
     queryKey: ["brands-all"],
     queryFn: async () => {
-      const res = await axios.get(`${API_BASE_URL}/brands`);
+      const res = await apiClient.get("/brands");
+      return res.data.data;
+    },
+  });
+
+  const { data: vendors = [] } = useQuery<any[]>({
+    queryKey: ["vendors-all"],
+    queryFn: async () => {
+      const res = await apiClient.get("/vendors");
       return res.data.data;
     },
   });
@@ -97,29 +113,46 @@ export function AdminProductsPage() {
   const saveProductMutation = useMutation({
     mutationFn: async (payload: any) => {
       if (editingProduct) {
-        const res = await axios.patch(`${API_BASE_URL}/products/${editingProduct.id}`, payload, {
-          headers: getAuthHeader(),
-        });
-        return res.data.data;
-      } else {
-        const res = await axios.post(`${API_BASE_URL}/products`, payload, {
-          headers: getAuthHeader(),
-        });
+        const res = await apiClient.patch(`/products/${editingProduct.id}`, payload);
         return res.data.data;
       }
+      const res = await apiClient.post("/products", payload);
+      return res.data.data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["admin-products-list"] });
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      setSaveError(null);
       handleCloseDialog();
+      
+      if (!editingProduct && data?.slug) {
+        setSuccessSnackbar({
+          open: true,
+          message: `Product "${data.slug}" created successfully`,
+        });
+      } else {
+        setSuccessSnackbar({
+          open: true,
+          message: "Product updated successfully",
+        });
+      }
+    },
+    onError: (error: unknown) => {
+      const message =
+        error && typeof error === "object" && "response" in error
+          ? (error as { response?: { data?: { message?: string } } }).response?.data?.message
+          : undefined;
+      setSaveError(message || "Failed to save product. Please check all fields and try again.");
     },
   });
 
   const deleteProductMutation = useMutation({
     mutationFn: async (id: string) => {
-      await axios.delete(`${API_BASE_URL}/products/${id}`, { headers: getAuthHeader() });
+      await apiClient.delete(`/products/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-products-list"] });
+      queryClient.invalidateQueries({ queryKey: ["products"] });
     },
   });
 
@@ -134,13 +167,15 @@ export function AdminProductsPage() {
     setGender("UNISEX");
     setCategoryId(categories[0]?.id || "");
     setBrandId(brands[0]?.id || "");
+    setVendorId(vendors[0]?.id || "");
     setStatus("ACTIVE");
     setFeatured(false);
     setIsTrending(false);
     setIsNewArrival(true);
     setIsBestSeller(false);
-    setPrimaryImageUrl("https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=600");
+    setPrimaryImageUrl("");
     setGalleryUrls([]);
+    setSaveError(null);
     setDialogOpen(true);
   };
 
@@ -164,6 +199,7 @@ export function AdminProductsPage() {
     const primary = prod.images?.find((img: any) => img.isPrimary) || prod.images?.[0];
     setPrimaryImageUrl(primary?.imageUrl || "");
     setGalleryUrls(prod.images?.filter((img: any) => !img.isPrimary).map((img: any) => img.imageUrl) || []);
+    setSaveError(null);
 
     setDialogOpen(true);
   };
@@ -171,6 +207,8 @@ export function AdminProductsPage() {
   const handleCloseDialog = () => {
     setDialogOpen(false);
     setEditingProduct(null);
+    setSaveError(null);
+    setUploadingCount(0);
   };
 
   const handleSelectMedia = (selectedUrl: string) => {
@@ -182,6 +220,13 @@ export function AdminProductsPage() {
   };
 
   const handleSave = () => {
+    if (!primaryImageUrl) {
+      setSaveError("Please upload a primary product image before saving.");
+      return;
+    }
+
+    setSaveError(null);
+
     const imagesPayload: any[] = [];
     if (primaryImageUrl) {
       imagesPayload.push({ imageUrl: primaryImageUrl, isPrimary: true, displayOrder: 0 });
@@ -200,6 +245,7 @@ export function AdminProductsPage() {
       gender,
       categoryId,
       brandId,
+      vendorId,
       status,
       featured,
       isTrending,
@@ -444,61 +490,95 @@ export function AdminProductsPage() {
               </FormControl>
             </Grid>
 
+            <Grid size={{ xs: 12, md: 4 }}>
+              <FormControl fullWidth>
+                <InputLabel>Vendor</InputLabel>
+                <Select value={vendorId} label="Vendor" onChange={(e) => setVendorId(e.target.value)}>
+                  {vendors.map((v) => (
+                    <MenuItem key={v.id} value={v.id}>{v.shopName}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+
             {/* Images & Gallery Section */}
             <Grid size={{ xs: 12 }}>
               <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>
                 Product Images & Gallery
               </Typography>
+
               <Stack direction="row" spacing={2} alignItems="center" mb={2}>
                 <Button
                   variant="outlined"
+                  size="small"
                   startIcon={<CollectionsIcon />}
                   onClick={() => {
                     setMediaTarget("primary");
                     setMediaPickerOpen(true);
                   }}
                 >
-                  Choose Primary Image
+                  Pick Primary from Media Library
                 </Button>
                 <Button
                   variant="outlined"
+                  size="small"
                   startIcon={<CollectionsIcon />}
                   onClick={() => {
                     setMediaTarget("gallery");
                     setMediaPickerOpen(true);
                   }}
                 >
-                  Add Gallery Image
+                  Pick Gallery from Media Library
                 </Button>
               </Stack>
 
-              <TextField
-                label="Primary Image URL"
-                value={primaryImageUrl}
-                onChange={(e) => setPrimaryImageUrl(e.target.value)}
-                fullWidth
-                size="small"
-                sx={{ mb: 2 }}
-              />
+              <Box mb={3}>
+                <ImageUploader
+                  label="Primary Product Image"
+                  value={primaryImageUrl}
+                  onChange={setPrimaryImageUrl}
+                  onUploadingChange={handleUploadingChange}
+                  folder="products"
+                  helperText="Upload directly to Cloudinary. The secure URL will be saved with the product."
+                />
+              </Box>
+
+              {galleryUrls.length > 0 && (
+                <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 1 }}>
+                  Gallery Images ({galleryUrls.length})
+                </Typography>
+              )}
 
               {galleryUrls.map((gUrl, idx) => (
-                <Stack key={idx} direction="row" spacing={1} alignItems="center" mb={1}>
-                  <TextField
+                <Box key={idx} mb={2}>
+                  <ImageUploader
                     label={`Gallery Image #${idx + 1}`}
                     value={gUrl}
-                    onChange={(e) => {
-                      const updated = [...galleryUrls];
-                      updated[idx] = e.target.value;
-                      setGalleryUrls(updated);
+                    onChange={(newUrl) => {
+                      if (!newUrl) {
+                        setGalleryUrls(galleryUrls.filter((_, i) => i !== idx));
+                      } else {
+                        const updated = [...galleryUrls];
+                        updated[idx] = newUrl;
+                        setGalleryUrls(updated);
+                      }
                     }}
-                    fullWidth
-                    size="small"
+                    onUploadingChange={handleUploadingChange}
+                    folder="products/gallery"
+                    previewHeight={140}
                   />
-                  <IconButton color="error" onClick={() => setGalleryUrls(galleryUrls.filter((_, i) => i !== idx))}>
-                    <DeleteIcon />
-                  </IconButton>
-                </Stack>
+                </Box>
               ))}
+
+              <Button
+                variant="outlined"
+                size="small"
+                startIcon={<AddIcon />}
+                onClick={() => setGalleryUrls([...galleryUrls, ""])}
+                sx={{ borderStyle: "dashed", width: "100%", py: 1 }}
+              >
+                Add Another Gallery Image
+              </Button>
             </Grid>
 
             {/* Promotion Flags & Status */}
@@ -537,15 +617,37 @@ export function AdminProductsPage() {
               </Box>
             </Grid>
           </Grid>
+
+          {saveError && (
+            <Alert severity="error" sx={{ mt: 2 }}>
+              {saveError}
+            </Alert>
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDialog}>Cancel</Button>
           <Button
             variant="contained"
             onClick={handleSave}
-            disabled={!name || !price || !categoryId || !brandId || saveProductMutation.isPending}
+            disabled={
+              !name ||
+              !description ||
+              !price ||
+              !categoryId ||
+              !brandId ||
+              !vendorId ||
+              !primaryImageUrl ||
+              saveProductMutation.isPending ||
+              isUploading
+            }
           >
-            {editingProduct ? "Save Changes" : "Create Product"}
+            {saveProductMutation.isPending ? (
+              <CircularProgress size={22} color="inherit" />
+            ) : editingProduct ? (
+              "Save Changes"
+            ) : (
+              "Create Product"
+            )}
           </Button>
         </DialogActions>
       </Dialog>
@@ -557,6 +659,22 @@ export function AdminProductsPage() {
         onSelect={handleSelectMedia}
         title={mediaTarget === "primary" ? "Select Primary Product Image" : "Select Gallery Image"}
       />
+
+      {/* Success Snackbar */}
+      <Snackbar
+        open={successSnackbar.open}
+        autoHideDuration={5000}
+        onClose={() => setSuccessSnackbar({ open: false, message: "" })}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+      >
+        <Alert
+          onClose={() => setSuccessSnackbar({ open: false, message: "" })}
+          severity="success"
+          sx={{ width: "100%" }}
+        >
+          {successSnackbar.message}
+        </Alert>
+      </Snackbar>
     </Stack>
   );
 }

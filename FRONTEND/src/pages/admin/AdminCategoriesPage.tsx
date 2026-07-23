@@ -25,6 +25,7 @@ import CollectionsIcon from "@mui/icons-material/Collections";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { MediaPickerModal } from "../../components/admin/MediaPickerModal";
+import { ImageUploader } from "../../components/admin/ImageUploader";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
 
@@ -202,20 +203,22 @@ export function AdminCategoriesPage() {
               required
             />
             <Box>
+              <ImageUploader
+                label="Category Image (Cloudinary Direct Upload)"
+                value={imageUrl}
+                onChange={setImageUrl}
+                folder="categories"
+                previewHeight={160}
+              />
               <Button
-                variant="outlined"
+                variant="text"
+                size="small"
                 startIcon={<CollectionsIcon />}
                 onClick={() => setMediaPickerOpen(true)}
-                sx={{ mb: 1 }}
+                sx={{ mt: 1 }}
               >
-                Choose Image from Media Library
+                Or choose from Media Library
               </Button>
-              <TextField
-                label="Category Image URL"
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
-                fullWidth
-              />
             </Box>
           </Stack>
         </DialogContent>

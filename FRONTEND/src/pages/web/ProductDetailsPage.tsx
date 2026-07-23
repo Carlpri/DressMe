@@ -25,6 +25,7 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
+  Snackbar,
 } from "@mui/material";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
@@ -32,7 +33,7 @@ import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import ShareIcon from "@mui/icons-material/Share";
 import { useProducts, useProduct } from "../../hooks/useProducts";
 import { useAddToCart } from "../../hooks/useCart";
-import { useAddToFavorites, useRemoveFromFavorites } from "../../hooks/useFavorites";
+import { useFavorites, useAddToFavorites, useRemoveFromFavorites } from "../../hooks/useFavorites";
 import { useReviews, useAddReview } from "../../hooks/useReviews";
 import { ProductCard } from "../../components/shared/ProductCard";
 import { LoadingSkeleton } from "../../components/shared/LoadingSkeleton";
@@ -58,6 +59,12 @@ export function ProductDetailsPage() {
   const { data: product, isLoading, error } = useProduct(slug || "");
   const { settings } = useAppSettings();
   const { recentProducts, addRecentlyViewed } = useRecentlyViewed();
+  const { data: favorites } = useFavorites();
+
+  const isFavorited = Boolean(product && favorites?.some((f) => f.id === product.id));
+  const [showCartSuccess, setShowCartSuccess] = useState(false);
+  const [showFavoriteSuccess, setShowFavoriteSuccess] = useState(false);
+  const [favoriteMessage, setFavoriteMessage] = useState("Added to wishlist!");
 
   const { data: relatedProducts } = useProducts({
     category: product?.category.slug,
@@ -85,11 +92,16 @@ export function ProductDetailsPage() {
 
   const handleAddToCart = () => {
     if (product) {
-      addToCart.mutate({
-        productId: product.id,
-        variantId: selectedVariant || undefined,
-        quantity,
-      });
+      addToCart.mutate(
+        {
+          productId: product.id,
+          variantId: selectedVariant || undefined,
+          quantity,
+        },
+        {
+          onSuccess: () => setShowCartSuccess(true),
+        }
+      );
     }
   };
 
@@ -108,8 +120,21 @@ export function ProductDetailsPage() {
   };
 
   const handleToggleFavorite = () => {
-    if (product) {
-      addToFavorites.mutate(product.id);
+    if (!product) return;
+    if (isFavorited) {
+      removeFromFavorites.mutate(product.id, {
+        onSuccess: () => {
+          setFavoriteMessage("Removed from wishlist!");
+          setShowFavoriteSuccess(true);
+        },
+      });
+    } else {
+      addToFavorites.mutate(product.id, {
+        onSuccess: () => {
+          setFavoriteMessage("Added to wishlist!");
+          setShowFavoriteSuccess(true);
+        },
+      });
     }
   };
 
@@ -408,12 +433,18 @@ export function ProductDetailsPage() {
                   </Button>
                   <IconButton
                     onClick={handleToggleFavorite}
+                    disabled={addToFavorites.isPending || removeFromFavorites.isPending}
                     sx={{
                       border: "1px solid",
-                      borderColor: "divider",
+                      borderColor: isFavorited ? "error.main" : "divider",
+                      color: isFavorited ? "error.main" : "action.active",
+                      "&:hover": {
+                        borderColor: isFavorited ? "error.dark" : "primary.main",
+                        bgcolor: isFavorited ? "#FFE5E5" : "action.hover",
+                      },
                     }}
                   >
-                    <FavoriteBorderIcon />
+                    {isFavorited ? <FavoriteIcon color="error" /> : <FavoriteBorderIcon />}
                   </IconButton>
                   <IconButton
                     sx={{
@@ -625,6 +656,28 @@ export function ProductDetailsPage() {
           </Button>
         </DialogActions>
       </Dialog>
+
+      <Snackbar
+        open={showCartSuccess}
+        autoHideDuration={3000}
+        onClose={() => setShowCartSuccess(false)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert severity="success" onClose={() => setShowCartSuccess(false)}>
+          Added to cart!
+        </Alert>
+      </Snackbar>
+
+      <Snackbar
+        open={showFavoriteSuccess}
+        autoHideDuration={3000}
+        onClose={() => setShowFavoriteSuccess(false)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert severity="success" onClose={() => setShowFavoriteSuccess(false)}>
+          {favoriteMessage}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 }

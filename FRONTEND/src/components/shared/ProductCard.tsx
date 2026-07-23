@@ -22,7 +22,7 @@ import StarIcon from "@mui/icons-material/Star";
 import { ROUTES } from "../../constants/routes";
 import type { Product } from "../../types/product";
 import { useAddToCart } from "../../hooks/useCart";
-import { useAddToFavorites, useRemoveFromFavorites } from "../../hooks/useFavorites";
+import { useFavorites, useAddToFavorites, useRemoveFromFavorites } from "../../hooks/useFavorites";
 import { useFormatCurrency } from "../../utils/currency";
 
 interface ProductCardProps {
@@ -31,9 +31,12 @@ interface ProductCardProps {
 
 export function ProductCard({ product }: ProductCardProps) {
   const theme = useTheme();
-  const [isFavorited, setIsFavorited] = useState(false);
+  const { data: favorites } = useFavorites();
+  const isFavorited = favorites ? favorites.some((f) => f.id === product.id) : false;
+
   const [showCartSuccess, setShowCartSuccess] = useState(false);
   const [showFavoriteSuccess, setShowFavoriteSuccess] = useState(false);
+  const [favoriteMessage, setFavoriteMessage] = useState("Added to wishlist!");
   const formatCurrency = useFormatCurrency();
 
   const addToCart = useAddToCart();
@@ -63,14 +66,14 @@ export function ProductCard({ product }: ProductCardProps) {
     if (isFavorited) {
       removeFromFavorites.mutate(product.id, {
         onSuccess: () => {
-          setIsFavorited(false);
+          setFavoriteMessage("Removed from wishlist!");
           setShowFavoriteSuccess(true);
         },
       });
     } else {
       addToFavorites.mutate(product.id, {
         onSuccess: () => {
-          setIsFavorited(true);
+          setFavoriteMessage("Added to wishlist!");
           setShowFavoriteSuccess(true);
         },
       });
@@ -327,7 +330,7 @@ export function ProductCard({ product }: ProductCardProps) {
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
       >
         <Alert severity="success" onClose={() => setShowFavoriteSuccess(false)}>
-          {isFavorited ? "Removed from wishlist!" : "Added to wishlist!"}
+          {favoriteMessage}
         </Alert>
       </Snackbar>
     </>
