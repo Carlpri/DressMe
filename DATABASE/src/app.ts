@@ -1,5 +1,5 @@
 import express from "express";
-import cors from "cors";
+import cors, { type CorsOptions } from "cors";
 import { errorHandler } from "./middleware/error.middleware.js";
 import authRoutes from "./modules/auth/auth.routes.js";
 import userRoutes from "./modules/users/user.routes.js";
@@ -18,11 +18,45 @@ import mediaRoutes from "./modules/media/media.routes.js";
 
 const app = express();
 
+const allowedFrontendOrigins = (process.env.FRONTEND_URL ?? "")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
+function matchesAllowedOrigin(origin: string) {
+  if (process.env.NODE_ENV !== "production") {
+    try {
+      const { hostname } = new URL(origin);
+      if (hostname === "localhost" || hostname === "127.0.0.1") return true;
+    } catch {
+      return false;
+    }
+  }
+
+  return allowedFrontendOrigins.some((allowedOrigin) => {
+    const expression = `^${allowedOrigin.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/\\\*/g, ".*")}$`;
+    return new RegExp(expression).test(origin);
+  });
+}
+
+const corsOptions: CorsOptions = {
+  origin(origin, callback) {
+    if (!origin || matchesAllowedOrigin(origin)) {
+      callback(null, true);
+      return;
+    }
+
+    callback(new Error("Origin is not allowed by CORS"));
+  },
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+
 // Global middleware
 
 
 app.use(express.json());
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/auth",authRoutes);
@@ -42,15 +76,23 @@ app.use("/api/settings", siteSettingsRoutes);
 app.use("/api/app-settings", siteSettingsRoutes);
 app.use("/api/media", mediaRoutes);
 
-app.use(errorHandler);
+app.get("/api/health", (_req, res) => {
+  res.status(200).json({
+    status: "ok",
+    service: "DressMe API",
+    environment: process.env.NODE_ENV ?? "development",
+    timestamp: new Date().toISOString(),
+  });
+});
 
-// Health check route
 app.get("/", (_req, res) => {
   res.status(200).json({
     success: true,
     message: "Welcome to DressMe API 🚀",
   });
 });
+
+app.use(errorHandler);
 
 export default app;
 
