@@ -23,11 +23,8 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CollectionsIcon from "@mui/icons-material/Collections";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
+import { apiClient } from "../../api/client";
 import { MediaPickerModal } from "../../components/admin/MediaPickerModal";
-import { env } from "../../config/env";
-
-const API_BASE_URL = env.apiUrl;
 
 export function AdminBrandsPage() {
   const queryClient = useQueryClient();
@@ -40,15 +37,10 @@ export function AdminBrandsPage() {
   const [description, setDescription] = useState("");
   const [mediaPickerOpen, setMediaPickerOpen] = useState(false);
 
-  const getAuthHeader = () => {
-    const token = localStorage.getItem("dressme_token");
-    return token ? { Authorization: `Bearer ${token}` } : {};
-  };
-
   const { data: brands = [], isLoading } = useQuery<any[]>({
     queryKey: ["admin-brands-list"],
     queryFn: async () => {
-      const res = await axios.get(`${API_BASE_URL}/brands`);
+      const res = await apiClient.get("/brands");
       return res.data.data;
     },
   });
@@ -56,14 +48,10 @@ export function AdminBrandsPage() {
   const saveBrandMutation = useMutation({
     mutationFn: async (payload: any) => {
       if (editingBrand) {
-        const res = await axios.patch(`${API_BASE_URL}/brands/${editingBrand.id}`, payload, {
-          headers: getAuthHeader(),
-        });
+        const res = await apiClient.patch(`/brands/${editingBrand.id}`, payload);
         return res.data.data;
       } else {
-        const res = await axios.post(`${API_BASE_URL}/brands`, payload, {
-          headers: getAuthHeader(),
-        });
+        const res = await apiClient.post("/brands", payload);
         return res.data.data;
       }
     },
@@ -75,7 +63,7 @@ export function AdminBrandsPage() {
 
   const deleteBrandMutation = useMutation({
     mutationFn: async (id: string) => {
-      await axios.delete(`${API_BASE_URL}/brands/${id}`, { headers: getAuthHeader() });
+      await apiClient.delete(`/brands/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-brands-list"] });

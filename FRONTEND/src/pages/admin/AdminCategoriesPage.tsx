@@ -23,12 +23,9 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CollectionsIcon from "@mui/icons-material/Collections";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
+import { apiClient } from "../../api/client";
 import { MediaPickerModal } from "../../components/admin/MediaPickerModal";
 import { ImageUploader } from "../../components/admin/ImageUploader";
-import { env } from "../../config/env";
-
-const API_BASE_URL = env.apiUrl;
 
 export function AdminCategoriesPage() {
   const queryClient = useQueryClient();
@@ -39,15 +36,10 @@ export function AdminCategoriesPage() {
   const [imageUrl, setImageUrl] = useState("");
   const [mediaPickerOpen, setMediaPickerOpen] = useState(false);
 
-  const getAuthHeader = () => {
-    const token = localStorage.getItem("dressme_token");
-    return token ? { Authorization: `Bearer ${token}` } : {};
-  };
-
   const { data: categories = [], isLoading } = useQuery<any[]>({
     queryKey: ["admin-categories-list"],
     queryFn: async () => {
-      const res = await axios.get(`${API_BASE_URL}/categories`);
+      const res = await apiClient.get("/categories");
       return res.data.data;
     },
   });
@@ -55,14 +47,10 @@ export function AdminCategoriesPage() {
   const saveCategoryMutation = useMutation({
     mutationFn: async (payload: { name: string; slug: string; image?: string }) => {
       if (editingCategory) {
-        const res = await axios.patch(`${API_BASE_URL}/categories/${editingCategory.id}`, payload, {
-          headers: getAuthHeader(),
-        });
+        const res = await apiClient.patch(`/categories/${editingCategory.id}`, payload);
         return res.data.data;
       } else {
-        const res = await axios.post(`${API_BASE_URL}/categories`, payload, {
-          headers: getAuthHeader(),
-        });
+        const res = await apiClient.post("/categories", payload);
         return res.data.data;
       }
     },
@@ -74,7 +62,7 @@ export function AdminCategoriesPage() {
 
   const deleteCategoryMutation = useMutation({
     mutationFn: async (id: string) => {
-      await axios.delete(`${API_BASE_URL}/categories/${id}`, { headers: getAuthHeader() });
+      await apiClient.delete(`/categories/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-categories-list"] });

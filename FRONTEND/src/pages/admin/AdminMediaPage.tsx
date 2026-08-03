@@ -27,10 +27,7 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import DeleteIcon from "@mui/icons-material/Delete";
 import LinkIcon from "@mui/icons-material/Link";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
-import { env } from "../../config/env";
-
-const API_BASE_URL = env.apiUrl;
+import { apiClient } from "../../api/client";
 
 export function AdminMediaPage() {
   const queryClient = useQueryClient();
@@ -41,16 +38,10 @@ export function AdminMediaPage() {
   const [altText, setAltText] = useState("");
   const [snackbarMessage, setSnackbarMessage] = useState("");
 
-  const getAuthHeader = () => {
-    const token = localStorage.getItem("dressme_token");
-    return token ? { Authorization: `Bearer ${token}` } : {};
-  };
-
   const { data: mediaItems = [], isLoading } = useQuery<any[]>({
     queryKey: ["admin-media", search],
     queryFn: async () => {
-      const res = await axios.get(`${API_BASE_URL}/media`, {
-        headers: getAuthHeader(),
+      const res = await apiClient.get("/media", {
         params: { search: search || undefined },
       });
       return res.data.data;
@@ -59,9 +50,7 @@ export function AdminMediaPage() {
 
   const createMediaMutation = useMutation({
     mutationFn: async (payload: { filename: string; url: string; altText?: string }) => {
-      const res = await axios.post(`${API_BASE_URL}/media`, payload, {
-        headers: getAuthHeader(),
-      });
+      const res = await apiClient.post("/media", payload);
       return res.data.data;
     },
     onSuccess: () => {
@@ -76,9 +65,7 @@ export function AdminMediaPage() {
 
   const deleteMediaMutation = useMutation({
     mutationFn: async (id: string) => {
-      await axios.delete(`${API_BASE_URL}/media/${id}`, {
-        headers: getAuthHeader(),
-      });
+      await apiClient.delete(`/media/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-media"] });

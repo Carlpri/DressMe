@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
+import { apiClient } from "../../api/client";
 import {
   Box,
   Grid,
@@ -28,23 +28,15 @@ import { Link as RouterLink } from "react-router-dom";
 import { useFormatCurrency } from "../../utils/currency";
 import { WhatsAppService } from "../../services/whatsapp.service";
 import { useAppSettings } from "../../hooks/useAppSettings";
-import { env } from "../../config/env";
-
-const API_BASE_URL = env.apiUrl;
 
 export function AdminDashboardPage() {
   const formatCurrency = useFormatCurrency();
   const { settings } = useAppSettings();
 
-  const getAuthHeader = () => {
-    const token = localStorage.getItem("dressme_token");
-    return token ? { Authorization: `Bearer ${token}` } : {};
-  };
-
   const { data: orders = [], isLoading: ordersLoading } = useQuery<any[]>({
     queryKey: ["admin-orders"],
     queryFn: async () => {
-      const res = await axios.get(`${API_BASE_URL}/orders`, { headers: getAuthHeader() });
+      const res = await apiClient.get("/orders");
       return res.data.data;
     },
   });
@@ -52,7 +44,7 @@ export function AdminDashboardPage() {
   const { data: products = [], isLoading: productsLoading } = useQuery<any[]>({
     queryKey: ["admin-products"],
     queryFn: async () => {
-      const res = await axios.get(`${API_BASE_URL}/products?limit=100`, { headers: getAuthHeader() });
+      const res = await apiClient.get("/products?limit=100");
       return res.data.data.items;
     },
   });
@@ -60,7 +52,7 @@ export function AdminDashboardPage() {
   const { data: users = [], isLoading: usersLoading } = useQuery<any[]>({
     queryKey: ["admin-users"],
     queryFn: async () => {
-      const res = await axios.get(`${API_BASE_URL}/users`, { headers: getAuthHeader() });
+      const res = await apiClient.get("/users");
       return res.data.data;
     },
   });

@@ -12,21 +12,13 @@ import {
   CircularProgress,
 } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
-import { env } from "../../config/env";
-
-const API_BASE_URL = env.apiUrl;
+import { apiClient } from "../../api/client";
 
 export function AdminCustomersPage() {
-  const getAuthHeader = () => {
-    const token = localStorage.getItem("dressme_token");
-    return token ? { Authorization: `Bearer ${token}` } : {};
-  };
-
   const { data: users = [], isLoading } = useQuery<any[]>({
     queryKey: ["admin-users-list"],
     queryFn: async () => {
-      const res = await axios.get(`${API_BASE_URL}/users`, { headers: getAuthHeader() });
+      const res = await apiClient.get("/users");
       return res.data.data;
     },
   });

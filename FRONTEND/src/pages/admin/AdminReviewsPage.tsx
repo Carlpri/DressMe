@@ -17,31 +17,23 @@ import {
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
-import { env } from "../../config/env";
-
-const API_BASE_URL = env.apiUrl;
+import { apiClient } from "../../api/client";
 
 export function AdminReviewsPage() {
   const queryClient = useQueryClient();
   const [snackbarMessage, setSnackbarMessage] = useState("");
 
-  const getAuthHeader = () => {
-    const token = localStorage.getItem("dressme_token");
-    return token ? { Authorization: `Bearer ${token}` } : {};
-  };
-
   const { data: products = [], isLoading } = useQuery<any[]>({
     queryKey: ["admin-products-with-reviews"],
     queryFn: async () => {
-      const res = await axios.get(`${API_BASE_URL}/products?limit=100`, { headers: getAuthHeader() });
+      const res = await apiClient.get("/products?limit=100");
       return res.data.data.items;
     },
   });
 
   const deleteReviewMutation = useMutation({
     mutationFn: async (reviewId: string) => {
-      await axios.delete(`${API_BASE_URL}/reviews/${reviewId}`, { headers: getAuthHeader() });
+      await apiClient.delete(`/reviews/${reviewId}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-products-with-reviews"] });

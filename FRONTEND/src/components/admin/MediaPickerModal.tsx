@@ -20,10 +20,7 @@ import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
 import LinkIcon from "@mui/icons-material/Link";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
-import { env } from "../../config/env";
-
-const API_BASE_URL = env.apiUrl;
+import { apiClient } from "../../api/client";
 
 export interface MediaItem {
   id: string;
@@ -56,16 +53,10 @@ export function MediaPickerModal({
   const [customUrl, setCustomUrl] = useState("");
   const [filename, setFilename] = useState("");
 
-  const getAuthHeader = () => {
-    const token = localStorage.getItem("dressme_token");
-    return token ? { Authorization: `Bearer ${token}` } : {};
-  };
-
   const { data: mediaItems = [], isLoading } = useQuery<MediaItem[]>({
     queryKey: ["admin-media-picker", search],
     queryFn: async () => {
-      const response = await axios.get(`${API_BASE_URL}/media`, {
-        headers: getAuthHeader(),
+      const response = await apiClient.get("/media", {
         params: { search: search || undefined },
       });
       return response.data.data;
@@ -75,9 +66,7 @@ export function MediaPickerModal({
 
   const createMediaMutation = useMutation({
     mutationFn: async (payload: { filename: string; url: string }) => {
-      const response = await axios.post(`${API_BASE_URL}/media`, payload, {
-        headers: getAuthHeader(),
-      });
+      const response = await apiClient.post("/media", payload);
       return response.data.data;
     },
     onSuccess: (data) => {

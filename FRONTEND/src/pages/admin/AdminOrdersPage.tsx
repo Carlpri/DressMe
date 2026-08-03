@@ -25,13 +25,10 @@ import {
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import axios from "axios";
+import { apiClient } from "../../api/client";
 import { useFormatCurrency } from "../../utils/currency";
 import { WhatsAppService } from "../../services/whatsapp.service";
 import { useAppSettings } from "../../hooks/useAppSettings";
-import { env } from "../../config/env";
-
-const API_BASE_URL = env.apiUrl;
 
 const ORDER_STATUSES = [
   "ALL",
@@ -52,25 +49,19 @@ export function AdminOrdersPage() {
   const [statusFilter, setStatusFilter] = useState("ALL");
   const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
 
-  const getAuthHeader = () => {
-    const token = localStorage.getItem("dressme_token");
-    return token ? { Authorization: `Bearer ${token}` } : {};
-  };
-
   const { data: orders = [], isLoading } = useQuery<any[]>({
     queryKey: ["admin-orders-page"],
     queryFn: async () => {
-      const res = await axios.get(`${API_BASE_URL}/orders`, { headers: getAuthHeader() });
+      const res = await apiClient.get("/orders");
       return res.data.data;
     },
   });
 
   const updateStatusMutation = useMutation({
     mutationFn: async ({ orderId, status }: { orderId: string; status: string }) => {
-      const res = await axios.patch(
-        `${API_BASE_URL}/orders/${orderId}/status`,
-        { status },
-        { headers: getAuthHeader() }
+      const res = await apiClient.patch(
+        `/orders/${orderId}/status`,
+        { status }
       );
       return res.data.data;
     },
