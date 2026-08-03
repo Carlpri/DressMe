@@ -29,8 +29,9 @@ import axios from "axios";
 import { useFormatCurrency } from "../../utils/currency";
 import { WhatsAppService } from "../../services/whatsapp.service";
 import { useAppSettings } from "../../hooks/useAppSettings";
+import { env } from "../../config/env";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
+const API_BASE_URL = env.apiUrl;
 
 const ORDER_STATUSES = [
   "ALL",

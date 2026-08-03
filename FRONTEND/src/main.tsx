@@ -6,6 +6,7 @@ import App from "./app/App";
 import { webTheme } from "./theme/portalTheme";
 import { AuthProvider } from "./contexts/AuthContext";
 import { SiteSettingsProvider } from "./contexts/SiteSettingsContext";
+import { Analytics } from "@vercel/analytics/react";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -28,6 +29,7 @@ createRoot(document.getElementById("root")!).render(
               rel="stylesheet"
             />
             <App />
+            <Analytics />
           </ThemeProvider>
         </AuthProvider>
       </SiteSettingsProvider>

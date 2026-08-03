@@ -23,8 +23,8 @@ export async function uploadToCloudinary(
   file: File,
   options?: CloudinaryUploadOptions
 ): Promise<CloudinaryUploadResult> {
-  const cloudName = env.cloudinaryCloudName || import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || "mrjdesh0";
-  const uploadPreset = env.cloudinaryUploadPreset || import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || "dressme-products";
+  const cloudName = env.cloudinaryCloudName;
+  const uploadPreset = env.cloudinaryUploadPreset;
 
   if (!cloudName || !uploadPreset) {
     throw new Error(

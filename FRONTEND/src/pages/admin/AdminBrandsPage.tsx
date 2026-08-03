@@ -25,8 +25,9 @@ import CollectionsIcon from "@mui/icons-material/Collections";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { MediaPickerModal } from "../../components/admin/MediaPickerModal";
+import { env } from "../../config/env";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
+const API_BASE_URL = env.apiUrl;
 
 export function AdminBrandsPage() {
   const queryClient = useQueryClient();
