@@ -1,9 +1,35 @@
 import { createContext, useCallback, useEffect, useMemo, useState, type PropsWithChildren } from "react";
-import { configureApiAuthentication } from "../api/client";
+import { useQueryClient } from "@tanstack/react-query";
+import { clearApiAuthentication, configureApiAuthentication } from "../api/client";
 import type { AuthSession, AuthUser } from "../types/auth";
 import { isTokenExpired } from "../utils/jwt";
 
 const SESSION_KEY = "dressme-studio.session";
+const LEGACY_TOKEN_KEY = "dressme_token";
+const AUTHENTICATED_QUERY_KEYS = new Set([
+  "addresses",
+  "admin-brands-list",
+  "admin-categories-list",
+  "admin-media",
+  "admin-media-picker",
+  "admin-orders",
+  "admin-orders-page",
+  "admin-products",
+  "admin-products-list",
+  "admin-products-with-reviews",
+  "admin-users",
+  "admin-users-list",
+  "ai-outfits",
+  "ai-recommendations",
+  "cart",
+  "favorites",
+  "module-health",
+  "my-outfits",
+  "order",
+  "orders",
+  "outfits",
+  "siteSettings",
+]);
 
 interface AuthContextValue {
   user: AuthUser | null;
@@ -28,11 +54,17 @@ function readStoredSession(): AuthSession | null {
 
 export function AuthProvider({ children }: PropsWithChildren) {
   const [session, setSession] = useState<AuthSession | null>(readStoredSession);
+  const queryClient = useQueryClient();
 
   const logout = useCallback(() => {
     localStorage.removeItem(SESSION_KEY);
+    localStorage.removeItem(LEGACY_TOKEN_KEY);
+    clearApiAuthentication();
+    queryClient.removeQueries({
+      predicate: (query) => AUTHENTICATED_QUERY_KEYS.has(String(query.queryKey[0])),
+    });
     setSession(null);
-  }, []);
+  }, [queryClient]);
 
   const login = useCallback((nextSession: AuthSession) => {
     localStorage.setItem(SESSION_KEY, JSON.stringify(nextSession));

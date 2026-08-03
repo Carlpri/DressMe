@@ -57,6 +57,11 @@ export function AdminLayout() {
     setMobileOpen(!mobileOpen);
   };
 
+  const handleLogout = () => {
+    logout();
+    navigate("/studio/login", { replace: true });
+  };
+
   const drawerContent = (
     <Box sx={{ display: "flex", flexDirection: "column", height: "100%", bgcolor: "#0F172A", color: "white" }}>
       <Box sx={{ p: 3, display: "flex", alignItems: "center", gap: 1.5 }}>
@@ -149,7 +154,7 @@ export function AdminLayout() {
           View Storefront
         </Button>
         <Button
-          onClick={logout}
+          onClick={handleLogout}
           fullWidth
           color="error"
           startIcon={<LogoutIcon />}

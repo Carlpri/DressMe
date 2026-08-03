@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link as RouterLink, useLocation } from "react-router-dom";
+import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
 import {
   AppBar,
   Badge,
@@ -20,6 +20,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import PersonIcon from "@mui/icons-material/Person";
+import LogoutIcon from "@mui/icons-material/Logout";
 import { ROUTES } from "../../constants/routes";
 import { useAuth } from "../../hooks/useAuth";
 import { useSiteSettingsContext } from "../../contexts/SiteSettingsContext";
@@ -37,12 +38,18 @@ export function WebHeader() {
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
-  const { user, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+  const { user, isAuthenticated, logout } = useAuth();
   const { settings } = useSiteSettingsContext();
   const { data: favorites } = useFavorites();
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate(ROUTES.webLogin, { replace: true });
   };
 
   const navigationContent = (
@@ -154,6 +161,14 @@ export function WebHeader() {
                 >
                   {user?.name?.split(" ")[0] || "Account"}
                 </Button>
+                <IconButton
+                  aria-label="Log out"
+                  onClick={handleLogout}
+                  size="small"
+                  sx={{ color: "text.primary" }}
+                >
+                  <LogoutIcon />
+                </IconButton>
               </>
             ) : (
               <>

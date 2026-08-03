@@ -17,6 +17,12 @@ export function configureApiAuthentication(getToken: () => string | null, onUnau
   unauthorizedHandler = onUnauthorized;
 }
 
+export function clearApiAuthentication() {
+  tokenProvider = () => null;
+  unauthorizedHandler = undefined;
+  delete apiClient.defaults.headers.common.Authorization;
+}
+
 apiClient.interceptors.request.use((config) => {
   const token = tokenProvider();
   if (token) {
