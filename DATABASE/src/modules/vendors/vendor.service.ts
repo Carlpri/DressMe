@@ -12,17 +12,20 @@ export class VendorService {
     userId: string,
     data: CreateVendorDto
   ) {
+    // Admin can create vendor for another user by specifying userId in data
+    const targetUserId = data.userId || userId;
+
     const existingVendor =
-      await this.repository.findByUserId(userId);
+      await this.repository.findByUserId(targetUserId);
 
     if (existingVendor) {
       throw new ApiError(
         409,
-        "You already have a vendor profile."
+        "Vendor profile already exists for this user."
       );
     }
 
-    return this.repository.create(userId, data);
+    return this.repository.create(targetUserId, data);
   }
 
   async getAll() {

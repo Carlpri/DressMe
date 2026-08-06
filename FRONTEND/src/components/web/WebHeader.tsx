@@ -211,14 +211,82 @@ export function WebHeader() {
         ModalProps={{ keepMounted: true }}
         sx={{
           display: { xs: "block", md: "none" },
-          "& .MuiDrawer-paper": { boxSizing: "border-box", width: 280, pt: 2 },
+          "& .MuiDrawer-paper": {
+            boxSizing: "border-box",
+            width: 280,
+            pt: 2,
+            background: "rgba(255, 255, 255, 0.7)",
+            backdropFilter: "blur(20px)",
+            WebkitBackdropFilter: "blur(20px)",
+            borderLeft: "1px solid rgba(255, 255, 255, 0.3)",
+          },
         }}
       >
-        <Box onClick={handleDrawerToggle} sx={{ p: 3 }}>
+        <Box onClick={handleDrawerToggle} sx={{ p: 3, display: "flex", flexDirection: "column", height: "100%" }}>
           <Typography variant="h6" sx={{ mb: 3, fontWeight: 700 }}>
             Menu
           </Typography>
           {navigationContent}
+          <Box sx={{ mt: "auto", pt: 3, borderTop: "1px solid", borderColor: "divider" }}>
+            {isAuthenticated ? (
+              <Stack spacing={2}>
+                <Button
+                  component={RouterLink}
+                  to={ROUTES.wishlist}
+                  startIcon={<FavoriteBorderIcon />}
+                  fullWidth
+                  sx={{ justifyContent: "flex-start" }}
+                >
+                  Wishlist ({favorites?.length || 0})
+                </Button>
+                <Button
+                  component={RouterLink}
+                  to={ROUTES.customerCart}
+                  startIcon={<ShoppingCartIcon />}
+                  fullWidth
+                  sx={{ justifyContent: "flex-start" }}
+                >
+                  Cart
+                </Button>
+                <Button
+                  component={RouterLink}
+                  to={ROUTES.profile}
+                  startIcon={<PersonIcon />}
+                  fullWidth
+                  sx={{ justifyContent: "flex-start" }}
+                >
+                  {user?.name?.split(" ")[0] || "Account"}
+                </Button>
+                <Button
+                  onClick={handleLogout}
+                  startIcon={<LogoutIcon />}
+                  fullWidth
+                  sx={{ justifyContent: "flex-start" }}
+                >
+                  Logout
+                </Button>
+              </Stack>
+            ) : (
+              <Stack spacing={2}>
+                <Button
+                  component={RouterLink}
+                  to={ROUTES.webLogin}
+                  variant="outlined"
+                  fullWidth
+                >
+                  Sign In
+                </Button>
+                <Button
+                  component={RouterLink}
+                  to={ROUTES.webRegister}
+                  variant="contained"
+                  fullWidth
+                >
+                  Sign Up
+                </Button>
+              </Stack>
+            )}
+          </Box>
         </Box>
       </Drawer>
     </AppBar>

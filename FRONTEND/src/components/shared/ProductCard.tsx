@@ -122,8 +122,9 @@ export function ProductCard({ product }: ProductCardProps) {
                 sx={{
                   width: "100%",
                   height: "100%",
-                  objectFit: "cover",
+                  objectFit: "contain",
                   transition: "transform 0.3s",
+                  p: 1,
                 }}
               />
             ) : (

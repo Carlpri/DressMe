@@ -1,4 +1,5 @@
 export interface CreateVendorDto {
+  userId?: string; // Admin can specify userId to create vendor for another user
   shopName: string;
   phone: string;
   address: string;
