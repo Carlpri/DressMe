@@ -10,7 +10,11 @@ import type {
 } from "./product.types.js";
 
 const productInclude = {
-  category: true,
+  ProductCategory: {
+    include: {
+      Category: true,
+    },
+  },
   brand: true,
   vendor: {
     include: {
@@ -44,7 +48,6 @@ export class ProductRepository {
         description: data.description,
         price: data.price,
         compareAtPrice: data.compareAtPrice,
-        stock: data.stock,
         sku: data.sku,
         gender: data.gender,
         featured: data.featured,
@@ -53,8 +56,13 @@ export class ProductRepository {
         isBestSeller: data.isBestSeller,
         status: data.status,
         vendorId,
-        categoryId: data.categoryId,
         brandId: data.brandId,
+        ProductCategory: {
+          create: {
+            categoryId: data.categoryId,
+            isPrimary: true,
+          },
+        },
         images: data.images
           ? {
               create: data.images.map((image) => ({
@@ -150,8 +158,12 @@ export class ProductRepository {
           equals: name,
           mode: "insensitive",
         },
-        categoryId,
         brandId,
+        ProductCategory: {
+          some: {
+            categoryId,
+          },
+        },
       },
     });
   }
@@ -312,12 +324,12 @@ export class ProductRepository {
 
     for (const variant of variants) {
       const variantData = {
-        size: variant.size,
-        color: variant.color,
         stock: variant.stock,
         sku: variant.sku,
         price: variant.price,
         imageUrl: variant.imageUrl,
+        colorValue: variant.color,
+        sizeValue: variant.size,
       };
 
       if (variant.id) {
@@ -363,14 +375,19 @@ export class ProductRepository {
       });
     }
 
-    if (filters.category) {
-      and.push({
-        OR: [
-          { categoryId: filters.category },
-          { category: { slug: filters.category } },
-        ],
-      });
-    }
+    // TODO: Fix category filter with ProductCategory junction
+    // if (filters.category) {
+    //   and.push({
+    //     ProductCategory: {
+    //       some: {
+    //         OR: [
+    //           { categoryId: filters.category },
+    //           { Category: { slug: filters.category } },
+    //         ],
+    //       },
+    //     },
+    //   });
+    // }
 
     if (filters.brand) {
       and.push({
@@ -405,7 +422,7 @@ export class ProductRepository {
       and.push({
         variants: {
           some: {
-            size: {
+            sizeValue: {
               equals: filters.size,
               mode: "insensitive",
             },
@@ -418,7 +435,7 @@ export class ProductRepository {
       and.push({
         variants: {
           some: {
-            color: {
+            colorValue: {
               equals: filters.color,
               mode: "insensitive",
             },

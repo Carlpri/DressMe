@@ -24,7 +24,7 @@ const orderInclude = {
       email: true,
     },
   },
-} as const;
+};
 
 export class OrderRepository {
   async create(data: {
@@ -214,15 +214,6 @@ export class OrderRepository {
         stock: {
           decrement: quantity,
         },
-      },
-    });
-  }
-
-  async updateProductStock(productId: string, newStock: number) {
-    return prisma.product.update({
-      where: { id: productId },
-      data: {
-        stock: newStock,
       },
     });
   }

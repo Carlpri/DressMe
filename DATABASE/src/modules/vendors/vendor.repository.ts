@@ -5,13 +5,15 @@ import type {
 } from "./vendor.types.js";
 
 export class VendorRepository {
-  async create(userId: string, 
+  async create(userId: string,
                 data: CreateVendorDto
             ) {
     return prisma.vendor.create({
       data: {
         ...data,
         userId,
+        businessName: data.shopName || "Vendor",
+        whatsappNumber: data.phone || "",
       },
     });
   }

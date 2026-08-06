@@ -5,7 +5,11 @@ const favouriteInclude = {
   product: {
     include: {
       brand: true,
-      category: true,
+      ProductCategory: {
+        include: {
+          Category: true,
+        },
+      },
       vendor: true,
       images: {
         orderBy: {
@@ -52,6 +56,7 @@ export class FavouriteRepository {
       data: {
         userId,
         productId,
+        updatedAt: new Date(),
       },
       include: favouriteInclude,
     });

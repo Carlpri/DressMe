@@ -30,7 +30,6 @@ export class CartService {
 
     const stock = await this.getAvailableStock(
       product.id,
-      product.stock,
       data.variantId
     );
 
@@ -75,7 +74,6 @@ export class CartService {
 
     const stock = await this.getAvailableStock(
       item.productId,
-      item.product.stock,
       item.variantId ?? undefined
     );
 
@@ -114,11 +112,10 @@ export class CartService {
 
   private async getAvailableStock(
     productId: string,
-    productStock: number,
     variantId?: string
   ) {
     if (!variantId) {
-      return productStock;
+      throw new ApiError(400, "Variant selection is required.");
     }
 
     const variant = await this.repository.findVariantById(variantId);

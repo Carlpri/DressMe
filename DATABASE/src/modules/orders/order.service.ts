@@ -68,7 +68,7 @@ export class OrderService {
         variantId: cartItem.variantId ?? undefined,
         productName: product.name,
         productImage: primaryImage,
-        variantName: cartItem.variant ? `${cartItem.variant.size} / ${cartItem.variant.color}` : undefined,
+        variantName: cartItem.variant ? `${cartItem.variant.sizeValue} / ${cartItem.variant.colorValue}` : undefined,
         price: product.price,
         quantity: cartItem.quantity,
         subtotal: itemSubtotal,
@@ -124,12 +124,6 @@ export class OrderService {
           0
         );
 
-        await this.repository.updateProductStock(product.id, newStock);
-      } else if (product) {
-        await this.repository.updateProductStock(
-          product.id,
-          product.stock - item.quantity
-        );
       }
     }
 
@@ -183,33 +177,6 @@ export class OrderService {
             },
           });
         }
-
-        const product = await tx.product.findUnique({
-          where: { id: item.productId },
-          include: { variants: true },
-        });
-
-        if (product) {
-          if (product.variants.length > 0) {
-            const newStock = product.variants.reduce(
-              (sum, v) => sum + v.stock,
-              0
-            );
-            await tx.product.update({
-              where: { id: product.id },
-              data: { stock: newStock },
-            });
-          } else {
-            await tx.product.update({
-              where: { id: product.id },
-              data: {
-                stock: {
-                  increment: item.quantity,
-                },
-              },
-            });
-          }
-        }
       }
 
       return tx.order.update({
@@ -260,11 +227,11 @@ export class OrderService {
   }
 
   private getAvailableStock(
-    product: { stock: number; variants: Array<{ id: string; stock: number }> },
+    product: { variants: Array<{ id: string; stock: number }> },
     variantId?: string
   ): number {
     if (!variantId) {
-      return product.stock;
+      throw new ApiError(400, "Variant selection is required.");
     }
 
     const variant = product.variants.find((v) => v.id === variantId);

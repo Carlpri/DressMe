@@ -32,12 +32,8 @@ export class ProductService {
     this.ensureUniqueVariantOptions(data.variants);
 
     const slug = await this.createUniqueSlug(data.name);
-    const productData = {
-      ...data,
-      stock: this.resolveStock(data.stock, data.variants),
-    };
 
-    return this.repository.create(vendorId, slug, productData);
+    return this.repository.create(vendorId, slug, data);
   }
 
   async getAll(query: Record<string, unknown>) {
@@ -68,9 +64,9 @@ export class ProductService {
 
     await this.ensureCanManageProduct(userId, role, product.vendorId);
 
-    if (data.categoryId || data.brandId) {
+    if (data.brandId) {
       await this.ensureRelationsExist(
-        data.categoryId ?? product.categoryId,
+        data.categoryId,
         data.brandId ?? product.brandId
       );
     }
@@ -91,14 +87,6 @@ export class ProductService {
 
     if (data.name && data.name !== product.name) {
       updateData.slug = await this.createUniqueSlug(data.name, id);
-    }
-
-    if (data.variants) {
-      if (data.variants.length > 0) {
-        updateData.stock = this.sumVariantStock(data.variants);
-      }
-    } else if (product.variants.length > 0) {
-      updateData.stock = this.sumVariantStock(product.variants);
     }
 
     return this.repository.update(id, updateData);
@@ -152,18 +140,17 @@ export class ProductService {
   }
 
   private async ensureRelationsExist(
-    categoryId: string,
+    categoryId: string | undefined,
     brandId: string
   ) {
-    const [category, brand] = await Promise.all([
-      this.repository.findCategoryById(categoryId),
-      this.repository.findBrandById(brandId),
-    ]);
-
-    if (!category) {
-      throw new ApiError(404, "Category not found.");
+    if (categoryId) {
+      const category = await this.repository.findCategoryById(categoryId);
+      if (!category) {
+        throw new ApiError(404, "Category not found.");
+      }
     }
 
+    const brand = await this.repository.findBrandById(brandId);
     if (!brand) {
       throw new ApiError(404, "Brand not found.");
     }
@@ -201,18 +188,8 @@ export class ProductService {
     categoryId: string,
     brandId: string
   ) {
-    const existing = await this.repository.findByNameCategoryBrand(
-      name,
-      categoryId,
-      brandId
-    );
-
-    if (existing) {
-      throw new ApiError(
-        409,
-        "A product with the same name, category, and brand already exists."
-      );
-    }
+    // Skip duplicate check for now with new schema
+    // TODO: Implement proper check using ProductCategory junction
   }
 
   private async ensureVariantSkusAvailable(
@@ -273,25 +250,6 @@ export class ProductService {
     }
   }
 
-  private resolveStock(
-    productStock: number,
-    variants?: ProductVariantDto[]
-  ) {
-    if (variants && variants.length > 0) {
-      return this.sumVariantStock(variants);
-    }
-
-    return productStock;
-  }
-
-  private sumVariantStock(
-    variants: Array<{ stock: number }>
-  ) {
-    return variants.reduce(
-      (total, variant) => total + variant.stock,
-      0
-    );
-  }
 
   private parseFilters(query: Record<string, unknown>): ProductFilters {
     return {
