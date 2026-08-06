@@ -53,8 +53,8 @@ function groupItemsByVendor(items: CartItem[]): VendorCheckoutGroup[] {
     } else {
       groups.set(vendor.id, {
         vendorId: vendor.id,
-        shopName: vendor.shopName,
-        phone: vendor.phone,
+        shopName: vendor.businessName,
+        phone: vendor.whatsappNumber,
         items: [item],
         subtotal: lineTotal,
       });
@@ -105,7 +105,7 @@ export function CheckoutPage() {
       shopName: group.shopName,
       customerName: user.name,
       items: group.items,
-      address: selectedAddress,
+      address: selectedAddress as any,
       currency: settings?.currency ?? "KES",
       notes: orderNotes.trim() || undefined,
     });
@@ -232,7 +232,7 @@ export function CheckoutPage() {
 
                       <Stack spacing={2}>
                         {group.items.map((item) => {
-                          const primaryImage = item.product.images.find((img) => img.isPrimary) || item.product.images[0];
+                          const primaryImage = (item.product.images ?? []).find((img) => img.isPrimary) || item.product.images?.[0];
                           const price = item.variant?.price || item.product.price;
                           return (
                             <Stack key={item.id} direction="row" spacing={3} alignItems="center">
@@ -259,7 +259,7 @@ export function CheckoutPage() {
                                 <Typography sx={{ fontWeight: 500 }}>{item.product.name}</Typography>
                                 {item.variant && (
                                   <Typography variant="body2" color="text.secondary">
-                                    {item.variant.size} · {item.variant.color}
+                                    {item.variant.sizeValue} · {item.variant.colorValue}
                                   </Typography>
                                 )}
                                 <Typography variant="body2" color="text.secondary">

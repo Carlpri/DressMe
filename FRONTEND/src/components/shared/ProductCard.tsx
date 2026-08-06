@@ -43,11 +43,13 @@ export function ProductCard({ product }: ProductCardProps) {
   const addToFavorites = useAddToFavorites();
   const removeFromFavorites = useRemoveFromFavorites();
 
-  const primaryImage = product.images.find((img) => img.isPrimary) || product.images[0];
-  const isOutOfStock = product.stock === 0 || product.status === "HIDDEN";
-  const isLowStock = product.stock > 0 && product.stock <= 3 && product.status !== "HIDDEN";
+  const primaryImage = (product.images ?? []).find((img) => img.isPrimary) || product.images?.[0];
+  const totalStock = (product.variants ?? []).reduce((sum, v) => sum + (v.stock ?? 0), 0);
+  const isOutOfStock = totalStock === 0 || product.status === "HIDDEN";
+  const isLowStock = totalStock > 0 && totalStock <= 3 && product.status !== "HIDDEN";
   const hasSalePrice = product.compareAtPrice != null && product.compareAtPrice > product.price;
   const savings = hasSalePrice ? (product.compareAtPrice! - product.price) : 0;
+  const category = product.ProductCategory?.[0]?.Category;
 
   const handleAddToCart = () => {
     if (!isOutOfStock) {
@@ -256,7 +258,7 @@ export function ProductCard({ product }: ProductCardProps) {
             </Stack>
             {isLowStock && (
               <Typography variant="caption" sx={{ color: "warning.main", fontWeight: 600 }}>
-                ⚡ Only {product.stock} left in stock!
+                ⚡ Only {totalStock} left in stock!
               </Typography>
             )}
 
@@ -270,10 +272,10 @@ export function ProductCard({ product }: ProductCardProps) {
             )}
 
             <Stack direction="row" spacing={1} flexWrap="wrap">
-              {product.variants.slice(0, 3).map((variant) => (
+              {(product.variants ?? []).slice(0, 3).map((variant) => (
                 <Chip
                   key={variant.id}
-                  label={variant.size}
+                  label={variant.sizeValue}
                   size="small"
                   sx={{
                     height: 24,
@@ -283,7 +285,7 @@ export function ProductCard({ product }: ProductCardProps) {
                   }}
                 />
               ))}
-              {product.variants.length > 3 && (
+              {(product.variants?.length ?? 0) > 3 && (
                 <Chip
                   label={`+${product.variants.length - 3}`}
                   size="small"

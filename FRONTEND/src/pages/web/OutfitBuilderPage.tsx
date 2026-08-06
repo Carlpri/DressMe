@@ -213,7 +213,7 @@ export function OutfitBuilderPage() {
                       {selectedProducts.map((productId) => {
                         const product = allProducts?.items.find((p) => p.id === productId);
                         if (!product) return null;
-                        const primaryImage = product.images.find((img) => img.isPrimary) || product.images[0];
+                        const primaryImage = (product.images ?? []).find((img) => img.isPrimary) || product.images?.[0];
                         return (
                           <Box key={productId}>
                             <Stack direction="row" spacing={2} alignItems="center">
@@ -336,7 +336,7 @@ export function OutfitBuilderPage() {
                                   bgcolor: "#F8FAFC",
                                 }}
                               >
-                                {item.product.images[0] && (
+                                {item.product.images?.[0] && (
                                   <Box
                                     component="img"
                                     src={item.product.images[0].imageUrl}

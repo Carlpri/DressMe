@@ -68,7 +68,10 @@ export function AdminDashboardPage() {
   const todayStr = new Date().toISOString().split("T")[0];
   const ordersToday = orders.filter((o) => o.createdAt.startsWith(todayStr)).length;
   const pendingOrders = orders.filter((o) => o.status === "PENDING");
-  const lowStockProducts = products.filter((p) => p.stock <= 5);
+  const lowStockProducts = products.filter((p) => {
+    const totalStock = (p.variants ?? []).reduce((sum: number, v: any) => sum + (v.stock ?? 0), 0);
+    return totalStock <= 5;
+  });
   const recentOrders = orders.slice(0, 5);
 
   const whatsappNumber = settings?.whatsappNumber || "254700000000";
@@ -367,8 +370,8 @@ export function AdminDashboardPage() {
                         <TableCell sx={{ fontWeight: 500 }}>{product.name}</TableCell>
                         <TableCell align="right">
                           <Chip
-                            label={`${product.stock} left`}
-                            color={product.stock === 0 ? "error" : "warning"}
+                            label={`${(product.variants ?? []).reduce((sum: number, v: any) => sum + (v.stock ?? 0), 0)} left`}
+                            color={(product.variants ?? []).reduce((sum: number, v: any) => sum + (v.stock ?? 0), 0) === 0 ? "error" : "warning"}
                             size="small"
                           />
                         </TableCell>

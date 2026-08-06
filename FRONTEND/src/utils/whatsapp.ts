@@ -47,7 +47,7 @@ export function buildVendorOrderMessage({
   const lines = items.map((item) => {
     const price = item.variant?.price ?? item.product.price;
     const variantLabel = item.variant
-      ? ` (${item.variant.size}, ${item.variant.color})`
+      ? ` (${item.variant.sizeValue}, ${item.variant.colorValue})`
       : "";
     return `• ${item.product.name}${variantLabel} × ${item.quantity} — ${formatCurrency(price * item.quantity, currency)}`;
   });

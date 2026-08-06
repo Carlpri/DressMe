@@ -95,7 +95,7 @@ export function CartPage() {
             <Grid size={{ xs: 12, md: 8 }}>
               <Stack spacing={3}>
                 {items.map((item) => {
-                  const primaryImage = item.product.images.find((img) => img.isPrimary) || item.product.images[0];
+                  const primaryImage = (item.product.images ?? []).find((img) => img.isPrimary) || item.product.images?.[0];
                   const price = item.variant?.price || item.product.price;
                   const itemTotal = price * item.quantity;
 
@@ -169,7 +169,7 @@ export function CartPage() {
                               </Typography>
                               {item.variant && (
                                 <Typography variant="body2" color="text.secondary">
-                                  {item.variant.size} - {item.variant.color}
+                                  {item.variant.sizeValue} - {item.variant.colorValue}
                                 </Typography>
                               )}
                               <Typography variant="body2" color="text.secondary">

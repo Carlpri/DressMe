@@ -1,7 +1,7 @@
 export interface Vendor {
   id: string;
-  shopName: string;
-  phone: string;
+  businessName: string;
+  whatsappNumber: string;
   address: string;
   location: string;
   logo?: string;

@@ -31,9 +31,10 @@ export function WishlistItemCard({ product, onRemove, isRemoving = false }: Wish
   const formatCurrency = useFormatCurrency();
   const [showCartSuccess, setShowCartSuccess] = useState(false);
 
-  const primaryImage = product.images.find((image) => image.isPrimary) ?? product.images[0];
-  const isOutOfStock = product.stock === 0 || product.status === "HIDDEN";
-  const isLowStock = !isOutOfStock && product.stock <= 3;
+  const primaryImage = (product.images ?? []).find((image) => image.isPrimary) ?? product.images?.[0];
+  const totalStock = (product.variants ?? []).reduce((sum, v) => sum + (v.stock ?? 0), 0);
+  const isOutOfStock = totalStock === 0 || product.status === "HIDDEN";
+  const isLowStock = !isOutOfStock && totalStock <= 3;
   const hasDiscount = product.compareAtPrice != null && product.compareAtPrice > product.price;
   const discountPercent = hasDiscount
     ? Math.round(((product.compareAtPrice! - product.price) / product.compareAtPrice!) * 100)
@@ -103,13 +104,13 @@ export function WishlistItemCard({ product, onRemove, isRemoving = false }: Wish
 
         <Stack spacing={1} sx={{ p: { xs: 2, sm: 2.5 }, minWidth: 0, justifyContent: "center" }}>
           <Typography variant="overline" color="text.secondary" sx={{ lineHeight: 1.2, fontWeight: 700 }}>
-            {product.brand.name} · {product.category.name}
+            {product.brand.name} · {product.ProductCategory?.[0]?.Category?.name || ""}
           </Typography>
           <Typography component={RouterLink} to={productUrl} variant="h6" color="text.primary" sx={{ textDecoration: "none", fontWeight: 700, lineHeight: 1.3 }}>
             {product.name}
           </Typography>
           <Typography variant="body2" color={isOutOfStock ? "error.main" : isLowStock ? "warning.main" : "success.main"} sx={{ fontWeight: 700 }}>
-            {isOutOfStock ? "Out of stock" : isLowStock ? `Only ${product.stock} left` : "In stock"}
+            {isOutOfStock ? "Out of stock" : isLowStock ? `Only ${totalStock} left` : "In stock"}
           </Typography>
           {product.averageRating > 0 && (
             <Stack direction="row" alignItems="center" spacing={0.5}>

@@ -5,7 +5,6 @@ export interface Product {
   description: string;
   price: number;
   compareAtPrice?: number;
-  stock: number;
   sku?: string;
   featured: boolean;
   isTrending?: boolean;
@@ -19,16 +18,19 @@ export interface Product {
   gender: "MALE" | "FEMALE" | "UNISEX";
   vendor: {
     id: string;
-    shopName: string;
+    businessName: string;
+    whatsappNumber: string;
     logo?: string;
     verified: boolean;
   };
-  category: {
-    id: string;
-    name: string;
-    slug: string;
-    image?: string;
-  };
+  ProductCategory: Array<{
+    Category: {
+      id: string;
+      name: string;
+      slug: string;
+      image?: string;
+    };
+  }>;
   brand: {
     id: string;
     name: string;
@@ -51,8 +53,8 @@ export interface ProductImage {
 
 export interface ProductVariant {
   id: string;
-  size: string;
-  color: string;
+  sizeValue: string;
+  colorValue: string;
   stock: number;
   sku: string;
   price?: number;

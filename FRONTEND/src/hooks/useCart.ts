@@ -14,16 +14,16 @@ export interface CartItem {
     vendorId?: string;
     vendor?: {
       id: string;
-      shopName: string;
-      phone: string;
+      businessName: string;
+      whatsappNumber: string;
     };
     images: Array<{ imageUrl: string; isPrimary: boolean }>;
-    variants?: Array<{ id: string; size: string; color: string; price?: number }>;
+    variants?: Array<{ id: string; sizeValue: string; colorValue: string; price?: number }>;
   };
   variant?: {
     id: string;
-    size: string;
-    color: string;
+    sizeValue: string;
+    colorValue: string;
     price?: number;
   };
 }

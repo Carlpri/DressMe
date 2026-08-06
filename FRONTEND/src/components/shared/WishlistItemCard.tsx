@@ -30,10 +30,11 @@ export function WishlistItemCard({ product, onRemove, isRemoving }: WishlistItem
   const addToCart = useAddToCart();
   const formatCurrency = useFormatCurrency();
 
-  const primaryImage = product.images.find((img) => img.isPrimary) || product.images[0];
+  const primaryImage = (product.images ?? []).find((img) => img.isPrimary) || product.images?.[0];
+  const totalStock = (product.variants ?? []).reduce((sum, v) => sum + (v.stock ?? 0), 0);
 
   const handleAddToCart = () => {
-    if (product.stock > 0) {
+    if (totalStock > 0) {
       addToCart.mutate(
         { productId: product.id, quantity: 1 },
         {
@@ -187,11 +188,11 @@ export function WishlistItemCard({ product, onRemove, isRemoving }: WishlistItem
                 variant="contained"
                 size="small"
                 startIcon={<ShoppingCartIcon />}
-                disabled={product.stock === 0 || addToCart.isPending}
+                disabled={totalStock === 0 || addToCart.isPending}
                 onClick={handleAddToCart}
                 sx={{ flex: 1 }}
               >
-                {product.stock === 0 ? "Out of Stock" : "Add to Cart"}
+                {totalStock === 0 ? "Out of Stock" : "Add to Cart"}
               </Button>
             </Stack>
           </Stack>

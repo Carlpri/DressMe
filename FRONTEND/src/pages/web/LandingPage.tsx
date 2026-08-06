@@ -500,7 +500,7 @@ export function LandingPage() {
                           <CardMedia
                             component="img"
                             image={vendor.coverImage}
-                            alt={vendor.shopName}
+                            alt={vendor.businessName}
                             sx={{ width: "100%", height: "100%", objectFit: "cover" }}
                           />
                         )}
@@ -539,7 +539,7 @@ export function LandingPage() {
                               <Box
                                 component="img"
                                 src={vendor.logo}
-                                alt={vendor.shopName}
+                                alt={vendor.businessName}
                                 sx={{ width: "100%", height: "100%", objectFit: "contain" }}
                               />
                             ) : (
@@ -547,13 +547,13 @@ export function LandingPage() {
                                 variant="body1"
                                 sx={{ fontWeight: 700, color: "primary.main" }}
                               >
-                                {vendor.shopName.charAt(0)}
+                                {vendor.businessName.charAt(0)}
                               </Typography>
                             )}
                           </Box>
                           <Box sx={{ flex: 1 }}>
                             <Typography variant="h6" sx={{ fontWeight: 600, color: "white" }}>
-                              {vendor.shopName}
+                              {vendor.businessName}
                             </Typography>
                             <Typography
                               variant="body2"

@@ -235,7 +235,7 @@ export function OrderDetailsPage() {
                     <Stack spacing={3}>
                       {order.items.map((item) => {
                         if (!item.product) return null;
-                        const primaryImage = item.product.images.find((img) => img.isPrimary) || item.product.images[0];
+                        const primaryImage = (item.product.images ?? []).find((img) => img.isPrimary) || item.product.images?.[0];
                         return (
                           <Stack key={item.id} direction="row" spacing={3} alignItems="center">
                             <Box

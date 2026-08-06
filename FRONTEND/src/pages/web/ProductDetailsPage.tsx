@@ -67,7 +67,7 @@ export function ProductDetailsPage() {
   const [favoriteMessage, setFavoriteMessage] = useState("Added to wishlist!");
 
   const { data: relatedProducts } = useProducts({
-    category: product?.category.slug,
+    category: product?.ProductCategory?.[0]?.Category?.slug,
     limit: 4,
   });
   const { data: reviews } = useReviews(product?.id || "");
@@ -87,7 +87,7 @@ export function ProductDetailsPage() {
   const currentVariant = product?.variants.find((v) => v.id === selectedVariant);
   const displayPrice = currentVariant?.price || product?.price || 0;
   const compareAtPrice = product?.compareAtPrice;
-  const availableStock = currentVariant?.stock ?? product?.stock ?? 0;
+  const availableStock = currentVariant?.stock ?? 0;
   const savings = compareAtPrice && compareAtPrice > displayPrice ? compareAtPrice - displayPrice : 0;
 
   const handleAddToCart = () => {
@@ -112,8 +112,8 @@ export function ProductDetailsPage() {
         productName: product.name,
         sku: product.sku,
         productId: product.id,
-        selectedSize: currentVariant?.size,
-        selectedColor: currentVariant?.color,
+        selectedSize: currentVariant?.sizeValue,
+        selectedColor: currentVariant?.colorValue,
       });
       window.open(url, "_blank", "noopener,noreferrer");
     }
@@ -220,7 +220,7 @@ export function ProductDetailsPage() {
                   overflow: "hidden",
                 }}
               >
-                {product.images[selectedImage] ? (
+                {product.images?.[selectedImage] ? (
                   <Box
                     component="img"
                     src={product.images[selectedImage].imageUrl}
@@ -309,7 +309,7 @@ export function ProductDetailsPage() {
                     {product.brand.name}
                   </Typography>
                   <Typography color="text.secondary">•</Typography>
-                  <Typography color="text.secondary">{product.category.name}</Typography>
+                  <Typography color="text.secondary">{product.ProductCategory?.[0]?.Category?.name || ""}</Typography>
                 </Stack>
               </Box>
 
@@ -350,16 +350,16 @@ export function ProductDetailsPage() {
               </Typography>
 
               {/* Variants */}
-              {product.variants.length > 0 && (
+              {(product.variants?.length ?? 0) > 0 && (
                 <Box>
                   <Typography variant="h6" sx={{ fontWeight: 600, mb: 2 }}>
                     Select Variant
                   </Typography>
                   <Stack direction="row" spacing={2} flexWrap="wrap">
-                    {product.variants.map((variant) => (
+                    {(product.variants ?? []).map((variant) => (
                       <Chip
                         key={variant.id}
-                        label={`${variant.size} - ${variant.color}`}
+                        label={`${variant.sizeValue} - ${variant.colorValue}`}
                         onClick={() => setSelectedVariant(variant.id)}
                         sx={{
                           border: selectedVariant === variant.id ? "2px solid" : "1px solid",
@@ -496,18 +496,18 @@ export function ProductDetailsPage() {
                         <Box
                           component="img"
                           src={product.vendor.logo}
-                          alt={product.vendor.shopName}
+                          alt={product.vendor.businessName}
                           sx={{ width: "100%", height: "100%", objectFit: "contain" }}
                         />
                       ) : (
                         <Typography variant="h6" sx={{ fontWeight: 700, color: "primary.main" }}>
-                          {product.vendor.shopName.charAt(0)}
+                          {product.vendor.businessName.charAt(0)}
                         </Typography>
                       )}
                     </Box>
                     <Box sx={{ flex: 1 }}>
                       <Typography variant="h6" sx={{ fontWeight: 600 }}>
-                        {product.vendor.shopName}
+                        {product.vendor.businessName}
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
                         {product.vendor.verified && "✓ Verified Vendor"}
