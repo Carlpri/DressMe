@@ -7,12 +7,16 @@ const cartInclude = {
         include: {
           images: true,
           brand: true,
-          category: true,
+          ProductCategory: {
+            include: {
+              Category: true,
+            },
+          },
           vendor: {
             select: {
               id: true,
-              shopName: true,
-              phone: true,
+              businessName: true,
+              whatsappNumber: true,
             },
           },
         },
