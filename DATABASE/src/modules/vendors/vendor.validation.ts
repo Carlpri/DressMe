@@ -2,9 +2,9 @@ import { z } from "zod";
 
 export const createVendorSchema = z.object({
   body: z.object({
-    shopName: z.string().min(3),
+    businessName: z.string().min(3),
 
-    phone: z.string().min(10),
+    whatsappNumber: z.string().min(10),
 
     address: z.string().min(5),
 
@@ -30,9 +30,9 @@ export const createVendorSchema = z.object({
 
 export const updateVendorSchema = z.object({
   body: z.object({
-    shopName: z.string().min(3).optional(),
+    businessName: z.string().min(3).optional(),
 
-    phone: z.string().min(10).optional(),
+    whatsappNumber: z.string().min(10).optional(),
 
     address: z.string().min(5).optional(),
 

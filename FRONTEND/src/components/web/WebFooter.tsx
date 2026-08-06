@@ -1,31 +1,33 @@
-import { Box, Container, Link, Stack, Typography, useTheme } from "@mui/material";
+import { Box, Container, Link, Stack, Typography, useTheme, Avatar, Chip } from "@mui/material";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import InstagramIcon from "@mui/icons-material/Instagram";
 import TwitterIcon from "@mui/icons-material/Twitter";
+import PersonIcon from "@mui/icons-material/Person";
 import { Link as RouterLink } from "react-router-dom";
 import { ROUTES } from "../../constants/routes";
 import { useSiteSettingsContext } from "../../contexts/SiteSettingsContext";
+import { useAuth } from "../../hooks/useAuth";
 
 const FOOTER_LINKS = {
   Company: [
-    { label: "About Us", path: "#" },
-    { label: "Careers", path: "#" },
-    { label: "Press", path: "#" },
-    { label: "Blog", path: "#" },
+    { label: "About Us", path: ROUTES.about },
+    { label: "Vision", path: ROUTES.vision },
+    { label: "Mission", path: ROUTES.mission },
+    { label: "Careers", path: ROUTES.careers },
   ],
   Support: [
-    { label: "Help Center", path: "#" },
-    { label: "Contact Us", path: "#" },
-    { label: "Shipping Info", path: "#" },
-    { label: "Returns", path: "#" },
+    { label: "Help Center", path: ROUTES.help },
+    { label: "Contact Us", path: ROUTES.contact },
+    { label: "Shipping Info", path: ROUTES.shipping },
+    { label: "Returns", path: ROUTES.returns },
   ],
   Legal: [
-    { label: "Privacy Policy", path: "#" },
-    { label: "Terms of Service", path: "#" },
+    { label: "Privacy Policy", path: ROUTES.privacy },
+    { label: "Terms of Service", path: ROUTES.terms },
     { label: "Cookie Policy", path: "#" },
   ],
   Partners: [
-    { label: "Become a Vendor", path: "#" },
+    { label: "Become a Vendor", path: ROUTES.contact },
     { label: "Partner Program", path: "#" },
     { label: "API Access", path: "#" },
   ],
@@ -34,6 +36,7 @@ const FOOTER_LINKS = {
 export function WebFooter() {
   const theme = useTheme();
   const { settings } = useSiteSettingsContext();
+  const { user, isAuthenticated } = useAuth();
 
   const logoSrc = settings?.logoDarkUrl ?? settings?.logoUrl ?? undefined;
 
@@ -87,6 +90,41 @@ export function WebFooter() {
               >
                 {settings?.tagline || "Your Style. Powered by AI. Inspired by You."}
               </Typography>
+
+              {isAuthenticated && (
+                <Box
+                  sx={{
+                    mt: 3,
+                    p: 2,
+                    bgcolor: "rgba(255, 255, 255, 0.1)",
+                    borderRadius: 2,
+                    backdropFilter: "blur(10px)",
+                    WebkitBackdropFilter: "blur(10px)",
+                    border: "1px solid rgba(255, 255, 255, 0.2)",
+                  }}
+                >
+                  <Stack direction="row" spacing={2} alignItems="center">
+                    <Avatar sx={{ width: 40, height: 40, bgcolor: "#00C896" }}>
+                      <PersonIcon />
+                    </Avatar>
+                    <Box>
+                      <Typography variant="subtitle2" sx={{ fontWeight: 600, color: "white" }}>
+                        {user?.name}
+                      </Typography>
+                      <Chip
+                        label={user?.role}
+                        size="small"
+                        sx={{
+                          bgcolor: "rgba(0, 200, 150, 0.2)",
+                          color: "#00C896",
+                          fontSize: "0.7rem",
+                          height: 20,
+                        }}
+                      />
+                    </Box>
+                  </Stack>
+                </Box>
+              )}
             </Box>
 
             <Stack
@@ -110,7 +148,8 @@ export function WebFooter() {
                     {links.map((link) => (
                       <Link
                         key={link.label}
-                        href={link.path}
+                        component={RouterLink}
+                        to={link.path}
                         underline="none"
                         sx={{
                           color: "rgba(255, 255, 255, 0.7)",

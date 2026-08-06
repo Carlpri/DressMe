@@ -49,9 +49,9 @@ export class UserController {
  );
 
  changePassword = asyncHandler(
-    async ( req, res) =>{
+    async ( req, res)=>{
         console.log(req.body);
-        
+
         await userService.changePassword(
             req.user.userId,
             req.body
@@ -60,9 +60,35 @@ export class UserController {
         res,
         200,
         "Password changed successfully.",
-        null    
+        null
        );
     }
  );
+
+  updateUserRole = asyncHandler(
+    async (req, res) => {
+      const { userId, role } = req.body;
+      const updatedUser = await userService.updateUserRole(userId, role);
+      ApiResponse.success(
+        res,
+        200,
+        "User role updated successfully.",
+        updatedUser
+      );
+    }
+  );
+
+  promoteToVendor = asyncHandler(
+    async (req, res) => {
+      const { userId, ...vendorData } = req.body;
+      const vendor = await userService.promoteToVendor(userId, vendorData);
+      ApiResponse.success(
+        res,
+        201,
+        "User promoted to vendor successfully.",
+        vendor
+      );
+    }
+  );
 
 }

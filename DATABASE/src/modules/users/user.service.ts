@@ -69,4 +69,42 @@ if (isSamePassword) {
     hashedPassword
   );
 }
+
+  async updateUserRole(userId: string, role: string) {
+    const user = await this.repository.findById(userId);
+
+    if (!user) {
+      throw new ApiError(404, "User not found.");
+    }
+
+    return this.repository.updateRole(userId, role);
+  }
+
+  async promoteToVendor(userId: string, vendorData: any) {
+    const user = await this.repository.findById(userId);
+
+    if (!user) {
+      throw new ApiError(404, "User not found.");
+    }
+
+    if (user.role === "VENDOR") {
+      throw new ApiError(409, "User is already a vendor.");
+    }
+
+    // Update user role to VENDOR
+    await this.repository.updateRole(userId, "VENDOR");
+
+    // Import VendorService to create vendor profile
+    const { VendorRepository } = await import("../vendors/vendor.repository.js");
+    const vendorRepository = new VendorRepository();
+
+    // Check if vendor profile already exists
+    const existingVendor = await vendorRepository.findByUserId(userId);
+    if (existingVendor) {
+      throw new ApiError(409, "Vendor profile already exists for this user.");
+    }
+
+    // Create vendor profile
+    return vendorRepository.create(userId, vendorData);
+  }
 }

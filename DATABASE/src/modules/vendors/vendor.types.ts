@@ -15,8 +15,8 @@ export interface CreateVendorDto {
 }
 
 export interface UpdateVendorDto {
-  shopName?: string;
-  phone?: string;
+  businessName?: string;
+  whatsappNumber?: string;
   address?: string;
   location?: string;
   logo?: string;

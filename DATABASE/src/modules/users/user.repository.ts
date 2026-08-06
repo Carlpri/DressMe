@@ -1,5 +1,6 @@
 import prisma from "../../config/prisma.js";
 import { updateProfileDto, changePasswordDto } from "./user.types.js";
+import { Role } from "@prisma/client";
 
 export class UserRepository {
   async findById(id: string) {
@@ -79,13 +80,27 @@ async findByIdWithPassword(id: string) {
     ) {
         return prisma.user.update({
             where: { id },
-            data: { 
-                password, 
+            data: {
+                password,
             },
         });
-    
 }
 
-  
+  async updateRole(id: string, role: string) {
+    return prisma.user.update({
+      where: { id },
+      data: { role: role as Role },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        avatar: true,
+        role: true,
+        status: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+  }
 
 }

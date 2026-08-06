@@ -7,7 +7,7 @@ const vendorService = new VendorService();
 export class VendorController {
   createVendor = asyncHandler(async (req, res) => {
     const vendor = await vendorService.create(
-      req.user.userId,
+      req.body.userId || req.user.userId,
       req.body
     );
 

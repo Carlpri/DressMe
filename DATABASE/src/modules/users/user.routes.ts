@@ -2,7 +2,7 @@ import { Router } from "express";
 import { UserController } from "./user.controller.js";
 import { authenticate } from "../../middleware/auth.middleware.js";
 import { validate } from "../../middleware/validate.middleware.js";
-import { updateProfileSchema,changePasswordSchema } from "./user.validation.js";
+import { updateProfileSchema,changePasswordSchema, updateRoleSchema, promoteToVendorSchema } from "./user.validation.js";
 import { Role } from "@prisma/client";
 import { authorize } from "../../middleware/authorize.middleware.js";
 
@@ -37,5 +37,21 @@ router.patch(
     validate(changePasswordSchema),
     controller.changePassword
 )
+
+router.patch(
+  "/role",
+  authenticate,
+  authorize(Role.ADMIN),
+  validate(updateRoleSchema),
+  controller.updateUserRole
+);
+
+router.post(
+  "/promote-to-vendor",
+  authenticate,
+  authorize(Role.ADMIN),
+  validate(promoteToVendorSchema),
+  controller.promoteToVendor
+);
 
 export default router;

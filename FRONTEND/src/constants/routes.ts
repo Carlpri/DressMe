@@ -17,6 +17,16 @@ export const ROUTES = {
   aiStylist: "/ai-stylist",
   outfitBuilder: "/outfit-builder",
   accessDenied: "/studio/access-denied",
+  about: "/about",
+  privacy: "/privacy",
+  terms: "/terms",
+  vision: "/vision",
+  mission: "/mission",
+  careers: "/careers",
+  shipping: "/shipping",
+  contact: "/contact",
+  returns: "/returns",
+  help: "/help",
 } as const;
 
 export const STUDIO_ROUTES = {

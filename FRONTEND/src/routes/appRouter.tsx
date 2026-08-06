@@ -37,6 +37,16 @@ import { AdminBrandsPage } from "../pages/admin/AdminBrandsPage";
 import { AdminOrdersPage } from "../pages/admin/AdminOrdersPage";
 import { AdminCustomersPage } from "../pages/admin/AdminCustomersPage";
 import { AdminReviewsPage } from "../pages/admin/AdminReviewsPage";
+import { AboutPage } from "../pages/web/AboutPage";
+import { PrivacyPage } from "../pages/web/PrivacyPage";
+import { TermsPage } from "../pages/web/TermsPage";
+import { VisionPage } from "../pages/web/VisionPage";
+import { MissionPage } from "../pages/web/MissionPage";
+import { CareersPage } from "../pages/web/CareersPage";
+import { ShippingPage } from "../pages/web/ShippingPage";
+import { ContactPage } from "../pages/web/ContactPage";
+import { ReturnsPage } from "../pages/web/ReturnsPage";
+import { HelpPage } from "../pages/web/HelpPage";
 
 export const appRouter = createBrowserRouter([
   {
@@ -102,11 +112,21 @@ export const appRouter = createBrowserRouter([
         element: <ProtectedRoute allowedRoles={["USER", "ADMIN"]} />,
         children: [{ index: true, element: <AIStylistPage /> }]
       },
-      { 
-        path: "outfit-builder", 
+      {
+        path: "outfit-builder",
         element: <ProtectedRoute allowedRoles={["USER", "ADMIN"]} />,
         children: [{ index: true, element: <OutfitBuilderPage /> }]
       },
+      { path: "about", element: <AboutPage /> },
+      { path: "privacy", element: <PrivacyPage /> },
+      { path: "terms", element: <TermsPage /> },
+      { path: "vision", element: <VisionPage /> },
+      { path: "mission", element: <MissionPage /> },
+      { path: "careers", element: <CareersPage /> },
+      { path: "shipping", element: <ShippingPage /> },
+      { path: "contact", element: <ContactPage /> },
+      { path: "returns", element: <ReturnsPage /> },
+      { path: "help", element: <HelpPage /> },
     ],
   },
   {
