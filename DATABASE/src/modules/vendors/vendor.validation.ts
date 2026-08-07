@@ -34,7 +34,6 @@ export const createVendorSchema = z.object({
 
     coverImage: optionalUrl,
 
-    businessEmail: z.string().email().or(z.literal("")).optional(),
 
     facebook: optionalUrl,
 
@@ -74,7 +73,6 @@ export const updateVendorSchema = z.object({
 
     coverImage: optionalUrl,
 
-    businessEmail: z.string().email().or(z.literal("")).optional(),
 
     facebook: optionalUrl,
 
