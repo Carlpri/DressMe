@@ -1,9 +1,15 @@
 export interface CreateVendorDto {
   userId?: string; // Admin can specify userId to create vendor for another user
-  shopName: string;
-  phone: string;
+  businessName: string;
+  whatsappNumber: string;
   address: string;
   location: string;
+  phoneNumber?: string;
+  email?: string;
+  city?: string;
+  county?: string;
+  town?: string;
+  contactPerson?: string;
   logo?: string;
   description?: string;
   coverImage?: string;
@@ -19,6 +25,12 @@ export interface UpdateVendorDto {
   whatsappNumber?: string;
   address?: string;
   location?: string;
+  phoneNumber?: string;
+  email?: string;
+  city?: string;
+  county?: string;
+  town?: string;
+  contactPerson?: string;
   logo?: string;
   description?: string;
   coverImage?: string;

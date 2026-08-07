@@ -32,9 +32,10 @@ export function AdminVendorsPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingVendor, setEditingVendor] = useState<any | null>(null);
   const [businessName, setBusinessName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
+  const [businessEmail, setBusinessEmail] = useState("");
+  const [whatsappNumber, setWhatsappNumber] = useState("");
   const [address, setAddress] = useState("");
+  const [location, setLocation] = useState("");
   const [website, setWebsite] = useState("");
   const [description, setDescription] = useState("");
   const [logo, setLogo] = useState("");
@@ -57,7 +58,8 @@ export function AdminVendorsPage() {
         return res.data.data;
       }
 
-      return null;
+      const res = await apiClient.post("/vendors", payload);
+      return res.data.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-vendors-list"] });
@@ -68,9 +70,10 @@ export function AdminVendorsPage() {
   const handleOpenCreate = () => {
     setEditingVendor(null);
     setBusinessName("");
-    setEmail("");
-    setPhone("");
+    setBusinessEmail("");
+    setWhatsappNumber("");
     setAddress("");
+    setLocation("");
     setWebsite("");
     setDescription("");
     setLogo("");
@@ -81,9 +84,10 @@ export function AdminVendorsPage() {
   const handleOpenEdit = (vendor: any) => {
     setEditingVendor(vendor);
     setBusinessName(vendor.businessName || "");
-    setEmail(vendor.email || "");
-    setPhone(vendor.phoneNumber || vendor.whatsappNumber || "");
+    setBusinessEmail(vendor.businessEmail || "");
+    setWhatsappNumber(vendor.whatsappNumber || "");
     setAddress(vendor.address || "");
+    setLocation(vendor.location || "");
     setWebsite(vendor.website || "");
     setDescription(vendor.description || "");
     setLogo(vendor.logo || "");
@@ -102,12 +106,13 @@ export function AdminVendorsPage() {
       address,
     };
 
-    if (phone) payload.whatsappNumber = phone;
+    if (whatsappNumber) payload.whatsappNumber = whatsappNumber;
+    if (location) payload.location = location;
     if (logo) payload.logo = logo;
     if (coverImage) payload.coverImage = coverImage;
     if (website) payload.website = website;
     if (description) payload.description = description;
-    if (email) payload.email = email;
+    if (businessEmail) payload.businessEmail = businessEmail;
 
     saveVendorMutation.mutate(payload);
   };
@@ -173,9 +178,9 @@ export function AdminVendorsPage() {
                     </Stack>
                   </TableCell>
                   <TableCell>
-                    <Typography variant="body2">{vendor.email || "N/A"}</Typography>
+                    <Typography variant="body2">{vendor.businessEmail || "N/A"}</Typography>
                     <Typography variant="caption" color="text.secondary">
-                      {vendor.phoneNumber || vendor.whatsappNumber || "No phone"}
+                      {vendor.whatsappNumber || "No phone"}
                     </Typography>
                   </TableCell>
                   <TableCell>{vendor.website || "N/A"}</TableCell>
@@ -196,9 +201,10 @@ export function AdminVendorsPage() {
         <DialogContent dividers>
           <Stack spacing={3} sx={{ pt: 1 }}>
             <TextField label="Business Name" value={businessName} onChange={(e) => setBusinessName(e.target.value)} fullWidth required />
-            <TextField label="Email" value={email} onChange={(e) => setEmail(e.target.value)} fullWidth />
-            <TextField label="Phone / WhatsApp" value={phone} onChange={(e) => setPhone(e.target.value)} fullWidth />
+            <TextField label="Business Email" value={businessEmail} onChange={(e) => setBusinessEmail(e.target.value)} fullWidth />
+            <TextField label="WhatsApp Number" value={whatsappNumber} onChange={(e) => setWhatsappNumber(e.target.value)} fullWidth />
             <TextField label="Address" value={address} onChange={(e) => setAddress(e.target.value)} fullWidth multiline rows={2} />
+            <TextField label="Location" value={location} onChange={(e) => setLocation(e.target.value)} fullWidth />
             <TextField label="Website" value={website} onChange={(e) => setWebsite(e.target.value)} fullWidth />
             <TextField label="Description" value={description} onChange={(e) => setDescription(e.target.value)} fullWidth multiline rows={3} />
 

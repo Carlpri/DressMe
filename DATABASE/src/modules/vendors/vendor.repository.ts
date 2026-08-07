@@ -12,8 +12,6 @@ export class VendorRepository {
       data: {
         ...data,
         userId,
-        businessName: data.shopName || "Vendor",
-        whatsappNumber: data.phone || "",
       },
     });
   }

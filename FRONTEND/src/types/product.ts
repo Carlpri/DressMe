@@ -28,7 +28,7 @@ export interface Product {
     businessName: string;
     whatsappNumber: string;
     logo?: string;
-    verified: boolean;
+    isVerified: boolean;
   };
   categories: CategorySummary[];
   brand: {

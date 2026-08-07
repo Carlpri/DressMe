@@ -4,6 +4,13 @@ export interface Vendor {
   whatsappNumber: string;
   address: string;
   location: string;
+  phoneNumber?: string;
+  email?: string;
+  city?: string;
+  county?: string;
+  town?: string;
+  contactPerson?: string;
+  slug?: string;
   logo?: string;
   description?: string;
   coverImage?: string;
@@ -12,7 +19,8 @@ export interface Vendor {
   instagram?: string;
   tiktok?: string;
   website?: string;
-  verified: boolean;
+  isVerified: boolean;
+  isActive: boolean;
   userId: string;
   createdAt: string;
   updatedAt: string;

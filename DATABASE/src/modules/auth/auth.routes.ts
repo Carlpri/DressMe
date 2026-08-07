@@ -10,10 +10,6 @@ const authController = new AuthController();
 
 router.post(
   "/register",
-  (req,_res,next)=>{
-    console.log("BODY:",req.body);
-    next();
-  },
   validate(registerSchema),
   authController.register
 );

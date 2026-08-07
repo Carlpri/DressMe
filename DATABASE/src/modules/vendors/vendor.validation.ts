@@ -10,6 +10,18 @@ export const createVendorSchema = z.object({
 
     location: z.string().min(2),
 
+    phoneNumber: z.string().min(10).optional(),
+
+    email: z.string().email().optional(),
+
+    city: z.string().min(2).optional(),
+
+    county: z.string().min(2).optional(),
+
+    town: z.string().min(2).optional(),
+
+    contactPerson: z.string().min(2).optional(),
+
     logo: z.string().url().optional(),
 
     description: z.string().optional(),
@@ -37,6 +49,18 @@ export const updateVendorSchema = z.object({
     address: z.string().min(5).optional(),
 
     location: z.string().min(2).optional(),
+
+    phoneNumber: z.string().min(10).optional(),
+
+    email: z.string().email().optional(),
+
+    city: z.string().min(2).optional(),
+
+    county: z.string().min(2).optional(),
+
+    town: z.string().min(2).optional(),
+
+    contactPerson: z.string().min(2).optional(),
 
     logo: z.string().url().optional(),
 

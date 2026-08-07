@@ -9,7 +9,9 @@ export const authService = {
     return data.data;
   },
   register: async (values: RegisterFormValues) => {
-    const { data } = await apiClient.post<ApiResponse<AuthSession>>("/auth/register", values);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { confirmPassword: _, ...payload } = values;
+    const { data } = await apiClient.post<ApiResponse<AuthSession>>("/auth/register", payload);
     return data.data;
   },
 };
