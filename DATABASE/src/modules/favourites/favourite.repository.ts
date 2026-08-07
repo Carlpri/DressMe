@@ -56,7 +56,6 @@ export class FavouriteRepository {
       data: {
         userId,
         productId,
-        updatedAt: new Date(),
       },
       include: favouriteInclude,
     });
