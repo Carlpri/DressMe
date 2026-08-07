@@ -190,6 +190,7 @@ export function AdminProductsPage() {
     setGender(prod.gender);
     setCategoryId(prod.categoryId || prod.category?.id || "");
     setBrandId(prod.brandId || prod.brand?.id || "");
+    setVendorId(prod.vendorId || prod.vendor?.id || "");
     setStatus(prod.status);
     setFeatured(prod.featured);
     setIsTrending(prod.isTrending || false);
@@ -495,7 +496,7 @@ export function AdminProductsPage() {
                 <InputLabel>Vendor</InputLabel>
                 <Select value={vendorId} label="Vendor" onChange={(e) => setVendorId(e.target.value)}>
                   {vendors.map((v) => (
-                    <MenuItem key={v.id} value={v.id}>{v.shopName}</MenuItem>
+                    <MenuItem key={v.id} value={v.id}>{v.businessName || v.shopName}</MenuItem>
                   ))}
                 </Select>
               </FormControl>
