@@ -100,6 +100,7 @@ model Product {
   isBestSeller     Boolean            @default(false)
   isNewArrival     Boolean            @default(false)
   isTrending       Boolean            @default(false)
+  stock            Int                @default(0)
   cartItems        CartItem[]
   favorites        FavoriteProduct[]
   orderItems       OrderItem[]
