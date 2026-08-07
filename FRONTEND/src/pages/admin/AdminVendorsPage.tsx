@@ -17,10 +17,10 @@ import {
   TextField,
   Paper,
   CircularProgress,
+  Tooltip,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
 import CollectionsIcon from "@mui/icons-material/Collections";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../../api/client";
@@ -40,6 +40,8 @@ export function AdminVendorsPage() {
   const [description, setDescription] = useState("");
   const [logo, setLogo] = useState("");
   const [coverImage, setCoverImage] = useState("");
+
+  // Media picker state — shared modal, tracks which field it targets
   const [mediaPickerOpen, setMediaPickerOpen] = useState(false);
   const [mediaTarget, setMediaTarget] = useState<"logo" | "cover">("logo");
 
@@ -57,7 +59,6 @@ export function AdminVendorsPage() {
         const res = await apiClient.patch(`/vendors/${editingVendor.id}`, payload);
         return res.data.data;
       }
-
       const res = await apiClient.post("/vendors", payload);
       return res.data.data;
     },
@@ -67,8 +68,7 @@ export function AdminVendorsPage() {
     },
   });
 
-  const handleOpenCreate = () => {
-    setEditingVendor(null);
+  const resetForm = () => {
     setBusinessName("");
     setBusinessEmail("");
     setWhatsappNumber("");
@@ -78,6 +78,11 @@ export function AdminVendorsPage() {
     setDescription("");
     setLogo("");
     setCoverImage("");
+  };
+
+  const handleOpenCreate = () => {
+    setEditingVendor(null);
+    resetForm();
     setDialogOpen(true);
   };
 
@@ -95,7 +100,10 @@ export function AdminVendorsPage() {
     setDialogOpen(true);
   };
 
+  // Blur the currently focused element first to avoid the MUI aria-hidden warning
+  // (when the Dialog closes while a button inside it still holds focus)
   const handleCloseDialog = () => {
+    (document.activeElement as HTMLElement | null)?.blur();
     setDialogOpen(false);
     setEditingVendor(null);
   };
@@ -115,6 +123,20 @@ export function AdminVendorsPage() {
     if (businessEmail) payload.businessEmail = businessEmail;
 
     saveVendorMutation.mutate(payload);
+  };
+
+  const openMediaPicker = (target: "logo" | "cover") => {
+    setMediaTarget(target);
+    setMediaPickerOpen(true);
+  };
+
+  const handleMediaSelect = (url: string) => {
+    if (mediaTarget === "logo") {
+      setLogo(url);
+    } else {
+      setCoverImage(url);
+    }
+    setMediaPickerOpen(false);
   };
 
   return (
@@ -164,7 +186,12 @@ export function AdminVendorsPage() {
                         }}
                       >
                         {vendor.logo ? (
-                          <Box component="img" src={vendor.logo} alt={vendor.businessName} sx={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                          <Box
+                            component="img"
+                            src={vendor.logo}
+                            alt={vendor.businessName}
+                            sx={{ width: "100%", height: "100%", objectFit: "cover" }}
+                          />
                         ) : null}
                       </Box>
                       <Box>
@@ -196,66 +223,152 @@ export function AdminVendorsPage() {
         </Paper>
       )}
 
+      {/* Add / Edit Dialog */}
       <Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth="md" fullWidth>
         <DialogTitle>{editingVendor ? "Edit Vendor" : "Add Vendor"}</DialogTitle>
         <DialogContent dividers>
           <Stack spacing={3} sx={{ pt: 1 }}>
-            <TextField label="Business Name" value={businessName} onChange={(e) => setBusinessName(e.target.value)} fullWidth required />
-            <TextField label="Business Email" value={businessEmail} onChange={(e) => setBusinessEmail(e.target.value)} fullWidth />
-            <TextField label="WhatsApp Number" value={whatsappNumber} onChange={(e) => setWhatsappNumber(e.target.value)} fullWidth />
-            <TextField label="Address" value={address} onChange={(e) => setAddress(e.target.value)} fullWidth multiline rows={2} />
-            <TextField label="Location" value={location} onChange={(e) => setLocation(e.target.value)} fullWidth />
-            <TextField label="Website" value={website} onChange={(e) => setWebsite(e.target.value)} fullWidth />
-            <TextField label="Description" value={description} onChange={(e) => setDescription(e.target.value)} fullWidth multiline rows={3} />
+            {/* Basic info */}
+            <TextField
+              label="Business Name"
+              value={businessName}
+              onChange={(e) => setBusinessName(e.target.value)}
+              fullWidth
+              required
+            />
+            <TextField
+              label="Business Email"
+              type="email"
+              value={businessEmail}
+              onChange={(e) => setBusinessEmail(e.target.value)}
+              fullWidth
+            />
+            <TextField
+              label="WhatsApp Number"
+              value={whatsappNumber}
+              onChange={(e) => setWhatsappNumber(e.target.value)}
+              fullWidth
+            />
+            <TextField
+              label="Address"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              fullWidth
+              multiline
+              rows={2}
+            />
+            <TextField
+              label="Location"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              fullWidth
+            />
+            <TextField
+              label="Website"
+              value={website}
+              onChange={(e) => setWebsite(e.target.value)}
+              fullWidth
+            />
+            <TextField
+              label="Description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              fullWidth
+              multiline
+              rows={3}
+            />
 
+            {/* Branding */}
             <Box>
-              <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 1 }}>
+              <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 2 }}>
                 Vendor Branding
               </Typography>
-              <Stack spacing={2}>
-                <ImageUploader
-                  label="Vendor Logo"
-                  value={logo}
-                  onChange={setLogo}
-                  folder="vendors/logos"
-                  previewHeight={140}
-                  persistToMediaLibrary
-                  mediaLibraryFolder="vendors"
-                  mediaFilename={businessName || "vendor-logo"}
-                />
-                <ImageUploader
-                  label="Vendor Cover Image"
-                  value={coverImage}
-                  onChange={setCoverImage}
-                  folder="vendors/covers"
-                  previewHeight={180}
-                  persistToMediaLibrary
-                  mediaLibraryFolder="vendors"
-                  mediaFilename={businessName ? `${businessName}-cover` : "vendor-cover"}
-                />
+              <Stack spacing={3}>
+                {/* Logo */}
+                <Box>
+                  <Stack direction="row" justifyContent="space-between" alignItems="center" mb={1}>
+                    <Typography variant="body2" color="text.secondary">
+                      Logo
+                    </Typography>
+                    <Tooltip title="Pick from Media Library">
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        startIcon={<CollectionsIcon />}
+                        onClick={() => openMediaPicker("logo")}
+                      >
+                        Media Library
+                      </Button>
+                    </Tooltip>
+                  </Stack>
+                  <ImageUploader
+                    label="Vendor Logo"
+                    value={logo}
+                    onChange={setLogo}
+                    folder="vendors/logos"
+                    previewHeight={140}
+                    persistToMediaLibrary
+                    mediaLibraryFolder="vendors"
+                    mediaFilename={businessName || "vendor-logo"}
+                  />
+                </Box>
+
+                {/* Cover image */}
+                <Box>
+                  <Stack direction="row" justifyContent="space-between" alignItems="center" mb={1}>
+                    <Typography variant="body2" color="text.secondary">
+                      Cover Image
+                    </Typography>
+                    <Tooltip title="Pick from Media Library">
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        startIcon={<CollectionsIcon />}
+                        onClick={() => openMediaPicker("cover")}
+                      >
+                        Media Library
+                      </Button>
+                    </Tooltip>
+                  </Stack>
+                  <ImageUploader
+                    label="Vendor Cover Image"
+                    value={coverImage}
+                    onChange={setCoverImage}
+                    folder="vendors/covers"
+                    previewHeight={180}
+                    persistToMediaLibrary
+                    mediaLibraryFolder="vendors"
+                    mediaFilename={businessName ? `${businessName}-cover` : "vendor-cover"}
+                  />
+                </Box>
               </Stack>
             </Box>
           </Stack>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDialog}>Cancel</Button>
-          <Button variant="contained" onClick={handleSave} disabled={!businessName || saveVendorMutation.isPending}>
-            Save Vendor
+          <Button
+            variant="contained"
+            onClick={handleSave}
+            disabled={!businessName || saveVendorMutation.isPending}
+          >
+            {saveVendorMutation.isPending ? (
+              <CircularProgress size={20} color="inherit" />
+            ) : editingVendor ? (
+              "Save Changes"
+            ) : (
+              "Add Vendor"
+            )}
           </Button>
         </DialogActions>
       </Dialog>
 
+      {/* Media Picker — shared for logo and cover */}
       <MediaPickerModal
         open={mediaPickerOpen}
         onClose={() => setMediaPickerOpen(false)}
-        onSelect={(url) => {
-          if (mediaTarget === "logo") {
-            setLogo(url);
-          } else {
-            setCoverImage(url);
-          }
-        }}
-        title={mediaTarget === "logo" ? "Select Vendor Logo" : "Select Vendor Cover"}
+        onSelect={handleMediaSelect}
+        title={mediaTarget === "logo" ? "Select Vendor Logo" : "Select Vendor Cover Image"}
       />
     </Stack>
   );
