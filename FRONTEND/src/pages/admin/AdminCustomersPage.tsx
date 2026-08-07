@@ -106,12 +106,15 @@ export function AdminCustomersPage() {
   const handlePromoteSubmit = () => {
     if (!selectedUser) return;
     const fullPhoneNumber = `${vendorData.countryCode}${vendorData.whatsappNumber}`;
+    const location = [vendorData.city, vendorData.county, vendorData.country].filter(Boolean).join(", ");
     promoteMutation.mutate({
       userId: selectedUser.id,
       businessName: vendorData.businessName,
+      shopName: vendorData.businessName,
       whatsappNumber: fullPhoneNumber,
+      phone: fullPhoneNumber,
       address: vendorData.address,
-      location: `${vendorData.city}, ${vendorData.county}, ${vendorData.country}`,
+      location,
       description: vendorData.description,
     });
   };

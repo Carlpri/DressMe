@@ -81,7 +81,14 @@ export class UserController {
   promoteToVendor = asyncHandler(
     async (req, res) => {
       const { userId, ...vendorData } = req.body;
-      const vendor = await userService.promoteToVendor(userId, vendorData);
+      const normalizedVendorData = {
+        ...vendorData,
+        businessName: vendorData.businessName || vendorData.shopName,
+        whatsappNumber: vendorData.whatsappNumber || vendorData.phone,
+        location: vendorData.location || "Unknown",
+        shopName: vendorData.shopName || vendorData.businessName,
+      };
+      const vendor = await userService.promoteToVendor(userId, normalizedVendorData);
       ApiResponse.success(
         res,
         201,
