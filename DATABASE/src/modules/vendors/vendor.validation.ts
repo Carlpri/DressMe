@@ -1,5 +1,11 @@
 import { z } from "zod";
 
+// Accepts a valid URL OR an empty string (so optional fields don't 400 when blank)
+const optionalUrl = z.string().url().or(z.literal("")).optional();
+
+// Website is display-only — accept any non-empty string or omit it
+const optionalWebsite = z.string().optional();
+
 export const createVendorSchema = z.object({
   body: z.object({
     businessName: z.string().min(3),
@@ -22,21 +28,21 @@ export const createVendorSchema = z.object({
 
     contactPerson: z.string().min(2).optional(),
 
-    logo: z.string().url().optional(),
+    logo: optionalUrl,
 
     description: z.string().optional(),
 
-    coverImage: z.string().url().optional(),
+    coverImage: optionalUrl,
 
-    businessEmail: z.string().email().optional(),
+    businessEmail: z.string().email().or(z.literal("")).optional(),
 
-    facebook: z.string().url().optional(),
+    facebook: optionalUrl,
 
-    instagram: z.string().url().optional(),
+    instagram: optionalUrl,
 
-    tiktok: z.string().url().optional(),
+    tiktok: optionalUrl,
 
-    website: z.string().url().optional(),
+    website: optionalWebsite,
   }),
 });
 
@@ -52,7 +58,7 @@ export const updateVendorSchema = z.object({
 
     phoneNumber: z.string().min(10).optional(),
 
-    email: z.string().email().optional(),
+    email: z.string().email().or(z.literal("")).optional(),
 
     city: z.string().min(2).optional(),
 
@@ -62,21 +68,21 @@ export const updateVendorSchema = z.object({
 
     contactPerson: z.string().min(2).optional(),
 
-    logo: z.string().url().optional(),
+    logo: optionalUrl,
 
     description: z.string().optional(),
 
-    coverImage: z.string().url().optional(),
+    coverImage: optionalUrl,
 
-    businessEmail: z.string().email().optional(),
+    businessEmail: z.string().email().or(z.literal("")).optional(),
 
-    facebook: z.string().url().optional(),
+    facebook: optionalUrl,
 
-    instagram: z.string().url().optional(),
+    instagram: optionalUrl,
 
-    tiktok: z.string().url().optional(),
+    tiktok: optionalUrl,
 
-    website: z.string().url().optional(),
+    website: optionalWebsite,
   }),
 });
 

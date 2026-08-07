@@ -1,5 +1,8 @@
 import { z } from "zod";
 
+const optionalUrl = z.string().url().or(z.literal("")).optional();
+const optionalWebsite = z.string().optional();
+
 export const updateProfileSchema = z.object({
   name: z
     .string()
@@ -37,15 +40,13 @@ export const promoteToVendorSchema = z.object({
     whatsappNumber: z.string().min(10),
     address: z.string().min(5),
     location: z.string().min(2).optional(),
-    shopName: z.string().min(3).optional(),
-    phone: z.string().min(10).optional(),
-    logo: z.string().url().optional(),
+    logo: optionalUrl,
     description: z.string().optional(),
-    coverImage: z.string().url().optional(),
-    businessEmail: z.string().email().optional(),
-    facebook: z.string().url().optional(),
-    instagram: z.string().url().optional(),
-    tiktok: z.string().url().optional(),
-    website: z.string().url().optional(),
+    coverImage: optionalUrl,
+    businessEmail: z.string().email().or(z.literal("")).optional(),
+    facebook: optionalUrl,
+    instagram: optionalUrl,
+    tiktok: optionalUrl,
+    website: optionalWebsite,
   }),
-});
+});
