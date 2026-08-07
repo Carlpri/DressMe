@@ -23,7 +23,6 @@ export interface CreateProductDto {
   description: string;
   price: number;
   compareAtPrice?: number;
-  stock: number;
   sku: string;
   gender: Gender;
   categoryId: string;
@@ -43,7 +42,6 @@ export interface UpdateProductDto {
   description?: string;
   price?: number;
   compareAtPrice?: number;
-  stock?: number;
   sku?: string;
   gender?: Gender;
   categoryId?: string;

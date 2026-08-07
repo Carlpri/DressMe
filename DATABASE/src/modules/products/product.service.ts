@@ -75,9 +75,14 @@ export class ProductService {
       await this.ensureSkuAvailable(data.sku, id);
     }
 
-    await this.ensureVariantSkusAvailable(data.variants, id);
-    this.ensureOnePrimaryImage(data.images);
-    this.ensureUniqueVariantOptions(data.variants);
+    if (data.variants) {
+      await this.ensureVariantSkusAvailable(data.variants, id);
+      this.ensureUniqueVariantOptions(data.variants);
+    }
+
+    if (data.images) {
+      this.ensureOnePrimaryImage(data.images);
+    }
 
     const updateData: UpdateProductDto & {
       slug?: string;
