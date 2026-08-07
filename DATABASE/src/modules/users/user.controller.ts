@@ -50,8 +50,6 @@ export class UserController {
 
  changePassword = asyncHandler(
     async ( req, res)=>{
-        console.log(req.body);
-
         await userService.changePassword(
             req.user.userId,
             req.body
@@ -81,14 +79,13 @@ export class UserController {
   promoteToVendor = asyncHandler(
     async (req, res) => {
       const { userId, ...vendorData } = req.body;
-      const normalizedVendorData = {
+      // Normalise field names — frontend always sends businessName + whatsappNumber
+      const cleanData = {
         ...vendorData,
-        businessName: vendorData.businessName || vendorData.shopName,
-        whatsappNumber: vendorData.whatsappNumber || vendorData.phone,
-        location: vendorData.location || "Unknown",
-        shopName: vendorData.shopName || vendorData.businessName,
+        businessName:   vendorData.businessName,
+        whatsappNumber: vendorData.whatsappNumber,
       };
-      const vendor = await userService.promoteToVendor(userId, normalizedVendorData);
+      const vendor = await userService.promoteToVendor(userId, cleanData);
       ApiResponse.success(
         res,
         201,

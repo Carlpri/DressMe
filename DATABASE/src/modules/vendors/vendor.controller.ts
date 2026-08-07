@@ -6,10 +6,10 @@ const vendorService = new VendorService();
 
 export class VendorController {
   createVendor = asyncHandler(async (req, res) => {
-    const vendor = await vendorService.create(
-      req.body.userId || req.user.userId,
-      req.body
-    );
+    const { userId: bodyUserId, ...vendorData } = req.body;
+    const userId = bodyUserId || req.user.userId;
+
+    const vendor = await vendorService.create(userId, vendorData);
 
     ApiResponse.success(
       res,

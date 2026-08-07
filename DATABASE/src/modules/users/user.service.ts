@@ -104,7 +104,10 @@ if (isSamePassword) {
       throw new ApiError(409, "Vendor profile already exists for this user.");
     }
 
-    // Create vendor profile
-    return vendorRepository.create(userId, vendorData);
+    // Strip userId from vendorData — it is passed explicitly as the first param
+    const { userId: _ignoredId, ...cleanData } = vendorData;
+
+    // Create vendor profile with explicit userId
+    return vendorRepository.create(userId, cleanData);
   }
 }

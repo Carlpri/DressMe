@@ -5,30 +5,44 @@ import type {
 } from "./vendor.types.js";
 
 export class VendorRepository {
-  async create(userId: string,
-                data: CreateVendorDto
-            ) {
+  async create(userId: string, data: CreateVendorDto) {
+    // Explicitly map only the fields that exist in the Prisma Vendor model.
+    // Never spread req.body directly — unknown fields cause PrismaClientValidationError.
     return prisma.vendor.create({
       data: {
-        ...data,
         userId,
+        businessName:  data.businessName,
+        whatsappNumber: data.whatsappNumber,
+        address:       data.address,
+        location:      data.location,
+        // optional fields
+        phoneNumber:   data.phoneNumber   ?? null,
+        email:         data.email         ?? null,
+        city:          data.city          ?? null,
+        county:        data.county        ?? null,
+        town:          data.town          ?? null,
+        contactPerson: data.contactPerson ?? null,
+        logo:          data.logo          ?? null,
+        description:   data.description   ?? null,
+        coverImage:    data.coverImage    ?? null,
+        businessEmail: data.businessEmail ?? null,
+        facebook:      data.facebook      ?? null,
+        instagram:     data.instagram     ?? null,
+        tiktok:        data.tiktok        ?? null,
+        website:       data.website       ?? null,
       },
     });
   }
 
   async findByUserId(userId: string) {
     return prisma.vendor.findUnique({
-      where: {
-        userId,
-      },
+      where: { userId },
     });
   }
 
   async findById(id: string) {
     return prisma.vendor.findUnique({
-      where: {
-        id,
-      },
+      where: { id },
     });
   }
 
@@ -37,32 +51,48 @@ export class VendorRepository {
       include: {
         user: {
           select: {
-            id: true,
-            name: true,
+            id:    true,
+            name:  true,
             email: true,
           },
         },
       },
+      orderBy: { createdAt: "desc" },
     });
   }
 
-  async update(
-    id: string,
-    data: UpdateVendorDto
-  ) {
+  async update(id: string, data: UpdateVendorDto) {
+    // Only pass fields that were explicitly provided (not undefined).
+    const patch: Record<string, unknown> = {};
+
+    if (data.businessName   !== undefined) patch.businessName   = data.businessName;
+    if (data.whatsappNumber !== undefined) patch.whatsappNumber = data.whatsappNumber;
+    if (data.address        !== undefined) patch.address        = data.address;
+    if (data.location       !== undefined) patch.location       = data.location;
+    if (data.phoneNumber    !== undefined) patch.phoneNumber    = data.phoneNumber;
+    if (data.email          !== undefined) patch.email          = data.email;
+    if (data.city           !== undefined) patch.city           = data.city;
+    if (data.county         !== undefined) patch.county         = data.county;
+    if (data.town           !== undefined) patch.town           = data.town;
+    if (data.contactPerson  !== undefined) patch.contactPerson  = data.contactPerson;
+    if (data.logo           !== undefined) patch.logo           = data.logo;
+    if (data.description    !== undefined) patch.description    = data.description;
+    if (data.coverImage     !== undefined) patch.coverImage     = data.coverImage;
+    if (data.businessEmail  !== undefined) patch.businessEmail  = data.businessEmail;
+    if (data.facebook       !== undefined) patch.facebook       = data.facebook;
+    if (data.instagram      !== undefined) patch.instagram      = data.instagram;
+    if (data.tiktok         !== undefined) patch.tiktok         = data.tiktok;
+    if (data.website        !== undefined) patch.website        = data.website;
+
     return prisma.vendor.update({
-      where: {
-        id,
-      },
-      data,
+      where: { id },
+      data: patch,
     });
   }
 
   async delete(id: string) {
     return prisma.vendor.delete({
-      where: {
-        id,
-      },
+      where: { id },
     });
   }
 }
