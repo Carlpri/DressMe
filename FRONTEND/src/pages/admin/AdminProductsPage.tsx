@@ -242,7 +242,7 @@ export function AdminProductsPage() {
       price: Number(price),
       compareAtPrice: compareAtPrice ? Number(compareAtPrice) : null,
       stock: Number(stock),
-      sku: sku || `DM-SKU-${Math.floor(1000 + Math.random() * 9000)}`,
+      sku: sku || `DM-${Date.now().toString(36).toUpperCase()}-${Math.floor(Math.random() * 1000)}`,
       gender,
       categoryId,
       brandId,
@@ -410,6 +410,8 @@ export function AdminProductsPage() {
                 onChange={(e) => setSku(e.target.value)}
                 placeholder="e.g. DM-BLZ-001"
                 fullWidth
+                disabled
+                helperText="Auto-generated"
               />
             </Grid>
 
