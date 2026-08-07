@@ -16,7 +16,12 @@ import {
   Chip,
   IconButton,
   Alert,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
+import { KENYA_COUNTY_NAMES, getTownsForCounty } from "../../constants/kenya";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -259,20 +264,34 @@ export function AddressesPage() {
               placeholder="0712345678 or +254712345678"
               required
             />
-            <TextField
-              fullWidth
-              label="County"
-              value={formData.county}
-              onChange={(e) => setFormData({ ...formData, county: e.target.value })}
-              required
-            />
-            <TextField
-              fullWidth
-              label="City"
-              value={formData.city}
-              onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-              required
-            />
+            <FormControl fullWidth required>
+              <InputLabel id="county-label">County</InputLabel>
+              <Select
+                labelId="county-label"
+                label="County"
+                value={formData.county}
+                onChange={(e) =>
+                  setFormData({ ...formData, county: e.target.value, city: "" })
+                }
+              >
+                {KENYA_COUNTY_NAMES.map((c) => (
+                  <MenuItem key={c} value={c}>{c}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <FormControl fullWidth required disabled={!formData.county}>
+              <InputLabel id="city-label">City / Town</InputLabel>
+              <Select
+                labelId="city-label"
+                label="City / Town"
+                value={formData.city}
+                onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+              >
+                {getTownsForCounty(formData.county).map((t) => (
+                  <MenuItem key={t} value={t}>{t}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
             <TextField
               fullWidth
               label="Area / Estate"

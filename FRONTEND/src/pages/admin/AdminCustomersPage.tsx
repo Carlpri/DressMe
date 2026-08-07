@@ -25,33 +25,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../../api/client";
 import { useState } from "react";
 
-const COUNTRIES = [
-  { code: "+254", name: "Kenya" },
-  { code: "+255", name: "Tanzania" },
-  { code: "+256", name: "Uganda" },
-  { code: "+257", name: "Burundi" },
-  { code: "+250", name: "Rwanda" },
-  { code: "+251", name: "Ethiopia" },
-  { code: "+258", name: "Mozambique" },
-  { code: "+260", name: "Zambia" },
-  { code: "+263", name: "Zimbabwe" },
-  { code: "+27", name: "South Africa" },
-];
-
-const KENYA_COUNTIES = [
-  "Nairobi", "Mombasa", "Kisumu", "Nakuru", "Eldoret", "Kiambu", "Machakos",
-  "Kajiado", "Turkana", "Marsabit", "Isiolo", "Meru", "Tharaka Nithi", "Embu",
-  "Kitui", "Makueni", "Nyandarua", "Nyeri", "Kirinyaga", "Murang'a", "Kiambu",
-  "Nyamira", "Kisii", "Homa Bay", "Migori", "Kisumu", "Siaya", "Busia",
-  "Bungoma", "Trans Nzoia", "Uasin Gishu", "Elgeyo Marakwet", "Nandi", "Baringo",
-  "Kericho", "Bomet", "Narok", "Kajiado", "Taita Taveta", "Kwale", "Kilifi",
-  "Lamu", "Garissa", "Wajir", "Mandera", "Marsabit", "Isiolo", "Samburu",
-];
-
-const MAJOR_CITIES = [
-  "Nairobi", "Mombasa", "Kisumu", "Nakuru", "Eldoret", "Thika", "Malindi",
-  "Naivasha", "Kitale", "Kakamega", "Nyeri", "Meru", "Embu", "Machakos",
-];
+import { KENYA_COUNTY_NAMES, getTownsForCounty } from "../../constants/kenya";
 
 export function AdminCustomersPage() {
   const { data: users = [], isLoading } = useQuery<any[]>({
@@ -68,7 +42,6 @@ export function AdminCustomersPage() {
     businessName: "",
     countryCode: "+254",
     whatsappNumber: "",
-    country: "Kenya",
     county: "",
     city: "",
     address: "",
@@ -89,7 +62,6 @@ export function AdminCustomersPage() {
         businessName: "",
         countryCode: "+254",
         whatsappNumber: "",
-        country: "Kenya",
         county: "",
         city: "",
         address: "",
@@ -106,13 +78,11 @@ export function AdminCustomersPage() {
   const handlePromoteSubmit = () => {
     if (!selectedUser) return;
     const fullPhoneNumber = `${vendorData.countryCode}${vendorData.whatsappNumber}`;
-    const location = [vendorData.city, vendorData.county, vendorData.country].filter(Boolean).join(", ");
+    const location = [vendorData.city, vendorData.county].filter(Boolean).join(", ");
     promoteMutation.mutate({
       userId: selectedUser.id,
       businessName: vendorData.businessName,
-      shopName: vendorData.businessName,
       whatsappNumber: fullPhoneNumber,
-      phone: fullPhoneNumber,
       address: vendorData.address,
       location,
       description: vendorData.description,
@@ -197,60 +167,29 @@ export function AdminCustomersPage() {
               required
             />
             <FormControl fullWidth required>
-              <InputLabel>Country</InputLabel>
+              <InputLabel>County</InputLabel>
               <Select
-                label="Country"
-                value={vendorData.country}
-                onChange={(e) => {
-                  const selectedCountry = COUNTRIES.find(c => c.name === e.target.value);
-                  setVendorData({
-                    ...vendorData,
-                    country: e.target.value,
-                    countryCode: selectedCountry?.code || "+254",
-                    county: "",
-                    city: "",
-                  });
-                }}
+                label="County"
+                value={vendorData.county}
+                onChange={(e) => setVendorData({ ...vendorData, county: e.target.value, city: "" })}
               >
-                {COUNTRIES.map((country) => (
-                  <MenuItem key={country.code} value={country.name}>
-                    {country.name} ({country.code})
-                  </MenuItem>
+                {KENYA_COUNTY_NAMES.map((county) => (
+                  <MenuItem key={county} value={county}>{county}</MenuItem>
                 ))}
               </Select>
             </FormControl>
-            {vendorData.country === "Kenya" && (
-              <>
-                <FormControl fullWidth required>
-                  <InputLabel>County</InputLabel>
-                  <Select
-                    label="County"
-                    value={vendorData.county}
-                    onChange={(e) => setVendorData({ ...vendorData, county: e.target.value })}
-                  >
-                    {KENYA_COUNTIES.map((county) => (
-                      <MenuItem key={county} value={county}>
-                        {county}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-                <FormControl fullWidth required>
-                  <InputLabel>City/Town</InputLabel>
-                  <Select
-                    label="City/Town"
-                    value={vendorData.city}
-                    onChange={(e) => setVendorData({ ...vendorData, city: e.target.value })}
-                  >
-                    {MAJOR_CITIES.map((city) => (
-                      <MenuItem key={city} value={city}>
-                        {city}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </>
-            )}
+            <FormControl fullWidth required disabled={!vendorData.county}>
+              <InputLabel>City / Town</InputLabel>
+              <Select
+                label="City / Town"
+                value={vendorData.city}
+                onChange={(e) => setVendorData({ ...vendorData, city: e.target.value })}
+              >
+                {getTownsForCounty(vendorData.county).map((city) => (
+                  <MenuItem key={city} value={city}>{city}</MenuItem>
+                ))}
+              </Select>
+            </FormControl>
             <Stack direction="row" spacing={1}>
               <TextField
                 label="Country Code"
