@@ -448,7 +448,7 @@ model ProductCategory {
   Product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
 
   @@id([productId, categoryId])
-  @@index([categoryId])
+
   @@index([productId])
 }
 

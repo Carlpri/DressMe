@@ -66,7 +66,7 @@ export class ProductService {
 
     if (data.brandId || data.categoryIds) {
       await this.ensureRelationsExist(
-        data.categoryIds ?? product.categories?.map((category) => category.id),
+        data.categoryIds ?? product.categories?.map((c) => c.id),
         data.brandId ?? product.brandId
       );
     }
@@ -157,9 +157,11 @@ export class ProductService {
       }
     }
 
-    const brand = await this.repository.findBrandById(brandId);
-    if (!brand) {
-      throw new ApiError(404, "Brand not found.");
+    if (brandId) {
+      const brand = await this.repository.findBrandById(brandId);
+      if (!brand) {
+        throw new ApiError(404, "Brand not found.");
+      }
     }
   }
 
@@ -202,7 +204,10 @@ export class ProductService {
     );
 
     if (existing) {
-      throw new ApiError(409, "Product already exists for the selected categories and brand.");
+      throw new ApiError(
+        409,
+        "A product with this name, category, and brand already exists."
+      );
     }
   }
 

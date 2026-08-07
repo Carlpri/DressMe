@@ -17,7 +17,7 @@ export class VendorRepository {
         location:      data.location,
         // optional fields
         phoneNumber:   data.phoneNumber   ?? null,
-        email:         data.businessEmail ?? data.email ?? null,   // Prisma column = email
+        email:         data.email         ?? null,   // Prisma column = email
         city:          data.city          ?? null,
         county:        data.county        ?? null,
         town:          data.town          ?? null,
@@ -69,7 +69,6 @@ export class VendorRepository {
     if (data.address        !== undefined) patch.address        = data.address;
     if (data.location       !== undefined) patch.location       = data.location;
     if (data.phoneNumber    !== undefined) patch.phoneNumber    = data.phoneNumber;
-    if (data.businessEmail  !== undefined) patch.email          = data.businessEmail;  // Prisma column = email
     if (data.email          !== undefined) patch.email          = data.email;
     if (data.city           !== undefined) patch.city           = data.city;
     if (data.county         !== undefined) patch.county         = data.county;
@@ -78,7 +77,6 @@ export class VendorRepository {
     if (data.logo           !== undefined) patch.logo           = data.logo;
     if (data.description    !== undefined) patch.description    = data.description;
     if (data.coverImage     !== undefined) patch.coverImage     = data.coverImage;
-    if (data.businessEmail  !== undefined) patch.businessEmail  = data.businessEmail;
     if (data.facebook       !== undefined) patch.facebook       = data.facebook;
     if (data.instagram      !== undefined) patch.instagram      = data.instagram;
     if (data.tiktok         !== undefined) patch.tiktok         = data.tiktok;
