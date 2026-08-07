@@ -48,6 +48,7 @@ export class ProductRepository {
         description: data.description,
         price: data.price,
         compareAtPrice: data.compareAtPrice,
+        stock: data.stock,
         sku: data.sku,
         gender: data.gender,
         featured: data.featured,

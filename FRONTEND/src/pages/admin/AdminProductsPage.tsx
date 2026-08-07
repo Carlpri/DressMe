@@ -64,6 +64,7 @@ export function AdminProductsPage() {
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState<number>(0);
   const [compareAtPrice, setCompareAtPrice] = useState<number | undefined>(undefined);
+  const [stock, setStock] = useState<number>(10);
   const [sku, setSku] = useState("");
   const [gender, setGender] = useState<"MALE" | "FEMALE" | "UNISEX">("UNISEX");
   const [categoryId, setCategoryId] = useState("");
@@ -161,6 +162,7 @@ export function AdminProductsPage() {
     setDescription("High quality fashion product designed for maximum comfort and style.");
     setPrice(2500);
     setCompareAtPrice(3000);
+    setStock(15);
     setSku(`DM-${Date.now().toString(36).toUpperCase()}-${Math.floor(Math.random() * 1000)}`);
     setGender("UNISEX");
     setCategoryId(categories[0]?.id || "");
@@ -238,6 +240,7 @@ export function AdminProductsPage() {
       description,
       price: Number(price),
       compareAtPrice: compareAtPrice ? Number(compareAtPrice) : null,
+      stock: Number(stock),
       sku: sku || `DM-${Date.now().toString(36).toUpperCase()}-${Math.floor(Math.random() * 1000)}`,
       gender,
       categoryId,
