@@ -512,10 +512,10 @@ export function ProductDetailsPage() {
                         {product.vendor.businessName}
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
-                        {product.vendor.verified && "✓ Verified Vendor"}
+                        {product.vendor.isVerified && "✓ Verified Vendor"}
                       </Typography>
                     </Box>
-                    {product.vendor.verified && (
+                    {product.vendor.isVerified && (
                       <Chip label="Verified" color="success" size="small" />
                     )}
                   </Stack>

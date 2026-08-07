@@ -504,7 +504,7 @@ export function LandingPage() {
                             sx={{ width: "100%", height: "100%", objectFit: "cover" }}
                           />
                         )}
-                        {vendor.verified && (
+                        {vendor.isVerified && (
                           <Chip
                             label="Verified"
                             size="small"
