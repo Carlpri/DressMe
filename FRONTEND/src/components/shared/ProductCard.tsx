@@ -49,7 +49,7 @@ export function ProductCard({ product }: ProductCardProps) {
   const isLowStock = totalStock > 0 && totalStock <= 3 && product.status !== "HIDDEN";
   const hasSalePrice = product.compareAtPrice != null && product.compareAtPrice > product.price;
   const savings = hasSalePrice ? (product.compareAtPrice! - product.price) : 0;
-  const category = product.ProductCategory?.[0]?.Category;
+  const categories = product.categories ?? [];
 
   const handleAddToCart = () => {
     if (!isOutOfStock) {
@@ -209,7 +209,7 @@ export function ProductCard({ product }: ProductCardProps) {
               color="text.secondary"
               sx={{ fontWeight: 500 }}
             >
-              {product.brand.name}
+              {product.brand?.name || "Brand"}
             </Typography>
             <Box
               component={RouterLink}
@@ -275,7 +275,7 @@ export function ProductCard({ product }: ProductCardProps) {
               {(product.variants ?? []).slice(0, 3).map((variant) => (
                 <Chip
                   key={variant.id}
-                  label={variant.sizeValue}
+                  label={variant.sizeValue || variant.colorValue}
                   size="small"
                   sx={{
                     height: 24,
@@ -287,7 +287,7 @@ export function ProductCard({ product }: ProductCardProps) {
               ))}
               {(product.variants?.length ?? 0) > 3 && (
                 <Chip
-                  label={`+${product.variants.length - 3}`}
+                  label={`+${(product.variants?.length ?? 0) - 3}`}
                   size="small"
                   sx={{ height: 24, fontSize: "0.7rem", bgcolor: "#F8FAFC" }}
                 />

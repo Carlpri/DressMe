@@ -24,10 +24,10 @@ export class ProductService {
       data.vendorId
     );
 
-    await this.ensureRelationsExist(data.categoryId, data.brandId);
+    await this.ensureRelationsExist(data.categoryIds, data.brandId);
     await this.ensureSkuAvailable(data.sku);
     await this.ensureVariantSkusAvailable(data.variants);
-    await this.ensureProductNotDuplicate(data.name, data.categoryId, data.brandId);
+    await this.ensureProductNotDuplicate(data.name, data.categoryIds, data.brandId);
     this.ensureOnePrimaryImage(data.images);
     this.ensureUniqueVariantOptions(data.variants);
 
@@ -64,9 +64,9 @@ export class ProductService {
 
     await this.ensureCanManageProduct(userId, role, product.vendorId);
 
-    if (data.brandId) {
+    if (data.brandId || data.categoryIds) {
       await this.ensureRelationsExist(
-        data.categoryId,
+        data.categoryIds ?? product.categories?.map((category) => category.id),
         data.brandId ?? product.brandId
       );
     }
@@ -145,13 +145,15 @@ export class ProductService {
   }
 
   private async ensureRelationsExist(
-    categoryId: string | undefined,
+    categoryIds: string[] | undefined,
     brandId: string
   ) {
-    if (categoryId) {
-      const category = await this.repository.findCategoryById(categoryId);
-      if (!category) {
-        throw new ApiError(404, "Category not found.");
+    if (categoryIds && categoryIds.length > 0) {
+      for (const categoryId of categoryIds) {
+        const category = await this.repository.findCategoryById(categoryId);
+        if (!category) {
+          throw new ApiError(404, "Category not found.");
+        }
       }
     }
 
@@ -190,11 +192,18 @@ export class ProductService {
 
   private async ensureProductNotDuplicate(
     name: string,
-    categoryId: string,
+    categoryIds: string[],
     brandId: string
   ) {
-    // Skip duplicate check for now with new schema
-    // TODO: Implement proper check using ProductCategory junction
+    const existing = await this.repository.findByNameCategoryBrand(
+      name,
+      categoryIds,
+      brandId
+    );
+
+    if (existing) {
+      throw new ApiError(409, "Product already exists for the selected categories and brand.");
+    }
   }
 
   private async ensureVariantSkusAvailable(
@@ -244,7 +253,7 @@ export class ProductService {
 
     const keys = variants.map(
       (variant) =>
-        `${variant.size.trim().toLowerCase()}::${variant.color.trim().toLowerCase()}`
+        `${variant.sizeValue.trim().toLowerCase()}::${variant.colorValue.trim().toLowerCase()}`
     );
 
     if (new Set(keys).size !== keys.length) {

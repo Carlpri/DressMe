@@ -67,7 +67,7 @@ export function AdminProductsPage() {
   const [stock, setStock] = useState<number>(10);
   const [sku, setSku] = useState("");
   const [gender, setGender] = useState<"MALE" | "FEMALE" | "UNISEX">("UNISEX");
-  const [categoryId, setCategoryId] = useState("");
+  const [categoryIds, setCategoryIds] = useState<string[]>([]);
   const [brandId, setBrandId] = useState("");
   const [vendorId, setVendorId] = useState("");
   const [status, setStatus] = useState<"ACTIVE" | "DRAFT" | "ARCHIVED" | "HIDDEN">("ACTIVE");
@@ -165,7 +165,7 @@ export function AdminProductsPage() {
     setStock(15);
     setSku(`DM-${Date.now().toString(36).toUpperCase()}-${Math.floor(Math.random() * 1000)}`);
     setGender("UNISEX");
-    setCategoryId(categories[0]?.id || "");
+    setCategoryIds(categories.length > 0 ? [categories[0].id] : []);
     setBrandId(brands[0]?.id || "");
     setVendorId(vendors[0]?.id || "");
     setStatus("ACTIVE");
@@ -187,7 +187,7 @@ export function AdminProductsPage() {
     setCompareAtPrice(prod.compareAtPrice || undefined);
     setSku(prod.sku || "");
     setGender(prod.gender);
-    setCategoryId(prod.categoryId || prod.category?.id || "");
+    setCategoryIds((prod.categories ?? []).map((category: any) => category.id));
     setBrandId(prod.brandId || prod.brand?.id || "");
     setVendorId(prod.vendorId || prod.vendor?.id || "");
     setStatus(prod.status);
@@ -243,7 +243,7 @@ export function AdminProductsPage() {
       stock: Number(stock),
       sku: sku || `DM-${Date.now().toString(36).toUpperCase()}-${Math.floor(Math.random() * 1000)}`,
       gender,
-      categoryId,
+      categoryIds,
       brandId,
       vendorId,
       status,
@@ -334,7 +334,7 @@ export function AdminProductsPage() {
                       {prod.sku || "N/A"}
                     </TableCell>
                     <TableCell>
-                      <Typography variant="body2">{prod.category?.name}</Typography>
+                      <Typography variant="body2">{(prod.categories ?? []).map((category: any) => category.name).join(", ") || "Uncategorized"}</Typography>
                       <Typography variant="caption" color="text.secondary">
                         {prod.brand?.name}
                       </Typography>
@@ -463,7 +463,13 @@ export function AdminProductsPage() {
             <Grid size={{ xs: 12, md: 4 }}>
               <FormControl fullWidth>
                 <InputLabel>Category</InputLabel>
-                <Select value={categoryId} label="Category" onChange={(e) => setCategoryId(e.target.value)}>
+                <Select
+                  multiple
+                  value={categoryIds}
+                  label="Categories"
+                  onChange={(event) => setCategoryIds(typeof event.target.value === "string" ? [event.target.value] : event.target.value)}
+                  renderValue={(selected) => categories.filter((category) => selected.includes(category.id)).map((category) => category.name).join(", ")}
+                >
                   {categories.map((c) => (
                     <MenuItem key={c.id} value={c.id}>{c.name}</MenuItem>
                   ))}
@@ -625,7 +631,7 @@ export function AdminProductsPage() {
               !name ||
               !description ||
               !price ||
-              !categoryId ||
+              categoryIds.length === 0 ||
               !brandId ||
               !vendorId ||
               !primaryImageUrl ||

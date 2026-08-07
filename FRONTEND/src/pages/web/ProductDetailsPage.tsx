@@ -66,8 +66,10 @@ export function ProductDetailsPage() {
   const [showFavoriteSuccess, setShowFavoriteSuccess] = useState(false);
   const [favoriteMessage, setFavoriteMessage] = useState("Added to wishlist!");
 
+  const categories = product?.categories ?? [];
+
   const { data: relatedProducts } = useProducts({
-    category: product?.ProductCategory?.[0]?.Category?.slug,
+    category: categories[0]?.slug,
     limit: 4,
   });
   const { data: reviews } = useReviews(product?.id || "");
@@ -309,7 +311,7 @@ export function ProductDetailsPage() {
                     {product.brand.name}
                   </Typography>
                   <Typography color="text.secondary">•</Typography>
-                  <Typography color="text.secondary">{product.ProductCategory?.[0]?.Category?.name || ""}</Typography>
+                  <Typography color="text.secondary">{categories.map((category) => category.name).join(", ") || "Uncategorized"}</Typography>
                 </Stack>
               </Box>
 
@@ -359,7 +361,7 @@ export function ProductDetailsPage() {
                     {(product.variants ?? []).map((variant) => (
                       <Chip
                         key={variant.id}
-                        label={`${variant.sizeValue} - ${variant.colorValue}`}
+                        label={`${variant.sizeValue || "N/A"} - ${variant.colorValue || "N/A"}`}
                         onClick={() => setSelectedVariant(variant.id)}
                         sx={{
                           border: selectedVariant === variant.id ? "2px solid" : "1px solid",

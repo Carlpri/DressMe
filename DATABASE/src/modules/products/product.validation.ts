@@ -11,17 +11,24 @@ const imagesHaveExactlyOnePrimary = (images?: { isPrimary?: boolean }[]) => {
   return images.filter((image) => image.isPrimary === true).length === 1;
 };
 
-const variantsAreUnique = (variants?: { size: string; color: string }[]) => {
+const variantsAreUnique = (variants?: { sizeValue: string; colorValue: string }[]) => {
   if (!variants) {
     return true;
   }
 
-  const keys = variants.map(
-    (variant) =>
-      `${variant.size.trim().toLowerCase()}::${variant.color.trim().toLowerCase()}`
+  const keys = variants.map((variant) =>
+    `${variant.sizeValue.trim().toLowerCase()}::${variant.colorValue.trim().toLowerCase()}`
   );
 
   return new Set(keys).size === keys.length;
+};
+
+const categoryIdsAreValid = (categoryIds?: string[]) => {
+  if (!categoryIds) {
+    return true;
+  }
+
+  return categoryIds.length >= 1 && new Set(categoryIds).size === categoryIds.length;
 };
 
 const imageSchema = z.object({
@@ -34,8 +41,8 @@ const imageSchema = z.object({
 
 const variantSchema = z.object({
   id: z.string().min(1).optional(),
-  size: z.string().trim().min(1),
-  color: z.string().trim().min(1),
+  sizeValue: z.string().trim().min(1),
+  colorValue: z.string().trim().min(1),
   stock: z.number().int().min(0),
   sku: z.string().trim().min(2),
   price: priceSchema.optional(),
@@ -51,7 +58,7 @@ const createProductBodySchema = z
     stock: z.number().int().min(0),
     sku: z.string().trim().min(2),
     gender: z.enum(Gender),
-    categoryId: z.string().min(1),
+    categoryIds: z.array(z.string().min(1)).min(1),
     brandId: z.string().min(1),
     vendorId: z.string().min(1).optional(),
     images: z.array(imageSchema).optional(),
@@ -69,6 +76,10 @@ const createProductBodySchema = z
   .refine((data) => variantsAreUnique(data.variants), {
     path: ["variants"],
     message: "Variants cannot have duplicate size and color combinations.",
+  })
+  .refine((data) => categoryIdsAreValid(data.categoryIds), {
+    path: ["categoryIds"],
+    message: "Provide at least one unique category.",
   });
 
 const updateProductBodySchema = z
@@ -80,7 +91,7 @@ const updateProductBodySchema = z
     stock: z.number().int().min(0).optional(),
     sku: z.string().trim().min(2).optional(),
     gender: z.enum(Gender).optional(),
-    categoryId: z.string().min(1).optional(),
+    categoryIds: z.array(z.string().min(1)).min(1).optional(),
     brandId: z.string().min(1).optional(),
     images: z.array(imageSchema).optional(),
     variants: z.array(variantSchema).optional(),
@@ -97,6 +108,10 @@ const updateProductBodySchema = z
   .refine((data) => variantsAreUnique(data.variants), {
     path: ["variants"],
     message: "Variants cannot have duplicate size and color combinations.",
+  })
+  .refine((data) => categoryIdsAreValid(data.categoryIds), {
+    path: ["categoryIds"],
+    message: "Provide at least one unique category.",
   });
 
 export const createProductSchema = z.object({

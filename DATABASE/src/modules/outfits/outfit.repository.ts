@@ -18,7 +18,11 @@ const outfitInclude = {
       product: {
         include: {
           brand: true,
-          category: true,
+          ProductCategory: {
+            include: {
+              Category: true,
+            },
+          },
           images: {
             orderBy: {
               displayOrder: "asc",

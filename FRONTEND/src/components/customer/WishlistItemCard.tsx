@@ -104,7 +104,7 @@ export function WishlistItemCard({ product, onRemove, isRemoving = false }: Wish
 
         <Stack spacing={1} sx={{ p: { xs: 2, sm: 2.5 }, minWidth: 0, justifyContent: "center" }}>
           <Typography variant="overline" color="text.secondary" sx={{ lineHeight: 1.2, fontWeight: 700 }}>
-            {product.brand.name} · {product.ProductCategory?.[0]?.Category?.name || ""}
+            {product.brand?.name || "Brand"} · {(product.categories ?? []).map((category) => category.name).join(", ") || "Uncategorized"}
           </Typography>
           <Typography component={RouterLink} to={productUrl} variant="h6" color="text.primary" sx={{ textDecoration: "none", fontWeight: 700, lineHeight: 1.3 }}>
             {product.name}

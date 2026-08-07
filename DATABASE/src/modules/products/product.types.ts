@@ -10,8 +10,8 @@ export interface ProductImageDto {
 
 export interface ProductVariantDto {
   id?: string;
-  size: string;
-  color: string;
+  sizeValue: string;
+  colorValue: string;
   stock: number;
   sku: string;
   price?: number;
@@ -26,7 +26,7 @@ export interface CreateProductDto {
   stock: number;
   sku: string;
   gender: Gender;
-  categoryId: string;
+  categoryIds: string[];
   brandId: string;
   vendorId?: string;
   images?: ProductImageDto[];
@@ -46,7 +46,7 @@ export interface UpdateProductDto {
   stock?: number;
   sku?: string;
   gender?: Gender;
-  categoryId?: string;
+  categoryIds?: string[];
   brandId?: string;
   images?: ProductImageDto[];
   variants?: ProductVariantDto[];
@@ -55,6 +55,13 @@ export interface UpdateProductDto {
   isNewArrival?: boolean;
   isBestSeller?: boolean;
   status?: ProductStatus;
+}
+
+export interface CategorySummary {
+  id: string;
+  name: string;
+  slug: string;
+  image?: string | null;
 }
 
 export interface ProductFilters {

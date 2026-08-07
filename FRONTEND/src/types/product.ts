@@ -1,3 +1,10 @@
+export interface CategorySummary {
+  id: string;
+  name: string;
+  slug: string;
+  image?: string | null;
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -23,14 +30,7 @@ export interface Product {
     logo?: string;
     verified: boolean;
   };
-  ProductCategory: Array<{
-    Category: {
-      id: string;
-      name: string;
-      slug: string;
-      image?: string;
-    };
-  }>;
+  categories: CategorySummary[];
   brand: {
     id: string;
     name: string;
