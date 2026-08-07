@@ -25,6 +25,7 @@ import CollectionsIcon from "@mui/icons-material/Collections";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../../api/client";
 import { MediaPickerModal } from "../../components/admin/MediaPickerModal";
+import { ImageUploader } from "../../components/admin/ImageUploader";
 
 export function AdminBrandsPage() {
   const queryClient = useQueryClient();
@@ -213,20 +214,25 @@ export function AdminBrandsPage() {
               fullWidth
             />
             <Box>
+              <ImageUploader
+                label="Brand Logo (Cloudinary Upload)"
+                value={logo}
+                onChange={setLogo}
+                folder="brands"
+                previewHeight={160}
+                persistToMediaLibrary
+                mediaLibraryFolder="brands"
+                mediaFilename={name || "brand-logo"}
+              />
               <Button
-                variant="outlined"
+                variant="text"
+                size="small"
                 startIcon={<CollectionsIcon />}
                 onClick={() => setMediaPickerOpen(true)}
-                sx={{ mb: 1 }}
+                sx={{ mt: 1 }}
               >
-                Choose Brand Logo from Media Library
+                Or choose from Media Library
               </Button>
-              <TextField
-                label="Logo URL"
-                value={logo}
-                onChange={(e) => setLogo(e.target.value)}
-                fullWidth
-              />
             </Box>
           </Stack>
         </DialogContent>

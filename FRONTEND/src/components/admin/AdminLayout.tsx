@@ -41,6 +41,7 @@ const NAV_ITEMS = [
   { label: "Media Library", path: "/admin/media", icon: <PermMediaIcon /> },
   { label: "Categories", path: "/admin/categories", icon: <CategoryIcon /> },
   { label: "Brands", path: "/admin/brands", icon: <LocalOfferIcon /> },
+  { label: "Vendors", path: "/admin/vendors", icon: <StorefrontIcon /> },
   { label: "Orders", path: "/admin/orders", icon: <ShoppingCartIcon /> },
   { label: "Customers", path: "/admin/customers", icon: <PeopleIcon /> },
   { label: "Reviews", path: "/admin/reviews", icon: <StarIcon /> },

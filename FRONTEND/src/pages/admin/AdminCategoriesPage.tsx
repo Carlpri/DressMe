@@ -198,6 +198,9 @@ export function AdminCategoriesPage() {
                 onChange={setImageUrl}
                 folder="categories"
                 previewHeight={160}
+                persistToMediaLibrary
+                mediaLibraryFolder="categories"
+                mediaFilename={name || "category-image"}
               />
               <Button
                 variant="text"

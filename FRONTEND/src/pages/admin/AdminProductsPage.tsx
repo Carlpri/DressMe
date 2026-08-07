@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Box,
   Stack,
@@ -109,6 +109,12 @@ export function AdminProductsPage() {
       return res.data.data;
     },
   });
+
+  useEffect(() => {
+    if (!editingProduct && !vendorId && vendors.length > 0) {
+      setVendorId(vendors[0].id);
+    }
+  }, [editingProduct, vendorId, vendors]);
 
   const saveProductMutation = useMutation({
     mutationFn: async (payload: any) => {
@@ -492,9 +498,15 @@ export function AdminProductsPage() {
               <FormControl fullWidth>
                 <InputLabel>Vendor</InputLabel>
                 <Select value={vendorId} label="Vendor" onChange={(e) => setVendorId(e.target.value)}>
-                  {vendors.map((v) => (
-                    <MenuItem key={v.id} value={v.id}>{v.businessName || v.shopName}</MenuItem>
-                  ))}
+                  {vendors.length === 0 ? (
+                    <MenuItem disabled value="">
+                      No vendors are available yet.
+                    </MenuItem>
+                  ) : (
+                    vendors.map((v) => (
+                      <MenuItem key={v.id} value={v.id}>{v.businessName || v.shopName || "Vendor"}</MenuItem>
+                    ))
+                  )}
                 </Select>
               </FormControl>
             </Grid>

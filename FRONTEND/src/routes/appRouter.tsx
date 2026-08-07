@@ -34,6 +34,7 @@ import { AdminProductsPage } from "../pages/admin/AdminProductsPage";
 import { AdminMediaPage } from "../pages/admin/AdminMediaPage";
 import { AdminCategoriesPage } from "../pages/admin/AdminCategoriesPage";
 import { AdminBrandsPage } from "../pages/admin/AdminBrandsPage";
+import { AdminVendorsPage } from "../pages/admin/AdminVendorsPage";
 import { AdminOrdersPage } from "../pages/admin/AdminOrdersPage";
 import { AdminCustomersPage } from "../pages/admin/AdminCustomersPage";
 import { AdminReviewsPage } from "../pages/admin/AdminReviewsPage";
@@ -141,6 +142,7 @@ export const appRouter = createBrowserRouter([
           { path: "media", element: <AdminMediaPage /> },
           { path: "categories", element: <AdminCategoriesPage /> },
           { path: "brands", element: <AdminBrandsPage /> },
+          { path: "vendors", element: <AdminVendorsPage /> },
           { path: "orders", element: <AdminOrdersPage /> },
           { path: "customers", element: <AdminCustomersPage /> },
           { path: "reviews", element: <AdminReviewsPage /> },

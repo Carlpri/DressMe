@@ -19,6 +19,8 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import LinkIcon from "@mui/icons-material/Link";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import RefreshIcon from "@mui/icons-material/Refresh";
+import { useQueryClient } from "@tanstack/react-query";
+import { apiClient } from "../../api/client";
 import { uploadToCloudinary } from "../../services/cloudinary";
 
 export interface ImageUploaderProps {
@@ -31,6 +33,9 @@ export interface ImageUploaderProps {
   disabled?: boolean;
   helperText?: string;
   errorText?: string;
+  persistToMediaLibrary?: boolean;
+  mediaLibraryFolder?: string;
+  mediaFilename?: string;
 }
 
 export function ImageUploader({
@@ -43,7 +48,11 @@ export function ImageUploader({
   disabled = false,
   helperText,
   errorText,
+  persistToMediaLibrary = false,
+  mediaLibraryFolder,
+  mediaFilename,
 }: ImageUploaderProps) {
+  const queryClient = useQueryClient();
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [error, setError] = useState<string | null>(errorText || null);
@@ -97,6 +106,7 @@ export function ImageUploader({
       });
 
       onChange(result.secure_url);
+      void persistMedia(result.secure_url);
     } catch (err: any) {
       setError(err.message || "Failed to upload image. Please try again.");
     } finally {
@@ -125,9 +135,26 @@ export function ImageUploader({
     setError(null);
   };
 
+  const persistMedia = async (url: string) => {
+    if (!persistToMediaLibrary || !url) return;
+
+    try {
+      await apiClient.post("/media", {
+        filename: mediaFilename || `media_${Date.now()}`,
+        url,
+        folder: mediaLibraryFolder,
+      });
+      queryClient.invalidateQueries({ queryKey: ["admin-media-picker"] });
+    } catch (persistError) {
+      console.warn("Unable to persist uploaded media item:", persistError);
+    }
+  };
+
   const handleApplyManualUrl = () => {
     if (manualUrl.trim()) {
-      onChange(manualUrl.trim());
+      const nextUrl = manualUrl.trim();
+      onChange(nextUrl);
+      void persistMedia(nextUrl);
       setManualUrl("");
       setShowUrlInput(false);
       setError(null);
