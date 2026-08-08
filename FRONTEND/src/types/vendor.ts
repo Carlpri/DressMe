@@ -14,7 +14,6 @@ export interface Vendor {
   logo?: string;
   description?: string;
   coverImage?: string;
-  businessEmail?: string;
   facebook?: string;
   instagram?: string;
   tiktok?: string;
