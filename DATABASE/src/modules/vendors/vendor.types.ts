@@ -6,6 +6,7 @@ export interface CreateVendorDto {
   location: string;
   phoneNumber?: string;
   email?: string;         // Prisma column name
+  businessEmail?: string; // Prisma column name
   city?: string;
   county?: string;
   town?: string;
@@ -26,6 +27,7 @@ export interface UpdateVendorDto {
   location?: string;
   phoneNumber?: string;
   email?: string;         // Prisma column name
+  businessEmail?: string; // Prisma column name
   city?: string;
   county?: string;
   town?: string;

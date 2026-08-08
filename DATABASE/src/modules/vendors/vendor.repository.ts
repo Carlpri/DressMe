@@ -18,6 +18,7 @@ export class VendorRepository {
         // optional fields
         phoneNumber:   data.phoneNumber   ?? null,
         email:         data.email         ?? null,   // Prisma column = email
+        businessEmail: data.businessEmail ?? null,   // Prisma column = businessEmail
         city:          data.city          ?? null,
         county:        data.county        ?? null,
         town:          data.town          ?? null,
@@ -70,6 +71,7 @@ export class VendorRepository {
     if (data.location       !== undefined) patch.location       = data.location;
     if (data.phoneNumber    !== undefined) patch.phoneNumber    = data.phoneNumber;
     if (data.email          !== undefined) patch.email          = data.email;
+    if (data.businessEmail  !== undefined) patch.businessEmail  = data.businessEmail;
     if (data.city           !== undefined) patch.city           = data.city;
     if (data.county         !== undefined) patch.county         = data.county;
     if (data.town           !== undefined) patch.town           = data.town;

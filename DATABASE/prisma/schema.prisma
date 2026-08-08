@@ -37,6 +37,7 @@ model Vendor {
   updatedAt      DateTime  @updatedAt
   address        String
   coverImage     String?
+  businessEmail  String?
   facebook       String?
   instagram      String?
   tiktok         String?

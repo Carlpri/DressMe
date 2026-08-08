@@ -43,6 +43,7 @@ export const promoteToVendorSchema = z.object({
     logo: optionalUrl,
     description: z.string().optional(),
     coverImage: optionalUrl,
+    businessEmail: z.string().email().or(z.literal("")).optional(),
     facebook: optionalUrl,
     instagram: optionalUrl,
     tiktok: optionalUrl,
