@@ -504,7 +504,9 @@ export function AdminProductsPage() {
                     </MenuItem>
                   ) : (
                     vendors.map((v) => (
-                      <MenuItem key={v.id} value={v.id}>{v.businessName || v.shopName || "Vendor"}</MenuItem>
+                      <MenuItem key={v.id} value={v.id}>
+                        {v.businessName || v.shopName || "Vendor"} ({v.user?.name || "Unknown User"})
+                      </MenuItem>
                     ))
                   )}
                 </Select>

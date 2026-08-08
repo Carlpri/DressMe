@@ -61,7 +61,7 @@ export function AdminVendorsPage() {
 
   // form fields
   const [businessName, setBusinessName] = useState("");
-  const [email, setEmail] = useState("");
+  const [businessEmail, setBusinessEmail] = useState("");
   const [whatsappNumber, setWhatsappNumber] = useState("");
   const [address, setAddress] = useState("");
   const [county, setCounty] = useState("");
@@ -116,7 +116,7 @@ export function AdminVendorsPage() {
 
   const resetForm = () => {
     setBusinessName("");
-    setEmail("");
+    setBusinessEmail("");
     setWhatsappNumber("");
     setAddress("");
     setCounty("");
@@ -160,7 +160,7 @@ export function AdminVendorsPage() {
     blurActive();
     setEditingVendor(vendor);
     setBusinessName(vendor.businessName || "");
-    setEmail(vendor.email || "");
+    setBusinessEmail(vendor.businessEmail || "");
     setWhatsappNumber(vendor.whatsappNumber || "");
     setAddress(vendor.address || "");
     setCounty(vendor.county || "");
@@ -203,7 +203,7 @@ export function AdminVendorsPage() {
     if (coverImage) payload.coverImage = coverImage;
     if (website) payload.website = website.trim();
     if (description) payload.description = description.trim();
-    if (email) payload.email = email.trim();
+    if (businessEmail) payload.businessEmail = businessEmail.trim();
 
     saveVendorMutation.mutate(payload);
   };
@@ -253,6 +253,7 @@ export function AdminVendorsPage() {
             <TableHead>
               <TableRow>
                 <TableCell>Vendor</TableCell>
+                <TableCell>User</TableCell>
                 <TableCell>Contact</TableCell>
                 <TableCell>Location</TableCell>
                 <TableCell>Website</TableCell>
@@ -301,7 +302,13 @@ export function AdminVendorsPage() {
                     </Stack>
                   </TableCell>
                   <TableCell>
-                    <Typography variant="body2">{vendor.email || "—"}</Typography>
+                    <Typography variant="body2">{vendor.user?.name || "—"}</Typography>
+                    <Typography variant="caption" color="text.secondary">
+                      {vendor.user?.email || "No email"}
+                    </Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="body2">{vendor.businessEmail || "—"}</Typography>
                     <Typography variant="caption" color="text.secondary">
                       {vendor.whatsappNumber || "No phone"}
                     </Typography>
@@ -399,8 +406,8 @@ export function AdminVendorsPage() {
             <TextField
               label="Business Email"
               type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              value={businessEmail}
+              onChange={(e) => setBusinessEmail(e.target.value)}
               fullWidth
             />
             <TextField
