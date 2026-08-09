@@ -1,12 +1,17 @@
 import { VendorService } from "./vendor.service.js";
 import { asyncHandler } from "../../utils/async-handler.js";
 import { ApiResponse } from "../../utils/api-response.js";
+import { ApiError } from "../../utils/api-error.js";
+import { Role } from "@prisma/client";
 
 const vendorService = new VendorService();
 
 export class VendorController {
   createVendor = asyncHandler(async (req, res) => {
     const { userId: bodyUserId, ...vendorData } = req.body;
+    if (bodyUserId && req.user.role !== Role.ADMIN) {
+      throw new ApiError(403, "Only an administrator can create a vendor profile for another user.");
+    }
     const userId = bodyUserId || req.user.userId;
 
     const vendor = await vendorService.create(userId, vendorData);
@@ -46,6 +51,8 @@ export class VendorController {
   updateVendor = asyncHandler(async (req, res) => {
     const vendor = await vendorService.update(
       req.params.id as string,
+      req.user.userId,
+      req.user.role,
       req.body
     );
 
@@ -59,7 +66,9 @@ export class VendorController {
 
   deleteVendor = asyncHandler(async (req, res) => {
     await vendorService.delete(
-      req.params.id as string
+      req.params.id as string,
+      req.user.userId,
+      req.user.role
     );
 
     ApiResponse.success(

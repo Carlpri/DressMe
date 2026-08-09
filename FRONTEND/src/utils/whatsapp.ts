@@ -28,7 +28,7 @@ export function buildWhatsAppUrl(phone: string, message: string): string | null 
 }
 
 interface VendorOrderMessageOptions {
-  shopName: string;
+  businessName: string;
   customerName: string;
   items: CartItem[];
   address: Address;
@@ -37,7 +37,7 @@ interface VendorOrderMessageOptions {
 }
 
 export function buildVendorOrderMessage({
-  shopName,
+  businessName,
   customerName,
   items,
   address,
@@ -66,7 +66,7 @@ export function buildVendorOrderMessage({
   ].filter(Boolean);
 
   return [
-    `Hi ${shopName},`,
+    `Hi ${businessName},`,
     "",
     `I'd like to place an order via DressMe.`,
     "",

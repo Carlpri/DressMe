@@ -2,6 +2,8 @@ import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { ApiError } from "../utils/api-error.js";
 import { Role } from "@prisma/client";
+import prisma from "../config/prisma.js";
+import { getJwtSecret } from "../utils/jwt.js";
 
 interface JwtPayload {
   userId: string;
@@ -26,14 +28,20 @@ export async function authenticate(
 
     const token = authHeader.split(" ")[1];
 
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET!
-    ) as JwtPayload;
+    const decoded = jwt.verify(token, getJwtSecret()) as JwtPayload;
+
+    const user = await prisma.user.findUnique({
+      where: { id: decoded.userId },
+      select: { id: true, role: true, status: true },
+    });
+
+    if (!user || user.status !== "ACTIVE") {
+      throw new ApiError(401, "User account is unavailable.");
+    }
 
     req.user = {
-      userId:decoded.userId,
-       role:decoded.role,
+      userId: user.id,
+      role: user.role,
       };
 
     next();

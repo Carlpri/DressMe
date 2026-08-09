@@ -50,20 +50,20 @@ model Vendor {
   isActive       Boolean   @default(true)
   isVerified     Boolean   @default(false)
   phoneNumber    String?
-  whatsappNumber String
   slug           String?   @unique
   town           String?
+  whatsappNumber String
   products       Product[]
   user           User      @relation(fields: [userId], references: [id])
 }
 
 model Category {
-  id              String            @id @default(cuid())
-  name            String            @unique
-  slug            String            @unique
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
-  image           String?
+  id        String    @id @default(cuid())
+  name      String    @unique
+  slug      String    @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  image     String?
   ProductCategory ProductCategory[]
 }
 
@@ -80,40 +80,38 @@ model Brand {
 }
 
 model Product {
-  id               String             @id @default(cuid())
-  name             String
-  slug             String             @unique
-  description      String
-  price            Float
-  gender           Gender
-  vendorId         String
-  brandId          String
-  createdAt        DateTime           @default(now())
-  updatedAt        DateTime           @updatedAt
-  sku              String?            @unique
-  featured         Boolean            @default(false)
-  status           ProductStatus      @default(DRAFT)
-  views            Int                @default(0)
-  sales            Int                @default(0)
-  averageRating    Float              @default(0)
-  reviewCount      Int                @default(0)
-  compareAtPrice   Float?
-  isBestSeller     Boolean            @default(false)
-  isNewArrival     Boolean            @default(false)
-  isTrending       Boolean            @default(false)
-  stock            Int                @default(0)
-  cartItems        CartItem[]
-  favorites        FavoriteProduct[]
-  orderItems       OrderItem[]
-  outfitItems      OutfitItem[]
-  brand            Brand              @relation(fields: [brandId], references: [id])
-  vendor           Vendor             @relation(fields: [vendorId], references: [id])
-  ProductAttribute ProductAttribute[]
-  ProductCategory  ProductCategory[]
-  ProductFeature   ProductFeature[]
-  images           ProductImage[]
-  variants         ProductVariant[]
-  reviews          Review[]
+  id             String            @id @default(cuid())
+  name           String
+  slug           String            @unique
+  description    String
+  price          Float
+  gender         Gender
+  vendorId       String
+  brandId        String
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+  stock          Int               @default(0)
+  sku            String?           @unique
+  featured       Boolean           @default(false)
+  status         ProductStatus     @default(DRAFT)
+  views          Int               @default(0)
+  sales          Int               @default(0)
+  averageRating  Float             @default(0)
+  reviewCount    Int               @default(0)
+  compareAtPrice Float?
+  isBestSeller   Boolean           @default(false)
+  isNewArrival   Boolean           @default(false)
+  isTrending     Boolean           @default(false)
+  cartItems      CartItem[]
+  favorites      FavoriteProduct[]
+  orderItems     OrderItem[]
+  outfitItems    OutfitItem[]
+  brand          Brand             @relation(fields: [brandId], references: [id])
+  vendor         Vendor            @relation(fields: [vendorId], references: [id])
+  ProductCategory ProductCategory[]
+  images         ProductImage[]
+  variants       ProductVariant[]
+  reviews        Review[]
 
   @@index([vendorId])
   @@index([brandId])
@@ -129,10 +127,7 @@ model ProductImage {
   createdAt    DateTime @default(now())
   altText      String?
   displayOrder Int      @default(0)
-  product      Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-
-  @@index([isPrimary])
-  @@index([productId])
+  product      Product  @relation(fields: [productId], references: [id])
 }
 
 model Cart {
@@ -157,35 +152,77 @@ model CartItem {
   variant   ProductVariant? @relation(fields: [variantId], references: [id])
 
   @@unique([cartId, productId, variantId])
-  @@index([cartId])
-  @@index([productId])
 }
 
 model ProductVariant {
-  id             String      @id @default(cuid())
-  stock          Int         @default(0)
-  sku            String      @unique
-  productId      String
-  createdAt      DateTime    @default(now())
-  updatedAt      DateTime    @updatedAt
-  price          Float?
-  imageUrl       String?
-  colorId        String?
-  colorValue     String?
-  compareAtPrice Float?
-  costPrice      Float?
-  isAvailable    Boolean     @default(true)
-  sizeId         String?
-  sizeValue      String?
-  cartItems      CartItem[]
-  orderItems     OrderItem[]
-  Color          Color?      @relation(fields: [colorId], references: [id])
-  product        Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
-  Size           Size?       @relation(fields: [sizeId], references: [id])
+  id         String      @id @default(cuid())
+  sizeValue  String
+  colorValue String
+  stock      Int
+  sku        String      @unique
+  productId  String
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  price      Float?
+  imageUrl   String?
+  cartItems  CartItem[]
+  orderItems OrderItem[]
+  product    Product     @relation(fields: [productId], references: [id])
+}
 
-  @@index([colorId])
+model ProductCategory {
+  productId  String
+  categoryId String
+  isPrimary  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  Category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  Product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@id([productId, categoryId])
   @@index([productId])
-  @@index([sizeId])
+  @@index([categoryId])
+}
+
+model Attribute {
+  id             String           @id
+  name           String           @unique
+  slug           String           @unique
+  displayOrder   Int              @default(0)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  AttributeValue AttributeValue[]
+}
+
+model AttributeValue {
+  id          String    @id
+  attributeId String
+  value       String
+  slug        String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  Attribute   Attribute @relation(fields: [attributeId], references: [id], onDelete: Cascade)
+
+  @@unique([attributeId, value])
+  @@index([attributeId])
+}
+
+model Color {
+  id           String   @id
+  name         String   @unique
+  hexCode      String?
+  isActive     Boolean  @default(true)
+  displayOrder Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Size {
+  id           String       @id
+  name         String       @unique
+  category     SizeCategory @default(ADULT)
+  displayOrder Int          @default(0)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
 }
 
 model Outfit {
@@ -206,9 +243,6 @@ model Outfit {
   creator     User          @relation(fields: [creatorId], references: [id])
   items       OutfitItem[]
   savedBy     SavedOutfit[]
-
-  @@index([creatorId])
-  @@index([style])
 }
 
 model OutfitItem {
@@ -216,10 +250,7 @@ model OutfitItem {
   outfitId  String
   productId String
   createdAt DateTime @default(now())
-  positionX Float?
-  positionY Float?
-  scale     Float?   @default(1.0)
-  outfit    Outfit   @relation(fields: [outfitId], references: [id], onDelete: Cascade)
+  outfit    Outfit   @relation(fields: [outfitId], references: [id])
   product   Product  @relation(fields: [productId], references: [id])
 
   @@unique([outfitId, productId])
@@ -230,7 +261,7 @@ model SavedOutfit {
   userId    String
   outfitId  String
   createdAt DateTime @default(now())
-  outfit    Outfit   @relation(fields: [outfitId], references: [id], onDelete: Cascade)
+  outfit    Outfit   @relation(fields: [outfitId], references: [id])
   user      User     @relation(fields: [userId], references: [id])
 
   @@unique([userId, outfitId])
@@ -241,7 +272,7 @@ model FavoriteProduct {
   userId    String
   productId String
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  updatedAt DateTime @default(now()) @updatedAt
   product   Product  @relation(fields: [productId], references: [id])
   user      User     @relation(fields: [userId], references: [id])
 
@@ -250,7 +281,7 @@ model FavoriteProduct {
 
 model Review {
   id        String   @id @default(cuid())
-  rating    Int
+  rating    Float
   comment   String?
   userId    String
   productId String
@@ -260,7 +291,6 @@ model Review {
   user      User     @relation(fields: [userId], references: [id])
 
   @@unique([userId, productId])
-  @@index([productId])
 }
 
 model Address {
@@ -392,87 +422,6 @@ model MediaItem {
   createdBy String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-}
-
-model Attribute {
-  id             String           @id
-  name           String           @unique
-  slug           String           @unique
-  displayOrder   Int              @default(0)
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime
-  AttributeValue AttributeValue[]
-}
-
-model AttributeValue {
-  id               String             @id
-  attributeId      String
-  value            String
-  slug             String
-  createdAt        DateTime           @default(now())
-  updatedAt        DateTime
-  Attribute        Attribute          @relation(fields: [attributeId], references: [id], onDelete: Cascade)
-  ProductAttribute ProductAttribute[]
-
-  @@unique([attributeId, value])
-  @@index([attributeId])
-}
-
-model Color {
-  id             String           @id
-  name           String           @unique
-  hexCode        String?
-  isActive       Boolean          @default(true)
-  displayOrder   Int              @default(0)
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime
-  ProductVariant ProductVariant[]
-}
-
-model ProductAttribute {
-  productId        String
-  attributeValueId String
-  AttributeValue   AttributeValue @relation(fields: [attributeValueId], references: [id], onDelete: Cascade)
-  Product          Product        @relation(fields: [productId], references: [id], onDelete: Cascade)
-
-  @@id([productId, attributeValueId])
-  @@index([attributeValueId])
-  @@index([productId])
-}
-
-model ProductCategory {
-  productId  String
-  categoryId String
-  isPrimary  Boolean  @default(false)
-  createdAt  DateTime @default(now())
-  Category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  Product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-
-  @@id([productId, categoryId])
-
-  @@index([productId])
-}
-
-model ProductFeature {
-  id           String   @id
-  productId    String
-  value        String
-  icon         String?
-  displayOrder Int      @default(0)
-  createdAt    DateTime @default(now())
-  Product      Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-
-  @@index([productId])
-}
-
-model Size {
-  id             String           @id
-  name           String           @unique
-  category       SizeCategory     @default(ADULT)
-  displayOrder   Int              @default(0)
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime
-  ProductVariant ProductVariant[]
 }
 
 enum Role {

@@ -38,6 +38,8 @@ router.patch(
 // Seed endpoint - for initial setup (should be protected in production)
 router.post(
   "/seed",
+  authenticate,
+  authorize(Role.ADMIN),
   controller.seedDefaultSettings
 );
 

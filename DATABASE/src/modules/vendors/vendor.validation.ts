@@ -8,6 +8,7 @@ const optionalWebsite = z.string().optional();
 
 export const createVendorSchema = z.object({
   body: z.object({
+    userId: z.string().cuid().optional(),
     businessName: z.string().min(3),
 
     whatsappNumber: z.string().min(10),

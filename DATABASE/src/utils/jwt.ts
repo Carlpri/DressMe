@@ -1,7 +1,13 @@
 import jwt, { Secret, SignOptions } from "jsonwebtoken";
 import { Role } from "@prisma/client";
 
-const JWT_SECRET: Secret = process.env.JWT_SECRET!;
+export function getJwtSecret(): Secret {
+  const secret = process.env.JWT_SECRET?.trim();
+  if (!secret) {
+    throw new Error("JWT_SECRET must be configured.");
+  }
+  return secret;
+}
 
 export function generateToken
 (userId: string, role: Role) {
@@ -14,7 +20,7 @@ export function generateToken
       userId,
       role,
     },
-    JWT_SECRET,
+    getJwtSecret(),
     options
   );
 }

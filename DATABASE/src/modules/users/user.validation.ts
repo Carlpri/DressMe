@@ -4,27 +4,18 @@ const optionalUrl = z.string().url().or(z.literal("")).optional();
 const optionalWebsite = z.string().optional();
 
 export const updateProfileSchema = z.object({
-  name: z
-    .string()
-    .min(2)
-    .max(100)
-    .optional(),
-
-  avatar: z
-    .string()
-    .url()
-    .optional(),
+  body: z.object({
+    name: z.string().min(2).max(100).optional(),
+    avatar: z.string().url().optional(),
+  }),
 });
 
 export const changePasswordSchema = z.object({
-    currentPassword: z.string().min(8,
-     "Current password must contain at least 8 characters"),
-    newPassword: z.string()
-      .min(8,
-        "New password must contain at least 8 characters")
-        .max(100)
- }
-);
+  body: z.object({
+    currentPassword: z.string().min(8, "Current password must contain at least 8 characters"),
+    newPassword: z.string().min(8, "New password must contain at least 8 characters").max(100),
+  }),
+});
 
 export const updateRoleSchema = z.object({
   body: z.object({
@@ -39,7 +30,7 @@ export const promoteToVendorSchema = z.object({
     businessName: z.string().min(3),
     whatsappNumber: z.string().min(10),
     address: z.string().min(5),
-    location: z.string().min(2).optional(),
+    location: z.string().min(2),
     logo: optionalUrl,
     description: z.string().optional(),
     coverImage: optionalUrl,

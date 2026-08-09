@@ -451,20 +451,6 @@ export class ProductRepository {
       });
     }
 
-    // TODO: Fix category filter with ProductCategory junction
-    // if (filters.category) {
-    //   and.push({
-    //     ProductCategory: {
-    //       some: {
-    //         OR: [
-    //           { categoryId: filters.category },
-    //           { Category: { slug: filters.category } },
-    //         ],
-    //       },
-    //     },
-    //   });
-    // }
-
     if (filters.brand) {
       and.push({
         OR: [

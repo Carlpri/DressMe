@@ -505,7 +505,7 @@ export function AdminProductsPage() {
                   ) : (
                     vendors.map((v) => (
                       <MenuItem key={v.id} value={v.id}>
-                        {v.businessName || v.shopName || "Vendor"} ({v.user?.name || "Unknown User"})
+                        {v.businessName || "Vendor"} ({v.user?.name || "Unknown User"})
                       </MenuItem>
                     ))
                   )}

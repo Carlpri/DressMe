@@ -31,7 +31,7 @@ import type { CartItem } from "../../hooks/useCart";
 
 interface VendorCheckoutGroup {
   vendorId: string;
-  shopName: string;
+  businessName: string;
   phone: string;
   items: CartItem[];
   subtotal: number;
@@ -53,7 +53,7 @@ function groupItemsByVendor(items: CartItem[]): VendorCheckoutGroup[] {
     } else {
       groups.set(vendor.id, {
         vendorId: vendor.id,
-        shopName: vendor.businessName,
+        businessName: vendor.businessName,
         phone: vendor.whatsappNumber,
         items: [item],
         subtotal: lineTotal,
@@ -102,7 +102,7 @@ export function CheckoutPage() {
     }
 
     const message = buildVendorOrderMessage({
-      shopName: group.shopName,
+      businessName: group.businessName,
       customerName: user.name,
       items: group.items,
       address: selectedAddress as any,
@@ -112,7 +112,7 @@ export function CheckoutPage() {
 
     const url = buildWhatsAppUrl(group.phone, message);
     if (!url) {
-      setError(`${group.shopName} does not have a valid WhatsApp number. Please contact support.`);
+      setError(`${group.businessName} does not have a valid WhatsApp number. Please contact support.`);
       return;
     }
 
@@ -222,7 +222,7 @@ export function CheckoutPage() {
                         <StorefrontIcon color="primary" />
                         <Box sx={{ flex: 1 }}>
                           <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                            {group.shopName}
+                            {group.businessName}
                           </Typography>
                           <Typography variant="body2" color="text.secondary">
                             {group.items.length} item{group.items.length !== 1 ? "s" : ""} · {formatCurrency(group.subtotal)}

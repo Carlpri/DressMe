@@ -12,9 +12,6 @@ export function authorize(...roles: Role[]) {
       return next(new ApiError(401, "Unauthorized."));
     }
 
-    console.log("User role:", req.user.role);
-    console.log("Allowed Roles:",roles);
-
     if (!roles.includes(req.user.role)) {
       return next(
         new ApiError(

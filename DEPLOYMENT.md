@@ -52,5 +52,5 @@ For local frontend development, create `FRONTEND/.env` with the local API URL an
 
 1. Run `npm run build` in both `DATABASE` and `FRONTEND`.
 2. Confirm `GET https://<render-service>/api/health` returns HTTP 200.
-3. Confirm the Render migration command completes before starting the API.
+3. Confirm the Render pre-deploy migration command completes before starting the API. The start command intentionally does not run migrations a second time.
 4. Open a Vercel preview URL, sign in, and refresh a protected route such as `/wishlist`.

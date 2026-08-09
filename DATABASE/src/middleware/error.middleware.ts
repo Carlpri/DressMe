@@ -24,11 +24,10 @@ export function errorHandler(
     type:    details.constructor.name,
     message: details.message,
     // Prisma known errors carry a numeric code
-    code:    (error as any)?.code,
-    meta:    (error as any)?.meta,
+    code:    getPrismaField(error, "code"),
+    meta:    getPrismaField(error, "meta"),
     path:    req.path,
     method:  req.method,
-    body:    req.body,
   });
 
   // Return a slightly more informative message for Prisma validation failures
@@ -40,7 +39,7 @@ export function errorHandler(
   }
 
   if (isPrismaKnown) {
-    const code = (error as any).code as string;
+    const code = getPrismaField(error, "code");
     // Unique constraint
     if (code === "P2002") {
       return res.status(409).json({
@@ -61,4 +60,10 @@ export function errorHandler(
     success: false,
     message: "Internal server error.",
   });
+}
+
+function getPrismaField(error: unknown, field: "code" | "meta"): unknown {
+  return typeof error === "object" && error !== null && field in error
+    ? (error as Record<string, unknown>)[field]
+    : undefined;
 }

@@ -18,7 +18,7 @@ export async function seedVendors(
 
   for (let i = 1; i <= targetUsers.length; i++) {
     const index = String(i).padStart(3, "0");
-    const shopName = `BUSINESS${index}`;
+    const businessName = `BUSINESS${index}`;
     const userId = targetUsers[i - 1];
     const businessEmail = `business${index}@dressme.co.ke`;
 
@@ -30,23 +30,23 @@ export async function seedVendors(
     const vendor = await prisma.vendor.upsert({
       where: { userId },
       create: {
-        shopName,
-        phone: faker.phone.number("07########"),
+        businessName,
+        whatsappNumber: faker.phone.number("07########"),
         address: faker.location.streetAddress(),
         location: faker.location.city(),
         description: faker.commerce.productDescription(),
         businessEmail,
-        verified: Math.random() > 0.5,
+        isVerified: Math.random() > 0.5,
         userId,
       },
       update: {
-        shopName,
-        phone: faker.phone.number("07########"),
+        businessName,
+        whatsappNumber: faker.phone.number("07########"),
         address: faker.location.streetAddress(),
         location: faker.location.city(),
         description: faker.commerce.productDescription(),
         businessEmail,
-        verified: Math.random() > 0.5,
+        isVerified: Math.random() > 0.5,
       },
     });
 

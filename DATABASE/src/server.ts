@@ -1,12 +1,14 @@
 import "dotenv/config";
 import app from "./app.js";
 import prisma from "./config/prisma.js";
+import { getJwtSecret } from "./utils/jwt.js";
 
 const PORT = process.env.PORT || 5000;
 let server: ReturnType<typeof app.listen> | undefined;
 
 async function startServer() {
   try {
+    getJwtSecret();
     await prisma.$connect();
     console.log("Connected to the database successfully.");
 
