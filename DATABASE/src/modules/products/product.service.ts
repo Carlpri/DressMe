@@ -18,13 +18,21 @@ export class ProductService {
     role: Role,
     data: CreateProductDto
   ) {
+    const isDev = process.env.NODE_ENV !== "production";
+    
+    if (isDev) console.log("[PRODUCT_CREATE_REQUEST]", { userId, role, dataName: data.name });
+
     const vendorId = await this.resolveVendorId(
       userId,
       role,
       data.vendorId
     );
 
+    if (isDev) console.log("[PRODUCT_CREATE_VENDOR]", { vendorId });
+
     await this.ensureRelationsExist(data.categoryIds, data.brandId);
+    if (isDev) console.log("[PRODUCT_CREATE_CATEGORIES]", { categoryIds: data.categoryIds, brandId: data.brandId });
+
     await this.ensureSkuAvailable(data.sku);
     await this.ensureVariantSkusAvailable(data.variants);
     await this.ensureVariantRelationsExist(data.variants);
@@ -32,9 +40,17 @@ export class ProductService {
     this.ensureOnePrimaryImage(data.images);
     this.ensureUniqueVariantOptions(data.variants);
 
+    if (isDev) console.log("[PRODUCT_CREATE_VARIANTS]", { variantCount: data.variants?.length });
+
     const slug = await this.createUniqueSlug(data.name);
 
-    return this.repository.create(vendorId, slug, data);
+    if (isDev) console.log("[PRODUCT_CREATE_PRISMA]", { slug });
+
+    const result = await this.repository.create(vendorId, slug, data);
+
+    if (isDev) console.log("[PRODUCT_CREATE_SUCCESS]", { productId: result.id });
+
+    return result;
   }
 
   async getAll(query: Record<string, unknown>) {
@@ -273,7 +289,7 @@ export class ProductService {
 
     const keys = variants.map(
       (variant) =>
-        `${variant.sizeValue.trim().toLowerCase()}::${variant.colorValue.trim().toLowerCase()}`
+        `${(variant.sizeValue || "").trim().toLowerCase()}::${(variant.colorValue || "").trim().toLowerCase()}`
     );
 
     if (new Set(keys).size !== keys.length) {
