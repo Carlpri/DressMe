@@ -53,6 +53,18 @@ export function errorHandler(error: unknown, req: Request, res: Response, _next:
         field
       });
     }
+    if (code === "P2022") {
+      const isDev = process.env.NODE_ENV !== "production";
+      const message = isDev 
+        ? `Database schema mismatch: ${meta?.column || 'column'} does not exist.`
+        : "Internal server error.";
+      return res.status(500).json({ 
+        success: false, 
+        message,
+        code: "P2022",
+        field: meta?.column as string | undefined
+      });
+    }
     if (code === "P2025") {
       return res.status(404).json({ success: false, message: "Requested record was not found." });
     }
