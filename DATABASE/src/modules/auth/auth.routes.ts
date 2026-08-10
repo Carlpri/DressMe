@@ -4,18 +4,21 @@ import { validate } from "../../middleware/validate.middleware.js";
 import { registerSchema,loginSchema } from "./auth.validation.js";
 import { authenticate,  } from "../../middleware/auth.middleware.js";
 import { authorize } from "../../middleware/authorize.middleware.js";
+import { authRateLimiter } from "../../middleware/rate-limit.middleware.js";
 
 const router = Router();
 const authController = new AuthController();
 
 router.post(
   "/register",
+  authRateLimiter,
   validate(registerSchema),
   authController.register
 );
 
 router.post(
     "/login",
+    authRateLimiter,
     validate(loginSchema),
     authController.login
 );

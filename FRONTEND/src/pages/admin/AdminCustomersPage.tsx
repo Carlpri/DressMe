@@ -56,6 +56,8 @@ export function AdminCustomersPage() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["admin-users-list"] });
+      queryClient.invalidateQueries({ queryKey: ["vendors"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-vendors"] });
       setPromoteDialogOpen(false);
       setSelectedUser(null);
       setVendorData({

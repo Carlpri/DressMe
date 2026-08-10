@@ -120,7 +120,7 @@ export class CartService {
 
     const variant = await this.repository.findVariantById(variantId);
 
-    if (!variant || variant.productId !== productId) {
+    if (!variant || variant.productId !== productId || !variant.isAvailable) {
       throw new ApiError(400, "Product variant is invalid.");
     }
 

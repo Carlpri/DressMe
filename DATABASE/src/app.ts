@@ -22,7 +22,7 @@ const app = express();
 const allowedFrontendOrigins = (process.env.FRONTEND_URL ?? "")
   .split(",")
   .map((origin) => origin.trim())
-  .filter(Boolean);
+  .filter((origin) => Boolean(origin) && origin !== "*");
 
 function matchesAllowedOrigin(origin: string) {
   if (process.env.NODE_ENV !== "production") {

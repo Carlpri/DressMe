@@ -80,9 +80,14 @@ export class ProductRepository {
                 create: data.variants.map((variant) => ({
                   sizeValue: variant.sizeValue,
                   colorValue: variant.colorValue,
+                  sizeId: variant.sizeId,
+                  colorId: variant.colorId,
                   stock: variant.stock,
                   sku: variant.sku,
                   price: variant.price,
+                  compareAtPrice: variant.compareAtPrice,
+                  costPrice: variant.costPrice,
+                  isAvailable: variant.isAvailable,
                   imageUrl: variant.imageUrl,
                 })),
               }
@@ -190,6 +195,14 @@ export class ProductRepository {
     return prisma.productVariant.findUnique({
       where: { sku },
     });
+  }
+
+  async findSizeById(id: string) {
+    return prisma.size.findUnique({ where: { id } });
+  }
+
+  async findColorById(id: string) {
+    return prisma.color.findUnique({ where: { id } });
   }
 
   async findCategoryById(id: string) {
@@ -303,14 +316,24 @@ export class ProductRepository {
       },
     });
 
-    for (const categoryId of incoming) {
+    await tx.productCategory.updateMany({
+      where: { productId },
+      data: { isPrimary: false },
+    });
+
+    for (const [index, categoryId] of incoming.entries()) {
       if (!existingIds.has(categoryId)) {
         await tx.productCategory.create({
           data: {
             productId,
             categoryId,
-            isPrimary: categoryId === incoming[0],
+            isPrimary: index === 0,
           },
+        });
+      } else if (index === 0) {
+        await tx.productCategory.update({
+          where: { productId_categoryId: { productId, categoryId } },
+          data: { isPrimary: true },
         });
       }
     }
@@ -406,6 +429,11 @@ export class ProductRepository {
         imageUrl: variant.imageUrl,
         colorValue: variant.colorValue,
         sizeValue: variant.sizeValue,
+        colorId: variant.colorId,
+        sizeId: variant.sizeId,
+        compareAtPrice: variant.compareAtPrice,
+        costPrice: variant.costPrice,
+        isAvailable: variant.isAvailable,
       };
 
       if (variant.id) {

@@ -27,7 +27,7 @@ const orderInclude = {
 };
 
 export class OrderRepository {
-  async create(data: {
+  async createWithStockReservation(data: {
     userId: string;
     addressId: string;
     orderNumber: string;
@@ -38,6 +38,7 @@ export class OrderRepository {
     total: number;
     couponCode?: string;
     notes?: string;
+    cartId: string;
     items: Array<{
       productId: string;
       variantId?: string;
@@ -50,6 +51,26 @@ export class OrderRepository {
     }>;
   }) {
     return prisma.$transaction(async (tx) => {
+      for (const item of data.items) {
+        if (!item.variantId) {
+          throw new Error("Checkout item is missing a product variant.");
+        }
+
+        const reservation = await tx.productVariant.updateMany({
+          where: {
+            id: item.variantId,
+            productId: item.productId,
+            isAvailable: true,
+            stock: { gte: item.quantity },
+          },
+          data: { stock: { decrement: item.quantity } },
+        });
+
+        if (reservation.count !== 1) {
+          throw new Error(`Insufficient stock for product ${item.productId}.`);
+        }
+      }
+
       const order = await tx.order.create({
         data: {
           userId: data.userId,
@@ -77,6 +98,8 @@ export class OrderRepository {
         },
         include: orderInclude,
       });
+
+      await tx.cartItem.deleteMany({ where: { cartId: data.cartId } });
 
       return order;
     });

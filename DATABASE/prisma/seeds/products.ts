@@ -68,7 +68,9 @@ export async function seedProducts(
         gender,
         vendorId,
         brandId,
-        categoryId,
+        ProductCategory: {
+          create: { categoryId, isPrimary: true },
+        },
       },
       update: {
         name,
@@ -81,7 +83,10 @@ export async function seedProducts(
         gender,
         vendorId,
         brandId,
-        categoryId,
+        ProductCategory: {
+          deleteMany: {},
+          create: { categoryId, isPrimary: true },
+        },
       },
     });
 

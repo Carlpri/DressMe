@@ -27,6 +27,7 @@ export class ProductService {
     await this.ensureRelationsExist(data.categoryIds, data.brandId);
     await this.ensureSkuAvailable(data.sku);
     await this.ensureVariantSkusAvailable(data.variants);
+    await this.ensureVariantRelationsExist(data.variants);
     await this.ensureProductNotDuplicate(data.name, data.categoryIds, data.brandId);
     this.ensureOnePrimaryImage(data.images);
     this.ensureUniqueVariantOptions(data.variants);
@@ -77,6 +78,7 @@ export class ProductService {
 
     if (data.variants) {
       await this.ensureVariantSkusAvailable(data.variants, id);
+      await this.ensureVariantRelationsExist(data.variants);
       this.ensureUniqueVariantOptions(data.variants);
     }
 
@@ -233,6 +235,19 @@ export class ProductService {
 
       if (existing && existing.productId !== currentProductId) {
         throw new ApiError(409, "Variant SKU already exists.");
+      }
+    }
+  }
+
+  private async ensureVariantRelationsExist(variants?: ProductVariantDto[]) {
+    if (!variants) return;
+
+    for (const variant of variants) {
+      if (variant.sizeId && !(await this.repository.findSizeById(variant.sizeId))) {
+        throw new ApiError(404, "Size not found.");
+      }
+      if (variant.colorId && !(await this.repository.findColorById(variant.colorId))) {
+        throw new ApiError(404, "Color not found.");
       }
     }
   }

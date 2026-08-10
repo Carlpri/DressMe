@@ -41,11 +41,16 @@ const imageSchema = z.object({
 
 const variantSchema = z.object({
   id: z.string().min(1).optional(),
+  sizeId: z.string().min(1).optional(),
+  colorId: z.string().min(1).optional(),
   sizeValue: z.string().trim().min(1),
   colorValue: z.string().trim().min(1),
   stock: z.number().int().min(0),
   sku: z.string().trim().min(2),
   price: priceSchema.optional(),
+  compareAtPrice: priceSchema.optional().nullable(),
+  costPrice: z.number().min(0).finite().optional().nullable(),
+  isAvailable: z.boolean().optional(),
   imageUrl: z.string().url().optional(),
 });
 

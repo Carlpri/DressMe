@@ -6,16 +6,13 @@ import type {
 
 export class VendorRepository {
   async create(userId: string, data: CreateVendorDto) {
-    // Explicitly map only the fields that exist in the Prisma Vendor model.
-    // Never spread req.body directly — unknown fields cause PrismaClientValidationError.
-    return prisma.vendor.create({
+      return prisma.vendor.create({
       data: {
         userId,
         businessName:  data.businessName,
         whatsappNumber: data.whatsappNumber,
         address:       data.address,
         location:      data.location,
-        // optional fields
         phoneNumber:   data.phoneNumber   ?? null,
         email:         data.email         ?? null,   // Prisma column = email
         businessEmail: data.businessEmail ?? null,   // Prisma column = businessEmail

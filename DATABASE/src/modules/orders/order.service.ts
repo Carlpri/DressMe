@@ -1,6 +1,7 @@
 import { ProductStatus, Role } from "@prisma/client";
 import { ApiError } from "../../utils/api-error.js";
 import prisma from "../../config/prisma.js";
+import { randomUUID } from "node:crypto";
 import { OrderRepository } from "./order.repository.js";
 import type { CreateOrderDto } from "./order.types.js";
 
@@ -59,8 +60,13 @@ export class OrderService {
         );
       }
 
-      const primaryImage = (product.images[0]?.imageUrl ?? "") as string;
-      const itemSubtotal = product.price * cartItem.quantity;
+      if (!cartItem.variant?.isAvailable) {
+        throw new ApiError(400, `Product "${product.name}" is unavailable.`);
+      }
+
+      const unitPrice = cartItem.variant.price ?? product.price;
+      const primaryImage = product.images[0]?.imageUrl ?? "";
+      const itemSubtotal = unitPrice * cartItem.quantity;
       subtotal += itemSubtotal;
 
       orderItems.push({
@@ -68,8 +74,8 @@ export class OrderService {
         variantId: cartItem.variantId ?? undefined,
         productName: product.name,
         productImage: primaryImage,
-        variantName: cartItem.variant ? `${cartItem.variant.sizeValue} / ${cartItem.variant.colorValue}` : undefined,
-        price: product.price,
+        variantName: cartItem.variant ? `${cartItem.variant.sizeValue ?? ""} / ${cartItem.variant.colorValue ?? ""}`.trim() : undefined,
+        price: unitPrice,
         quantity: cartItem.quantity,
         subtotal: itemSubtotal,
       });
@@ -81,15 +87,11 @@ export class OrderService {
     const total = subtotal + shippingFee + tax - discount;
 
     const year = new Date().getFullYear();
-    const latestOrderNumber = await this.repository.findLatestOrderNumberForYear(
-      year
-    );
-    const sequence = latestOrderNumber
-      ? parseInt(latestOrderNumber.split("-")[2], 10) + 1
-      : 1;
-    const orderNumber = `DM-${year}-${String(sequence).padStart(6, "0")}`;
+    const orderNumber = `DM-${year}-${randomUUID().replace(/-/g, "").slice(0, 12).toUpperCase()}`;
 
-    const order = await this.repository.create({
+    let order;
+    try {
+      order = await this.repository.createWithStockReservation({
       userId,
       addressId: data.addressId,
       orderNumber,
@@ -101,33 +103,14 @@ export class OrderService {
       couponCode: data.couponCode,
       notes: data.notes,
       items: orderItems,
+      cartId: cart.id,
     });
-
-    for (const item of orderItems) {
-      if (item.variantId) {
-        await this.repository.reduceVariantStock(item.variantId, item.quantity);
+    } catch (error) {
+      if (error instanceof Error && error.message.startsWith("Insufficient stock")) {
+        throw new ApiError(400, "One or more variants are no longer available in the requested quantity.");
       }
-
-      const product = cart.items.find(
-        (ci) => ci.productId === item.productId
-      )?.product;
-
-      if (product && product.variants.length > 0) {
-        const remainingVariants = await Promise.all(
-          product.variants.map((v) =>
-            this.repository.findVariantById(v.id)
-          )
-        );
-
-        const newStock = remainingVariants.reduce(
-          (sum: number, v: { stock: number } | null | undefined) => sum + (v?.stock ?? 0),
-          0
-        );
-
-      }
+      throw error;
     }
-
-    await this.repository.clearCart(cart.id);
 
     return order;
   }
@@ -161,11 +144,16 @@ export class OrderService {
       throw new ApiError(403, "You do not have permission to cancel this order.");
     }
 
-    if (order.status !== "PENDING") {
-      throw new ApiError(400, "Only pending orders can be cancelled.");
-    }
-
     const restored = await prisma.$transaction(async (tx) => {
+      const cancellation = await tx.order.updateMany({
+        where: { id, status: "PENDING" },
+        data: { status: "CANCELLED" },
+      });
+
+      if (cancellation.count !== 1) {
+        throw new ApiError(400, "Only pending orders can be cancelled.");
+      }
+
       for (const item of order.items) {
         if (item.variantId) {
           await tx.productVariant.update({
@@ -179,9 +167,8 @@ export class OrderService {
         }
       }
 
-      return tx.order.update({
+      return tx.order.findUniqueOrThrow({
         where: { id },
-        data: { status: "CANCELLED" },
         include: {
           items: {
             include: {
@@ -222,8 +209,10 @@ export class OrderService {
     return this.repository.updatePaymentStatus(id, paymentStatus);
   }
 
-  async getVendorOrders(vendorId: string) {
-    return this.repository.findByVendor(vendorId);
+  async getVendorOrders(userId: string) {
+    const vendor = await prisma.vendor.findUnique({ where: { userId }, select: { id: true } });
+    if (!vendor) throw new ApiError(403, "Vendor profile not found.");
+    return this.repository.findByVendor(vendor.id);
   }
 
   private getAvailableStock(

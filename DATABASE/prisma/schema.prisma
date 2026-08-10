@@ -155,19 +155,30 @@ model CartItem {
 }
 
 model ProductVariant {
-  id         String      @id @default(cuid())
-  sizeValue  String
-  colorValue String
-  stock      Int
-  sku        String      @unique
-  productId  String
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
-  price      Float?
-  imageUrl   String?
-  cartItems  CartItem[]
-  orderItems OrderItem[]
-  product    Product     @relation(fields: [productId], references: [id])
+  id             String      @id @default(cuid())
+  stock          Int         @default(0)
+  sku            String      @unique
+  productId      String
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+  price          Float?
+  imageUrl       String?
+  colorId        String?
+  colorValue     String?
+  compareAtPrice Float?
+  costPrice      Float?
+  isAvailable    Boolean     @default(true)
+  sizeId         String?
+  sizeValue      String?
+  cartItems      CartItem[]
+  orderItems     OrderItem[]
+  Color          Color?      @relation(fields: [colorId], references: [id])
+  product        Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+  Size           Size?       @relation(fields: [sizeId], references: [id])
+
+  @@index([colorId])
+  @@index([productId])
+  @@index([sizeId])
 }
 
 model ProductCategory {
@@ -214,6 +225,7 @@ model Color {
   displayOrder Int      @default(0)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+  ProductVariant ProductVariant[]
 }
 
 model Size {
@@ -223,6 +235,7 @@ model Size {
   displayOrder Int          @default(0)
   createdAt    DateTime     @default(now())
   updatedAt    DateTime     @updatedAt
+  ProductVariant ProductVariant[]
 }
 
 model Outfit {

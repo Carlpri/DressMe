@@ -1,5 +1,6 @@
 import { asyncHandler } from "../../utils/async-handler.js";
 import { ApiResponse } from "../../utils/api-response.js";
+import { ApiError } from "../../utils/api-error.js";
 import { UserService } from "./user.service.js";
 
 const userService = new UserService();
@@ -32,6 +33,9 @@ export class UserController {
 
   promoteToVendor = asyncHandler(async (req, res) => {
     const { userId, ...vendorData } = req.body;
+    if (userId === req.user.userId) {
+      throw new ApiError(400, "Administrators cannot promote themselves through this endpoint.");
+    }
     const promotion = await userService.promoteToVendor(userId, vendorData);
     ApiResponse.success(res, 201, "User promoted to vendor successfully.", promotion);
   });

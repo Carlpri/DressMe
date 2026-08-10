@@ -7,7 +7,7 @@ DressMe is deployed as a Vite frontend on Vercel, an Express API on Render, and 
 Set the Render service root directory to `DATABASE`.
 
 - Build command: `npm ci && npm run build`
-- Pre-deploy command: `npm run prisma:migrate:deploy`
+- Pre-deploy command: leave unset until the live-database migration baseline has been reconciled and validated on a staging clone.
 - Start command: `npm run start`
 - Health check path: `/api/health`
 
@@ -52,5 +52,5 @@ For local frontend development, create `FRONTEND/.env` with the local API URL an
 
 1. Run `npm run build` in both `DATABASE` and `FRONTEND`.
 2. Confirm `GET https://<render-service>/api/health` returns HTTP 200.
-3. Confirm the Render pre-deploy migration command completes before starting the API. The start command intentionally does not run migrations a second time.
+3. Do not configure Render pre-deploy migrations until the live migration baseline is reconciled on staging. The start command intentionally does not run migrations.
 4. Open a Vercel preview URL, sign in, and refresh a protected route such as `/wishlist`.
