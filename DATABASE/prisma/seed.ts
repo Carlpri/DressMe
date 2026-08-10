@@ -4,6 +4,8 @@ import { seedUsers } from "./seeds/users.js";
 import { seedVendors } from "./seeds/vendors.js";
 import { seedBrands } from "./seeds/brands.js";
 import { seedCategories } from "./seeds/categories.js";
+import { seedSizes } from "./seeds/sizes.js";
+import { seedColors } from "./seeds/colors.js";
 import { seedProducts } from "./seeds/products.js";
 import { seedProductVariants } from "./seeds/productVariants.js";
 import { seedAddresses } from "./seeds/addresses.js";
@@ -24,6 +26,8 @@ interface SeedConfig {
   vendors: number;
   brands: number;
   categories: number;
+  sizes: number;
+  colors: number;
   products: number;
 }
 
@@ -46,6 +50,8 @@ const seedConfig: SeedConfig = {
   vendors: parseSeedCount("SEED_VENDORS", 5),
   brands: parseSeedCount("SEED_BRANDS", 10),
   categories: parseSeedCount("SEED_CATEGORIES", 8),
+  sizes: parseSeedCount("SEED_SIZES", 19),
+  colors: parseSeedCount("SEED_COLORS", 20),
   products: parseSeedCount("SEED_PRODUCTS", 100),
 };
 
@@ -56,6 +62,8 @@ function logSeedConfiguration(config: SeedConfig) {
   console.log(`   • Vendors: ${config.vendors}`);
   console.log(`   • Brands: ${config.brands}`);
   console.log(`   • Categories: ${config.categories}`);
+  console.log(`   • Sizes: ${config.sizes}`);
+  console.log(`   • Colors: ${config.colors}`);
   console.log(`   • Products: ${config.products}\n`);
 }
 
@@ -68,6 +76,8 @@ async function main() {
   const vendorIds = await seedVendors(prisma, userIds, seedConfig.vendors);
   const brandIds = await seedBrands(prisma, seedConfig.brands);
   const categoryIds = await seedCategories(prisma, seedConfig.categories);
+  const sizeIds = await seedSizes(prisma, seedConfig.sizes);
+  const colorIds = await seedColors(prisma, seedConfig.colors);
   const productIds = await seedProducts(
     prisma,
     vendorIds,

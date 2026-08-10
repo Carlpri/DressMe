@@ -77,6 +77,18 @@ export function AdminProductsPage() {
   const [isBestSeller, setIsBestSeller] = useState(false);
   const [primaryImageUrl, setPrimaryImageUrl] = useState("");
   const [galleryUrls, setGalleryUrls] = useState<string[]>([]);
+  const [variants, setVariants] = useState<any[]>([
+    {
+      sizeId: "",
+      sizeValue: "",
+      colorId: "",
+      colorValue: "",
+      price: 2500,
+      compareAtPrice: 3000,
+      stock: 10,
+      isAvailable: true,
+    },
+  ]);
 
   const { data: products = [], isLoading: productsLoading } = useQuery<any[]>({
     queryKey: ["admin-products-list"],
@@ -107,6 +119,22 @@ export function AdminProductsPage() {
     queryFn: async () => {
       const res = await apiClient.get("/vendors");
       return res.data.data;
+    },
+  });
+
+  const { data: sizes = [] } = useQuery<any[]>({
+    queryKey: ["sizes-all"],
+    queryFn: async () => {
+      const res = await apiClient.get("/references/sizes");
+      return res.data.data || res.data;
+    },
+  });
+
+  const { data: colors = [] } = useQuery<any[]>({
+    queryKey: ["colors-all"],
+    queryFn: async () => {
+      const res = await apiClient.get("/references/colors");
+      return res.data.data || res.data;
     },
   });
 
@@ -144,11 +172,22 @@ export function AdminProductsPage() {
       }
     },
     onError: (error: unknown) => {
-      const message =
-        error && typeof error === "object" && "response" in error
-          ? (error as { response?: { data?: { message?: string } } }).response?.data?.message
-          : undefined;
-      setSaveError(message || "Failed to save product. Please check all fields and try again.");
+      let message = "Failed to save product. Please check all fields and try again.";
+      
+      if (error && typeof error === "object" && "response" in error) {
+        const response = (error as { response?: { data?: any } }).response?.data;
+        
+        if (response?.message) {
+          message = response.message;
+        }
+        
+        // Show specific field errors if available
+        if (response?.errors && Array.isArray(response.errors)) {
+          message = response.errors.map((e: any) => `${e.field || 'Field'}: ${e.message || e.details}`).join('; ');
+        }
+      }
+      
+      setSaveError(message);
     },
   });
 
@@ -181,6 +220,18 @@ export function AdminProductsPage() {
     setIsBestSeller(false);
     setPrimaryImageUrl("");
     setGalleryUrls([]);
+    setVariants([
+      {
+        sizeId: "",
+        sizeValue: "",
+        colorId: "",
+        colorValue: "",
+        price: 2500,
+        compareAtPrice: 3000,
+        stock: 10,
+        isAvailable: true,
+      },
+    ]);
     setSaveError(null);
     setDialogOpen(true);
   };
@@ -215,6 +266,18 @@ export function AdminProductsPage() {
     setEditingProduct(null);
     setSaveError(null);
     setUploadingCount(0);
+    setVariants([
+      {
+        sizeId: "",
+        sizeValue: "",
+        colorId: "",
+        colorValue: "",
+        price: 2500,
+        compareAtPrice: 3000,
+        stock: 10,
+        isAvailable: true,
+      },
+    ]);
   };
 
   const handleSelectMedia = (selectedUrl: string) => {
@@ -225,10 +288,75 @@ export function AdminProductsPage() {
     }
   };
 
+  const addVariant = () => {
+    setVariants([
+      ...variants,
+      {
+        sizeId: "",
+        sizeValue: "",
+        colorId: "",
+        colorValue: "",
+        price: 2500,
+        compareAtPrice: 3000,
+        stock: 10,
+        isAvailable: true,
+      },
+    ]);
+  };
+
+  const removeVariant = (index: number) => {
+    setVariants(variants.filter((_, i) => i !== index));
+  };
+
+  const updateVariant = (index: number, field: string, value: any) => {
+    const updated = [...variants];
+    updated[index] = { ...updated[index], [field]: value };
+    
+    // Auto-derive sizeValue when sizeId changes
+    if (field === "sizeId") {
+      const selectedSize = sizes.find((s) => s.id === value);
+      updated[index].sizeValue = selectedSize?.name || "";
+    }
+    
+    // Auto-derive colorValue when colorId changes
+    if (field === "colorId") {
+      const selectedColor = colors.find((c) => c.id === value);
+      updated[index].colorValue = selectedColor?.name || "";
+    }
+    
+    setVariants(updated);
+  };
+
   const handleSave = () => {
     if (!primaryImageUrl) {
       setSaveError("Please upload a primary product image before saving.");
       return;
+    }
+
+    if (variants.length === 0) {
+      setSaveError("Add at least one product variant.");
+      return;
+    }
+
+    // Validate variants
+    for (let i = 0; i < variants.length; i++) {
+      const variant = variants[i];
+      if (!variant.sizeId) {
+        setSaveError(`Variant ${i + 1}: Select a size.`);
+        return;
+      }
+      if (!variant.colorId) {
+        setSaveError(`Variant ${i + 1}: Select a color.`);
+        return;
+      }
+      if (!variant.price || variant.price <= 0) {
+        setSaveError(`Variant ${i + 1}: Enter a valid price.`);
+        return;
+      }
+      if (variant.stock < 0) {
+        setSaveError(`Variant ${i + 1}: Stock cannot be negative.`);
+        return;
+      }
     }
 
     setSaveError(null);
@@ -240,6 +368,18 @@ export function AdminProductsPage() {
     galleryUrls.forEach((gUrl, idx) => {
       imagesPayload.push({ imageUrl: gUrl, isPrimary: false, displayOrder: idx + 1 });
     });
+
+    const variantsPayload = variants.map((v) => ({
+      sizeId: v.sizeId,
+      sizeValue: v.sizeValue,
+      colorId: v.colorId,
+      colorValue: v.colorValue,
+      price: Number(v.price),
+      compareAtPrice: v.compareAtPrice ? Number(v.compareAtPrice) : null,
+      stock: Number(v.stock),
+      isAvailable: v.isAvailable,
+      sku: `DM-${Date.now().toString(36).toUpperCase()}-${Math.floor(Math.random() * 1000)}`,
+    }));
 
     const payload = {
       name,
@@ -258,6 +398,7 @@ export function AdminProductsPage() {
       isNewArrival,
       isBestSeller,
       images: imagesPayload,
+      variants: variantsPayload,
     };
 
     saveProductMutation.mutate(payload);
@@ -590,6 +731,125 @@ export function AdminProductsPage() {
                 sx={{ borderStyle: "dashed", width: "100%", py: 1 }}
               >
                 Add Another Gallery Image
+              </Button>
+            </Grid>
+
+            {/* Product Variants Section */}
+            <Grid size={{ xs: 12 }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 2 }}>
+                Product Variants
+              </Typography>
+
+              {variants.map((variant, index) => (
+                <Paper
+                  key={index}
+                  variant="outlined"
+                  sx={{ p: 2, mb: 2, border: "1px solid #e0e0e0" }}
+                >
+                  <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
+                    <Typography variant="subtitle2" sx={{ fontWeight: 600 }}>
+                      Variant {index + 1}
+                    </Typography>
+                    {variants.length > 1 && (
+                      <IconButton size="small" color="error" onClick={() => removeVariant(index)}>
+                        <DeleteIcon fontSize="small" />
+                      </IconButton>
+                    )}
+                  </Stack>
+
+                  <Grid container spacing={2}>
+                    <Grid size={{ xs: 12, md: 3 }}>
+                      <FormControl fullWidth size="small">
+                        <InputLabel>Size</InputLabel>
+                        <Select
+                          value={variant.sizeId}
+                          label="Size"
+                          onChange={(e) => updateVariant(index, "sizeId", e.target.value)}
+                        >
+                          <MenuItem value="">Select size</MenuItem>
+                          {sizes.map((s) => (
+                            <MenuItem key={s.id} value={s.id}>
+                              {s.name}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Grid>
+
+                    <Grid size={{ xs: 12, md: 3 }}>
+                      <FormControl fullWidth size="small">
+                        <InputLabel>Color</InputLabel>
+                        <Select
+                          value={variant.colorId}
+                          label="Color"
+                          onChange={(e) => updateVariant(index, "colorId", e.target.value)}
+                        >
+                          <MenuItem value="">Select color</MenuItem>
+                          {colors.map((c) => (
+                            <MenuItem key={c.id} value={c.id}>
+                              {c.name}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                    </Grid>
+
+                    <Grid size={{ xs: 12, md: 2 }}>
+                      <TextField
+                        label="Price (KES)"
+                        type="number"
+                        value={variant.price}
+                        onChange={(e) => updateVariant(index, "price", Number(e.target.value))}
+                        fullWidth
+                        size="small"
+                      />
+                    </Grid>
+
+                    <Grid size={{ xs: 12, md: 2 }}>
+                      <TextField
+                        label="Compare Price"
+                        type="number"
+                        value={variant.compareAtPrice ?? ""}
+                        onChange={(e) => updateVariant(index, "compareAtPrice", e.target.value ? Number(e.target.value) : undefined)}
+                        fullWidth
+                        size="small"
+                      />
+                    </Grid>
+
+                    <Grid size={{ xs: 12, md: 2 }}>
+                      <TextField
+                        label="Stock"
+                        type="number"
+                        value={variant.stock}
+                        onChange={(e) => updateVariant(index, "stock", Number(e.target.value))}
+                        fullWidth
+                        size="small"
+                      />
+                    </Grid>
+
+                    <Grid size={{ xs: 12, md: 12 }}>
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={variant.isAvailable}
+                            onChange={(e) => updateVariant(index, "isAvailable", e.target.checked)}
+                          />
+                        }
+                        label="Available for sale"
+                      />
+                    </Grid>
+                  </Grid>
+                </Paper>
+              ))}
+
+              <Button
+                variant="outlined"
+                size="small"
+                startIcon={<AddIcon />}
+                onClick={addVariant}
+                sx={{ borderStyle: "dashed", width: "100%", py: 1 }}
+              >
+                Add Variant
               </Button>
             </Grid>
 
