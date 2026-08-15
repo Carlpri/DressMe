@@ -1,0 +1,19 @@
+{
+  "name": "ai-gateway",
+  "version": "1.0.0",
+  "description": "Vercel AI Gateway — text generation via AI SDK",
+  "private": true,
+  "scripts": {
+    "start": "tsx index.ts",
+    "dev": "tsx watch index.ts"
+  },
+  "type": "module",
+  "dependencies": {
+    "@ai-sdk/openai": "^4.0.42",
+    "@types/node": "^26.2.0",
+    "ai": "^7.0.66",
+    "dotenv": "^17.4.2",
+    "tsx": "^4.23.12",
+    "typescript": "^7.0.2"
+  }
+}

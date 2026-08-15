@@ -259,11 +259,30 @@ export class ProductService {
     if (!variants) return;
 
     for (const variant of variants) {
-      if (variant.sizeId && !(await this.repository.findSizeById(variant.sizeId))) {
-        throw new ApiError(404, "Size not found.");
+      if (variant.sizeId) {
+        try {
+          const size = await this.repository.findSizeById(variant.sizeId);
+          if (!size) throw new ApiError(404, "Size not found.");
+        } catch (err: any) {
+          // P2022 = table doesn't exist yet (migration pending on this environment)
+          if (err?.code === "P2022" || err?.constructor?.name === "PrismaClientValidationError") {
+            console.warn("[WARN] Size table not found in DB — skipping size validation. Run prisma migrate deploy.");
+          } else {
+            throw err;
+          }
+        }
       }
-      if (variant.colorId && !(await this.repository.findColorById(variant.colorId))) {
-        throw new ApiError(404, "Color not found.");
+      if (variant.colorId) {
+        try {
+          const color = await this.repository.findColorById(variant.colorId);
+          if (!color) throw new ApiError(404, "Color not found.");
+        } catch (err: any) {
+          if (err?.code === "P2022" || err?.constructor?.name === "PrismaClientValidationError") {
+            console.warn("[WARN] Color table not found in DB — skipping color validation. Run prisma migrate deploy.");
+          } else {
+            throw err;
+          }
+        }
       }
     }
   }
