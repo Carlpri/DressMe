@@ -387,6 +387,7 @@ export class ProductService {
       "price_asc",
       "price_desc",
       "popular",
+      "rating",
     ];
 
     return typeof value === "string" &&

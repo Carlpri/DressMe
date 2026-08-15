@@ -242,6 +242,7 @@ export function AdminProductsPage() {
     setDescription(prod.description);
     setPrice(prod.price);
     setCompareAtPrice(prod.compareAtPrice || undefined);
+    setStock(prod.stock ?? 0);
     setSku(prod.sku || "");
     setGender(prod.gender);
     setCategoryIds((prod.categories ?? []).map((category: any) => category.id));
@@ -255,9 +256,44 @@ export function AdminProductsPage() {
 
     const primary = prod.images?.find((img: any) => img.isPrimary) || prod.images?.[0];
     setPrimaryImageUrl(primary?.imageUrl || "");
-    setGalleryUrls(prod.images?.filter((img: any) => !img.isPrimary).map((img: any) => img.imageUrl) || []);
-    setSaveError(null);
+    setGalleryUrls(
+      (prod.images ?? [])
+        .filter((img: any) => !img.isPrimary)
+        .map((img: any) => img.imageUrl)
+    );
 
+    // Restore existing variants so the edit form shows the current variant data
+    if (prod.variants && prod.variants.length > 0) {
+      setVariants(
+        prod.variants.map((v: any) => ({
+          id: v.id,
+          sizeId: v.sizeId || "",
+          sizeValue: v.sizeValue || "",
+          colorId: v.colorId || "",
+          colorValue: v.colorValue || "",
+          price: v.price ?? prod.price,
+          compareAtPrice: v.compareAtPrice ?? undefined,
+          stock: v.stock ?? 0,
+          sku: v.sku || "",
+          isAvailable: v.isAvailable ?? true,
+        }))
+      );
+    } else {
+      setVariants([
+        {
+          sizeId: "",
+          sizeValue: "",
+          colorId: "",
+          colorValue: "",
+          price: prod.price,
+          compareAtPrice: undefined,
+          stock: 10,
+          isAvailable: true,
+        },
+      ]);
+    }
+
+    setSaveError(null);
     setDialogOpen(true);
   };
 
@@ -369,16 +405,24 @@ export function AdminProductsPage() {
       imagesPayload.push({ imageUrl: gUrl, isPrimary: false, displayOrder: idx + 1 });
     });
 
-    const variantsPayload = variants.map((v) => ({
-      sizeId: v.sizeId,
+    // Generate unique SKUs for variants that don't have one yet.
+    // We use an index + random suffix to prevent timestamp collisions when
+    // multiple variants are built inside the same millisecond.
+    const baseTs = Date.now().toString(36).toUpperCase();
+    const variantsPayload = variants.map((v, i) => ({
+      ...(v.id ? { id: v.id } : {}), // preserve id for updates
+      sizeId: v.sizeId || undefined,
       sizeValue: v.sizeValue,
-      colorId: v.colorId,
+      colorId: v.colorId || undefined,
       colorValue: v.colorValue,
       price: Number(v.price),
       compareAtPrice: v.compareAtPrice ? Number(v.compareAtPrice) : null,
       stock: Number(v.stock),
-      isAvailable: v.isAvailable,
-      sku: `DM-${Date.now().toString(36).toUpperCase()}-${Math.floor(Math.random() * 1000)}`,
+      isAvailable: v.isAvailable ?? true,
+      // If an existing variant already has a SKU keep it; otherwise generate a unique one.
+      sku: v.sku && v.sku.length >= 2
+        ? v.sku
+        : `DM-V${i + 1}-${baseTs}-${Math.floor(Math.random() * 9000 + 1000)}`,
     }));
 
     const payload = {
@@ -387,7 +431,7 @@ export function AdminProductsPage() {
       price: Number(price),
       compareAtPrice: compareAtPrice ? Number(compareAtPrice) : null,
       stock: Number(stock),
-      sku: sku || `DM-${Date.now().toString(36).toUpperCase()}-${Math.floor(Math.random() * 1000)}`,
+      sku: sku || `DM-${baseTs}-${Math.floor(Math.random() * 9000 + 1000)}`,
       gender,
       categoryIds,
       brandId,
