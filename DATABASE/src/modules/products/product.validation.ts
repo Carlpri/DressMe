@@ -52,19 +52,6 @@ const variantSchema = z.object({
   costPrice: z.number().min(0).finite().optional().nullable(),
   isAvailable: z.boolean().optional(),
   imageUrl: z.string().url().optional(),
-}).refine((data) => {
-  // If sizeValue is provided, sizeId should also be provided
-  if (data.sizeValue && !data.sizeId) {
-    return false;
-  }
-  // If colorValue is provided, colorId should also be provided
-  if (data.colorValue && !data.colorId) {
-    return false;
-  }
-  return true;
-}, {
-  message: "sizeId and colorId are required when sizeValue or colorValue are provided",
-  path: ["sizeId"],
 });
 
 const createProductBodySchema = z
