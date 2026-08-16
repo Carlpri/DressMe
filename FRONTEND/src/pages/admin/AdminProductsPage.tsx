@@ -37,10 +37,12 @@ import { apiClient } from "../../api/client";
 import { MediaPickerModal } from "../../components/admin/MediaPickerModal";
 import { ImageUploader } from "../../components/admin/ImageUploader";
 import { useFormatCurrency } from "../../utils/currency";
+import { useAuth } from "../../hooks/useAuth";
 
 export function AdminProductsPage() {
   const queryClient = useQueryClient();
   const formatCurrency = useFormatCurrency();
+  const { user } = useAuth();
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<any | null>(null);
