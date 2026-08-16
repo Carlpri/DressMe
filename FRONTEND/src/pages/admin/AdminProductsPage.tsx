@@ -181,9 +181,12 @@ export function AdminProductsPage() {
           message = response.message;
         }
         
-        // Show specific field errors if available
+        // Show specific field errors if available (Zod uses 'path')
         if (response?.errors && Array.isArray(response.errors)) {
-          message = response.errors.map((e: any) => `${e.field || 'Field'}: ${e.message || e.details}`).join('; ');
+          message = response.errors.map((e: any) => {
+            const fieldName = e.path ? e.path.join('.') : e.field || 'Field';
+            return `${fieldName}: ${e.message || e.details}`;
+          }).join(' | ');
         }
       }
       
@@ -364,6 +367,21 @@ export function AdminProductsPage() {
   };
 
   const handleSave = () => {
+    if (!name || name.trim().length < 2) {
+      setSaveError("Product name must be at least 2 characters.");
+      return;
+    }
+
+    if (!brandId) {
+      setSaveError("Please select a brand. If the list is empty, create a Brand first in the Brands page.");
+      return;
+    }
+
+    if (!categoryIds || categoryIds.length === 0) {
+      setSaveError("Please select at least one category. If the list is empty, create a Category first.");
+      return;
+    }
+
     if (!primaryImageUrl) {
       setSaveError("Please upload a primary product image before saving.");
       return;
