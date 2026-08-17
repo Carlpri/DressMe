@@ -374,6 +374,21 @@ export function AdminProductsPage() {
       return;
     }
 
+    if (!description || description.trim().length < 5) {
+      setSaveError("Product description must be at least 5 characters.");
+      return;
+    }
+
+    if (!price || Number(price) <= 0) {
+      setSaveError("Please enter a valid selling price greater than 0.");
+      return;
+    }
+
+    if (stock < 0) {
+      setSaveError("Stock cannot be negative.");
+      return;
+    }
+
     if (!primaryImageUrl) {
       setSaveError("Please upload a primary product image before saving.");
       return;
@@ -411,9 +426,11 @@ export function AdminProductsPage() {
     if (primaryImageUrl) {
       imagesPayload.push({ imageUrl: primaryImageUrl, isPrimary: true, displayOrder: 0 });
     }
-    galleryUrls.forEach((gUrl, idx) => {
-      imagesPayload.push({ imageUrl: gUrl, isPrimary: false, displayOrder: idx + 1 });
-    });
+    galleryUrls
+      .filter((gUrl) => gUrl && gUrl.trim() !== "")
+      .forEach((gUrl, idx) => {
+        imagesPayload.push({ imageUrl: gUrl, isPrimary: false, displayOrder: idx + 1 });
+      });
 
     // Generate unique SKUs for variants that don't have one yet.
     // We use an index + random suffix to prevent timestamp collisions when
