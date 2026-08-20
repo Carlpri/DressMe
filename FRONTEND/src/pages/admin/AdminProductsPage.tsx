@@ -81,9 +81,7 @@ export function AdminProductsPage() {
   const [galleryUrls, setGalleryUrls] = useState<string[]>([]);
   const [variants, setVariants] = useState<any[]>([
     {
-      sizeId: "",
-      sizeValue: "",
-      colorId: "",
+      sizeValue: "M",
       colorValue: "",
       price: 2500,
       compareAtPrice: 3000,
@@ -228,7 +226,7 @@ export function AdminProductsPage() {
     setVariants([
       {
         sizeValue: "M",
-        colorValue: "Default",
+        colorValue: "",
         price: 2500,
         compareAtPrice: 3000,
         stock: 10,
@@ -307,9 +305,7 @@ export function AdminProductsPage() {
     setUploadingCount(0);
     setVariants([
       {
-        sizeId: "",
-        sizeValue: "",
-        colorId: "",
+        sizeValue: "M",
         colorValue: "",
         price: 2500,
         compareAtPrice: 3000,
@@ -331,9 +327,7 @@ export function AdminProductsPage() {
     setVariants([
       ...variants,
       {
-        sizeId: "",
         sizeValue: "",
-        colorId: "",
         colorValue: "",
         price: 2500,
         compareAtPrice: 3000,
@@ -402,12 +396,8 @@ export function AdminProductsPage() {
     // Validate variants
     for (let i = 0; i < variants.length; i++) {
       const variant = variants[i];
-      if (!variant.sizeValue || variant.sizeValue.trim() === "") {
-        setSaveError(`Variant ${i + 1}: Enter a size (e.g. M, L, 42).`);
-        return;
-      }
-      if (!variant.colorValue || variant.colorValue.trim() === "") {
-        setSaveError(`Variant ${i + 1}: Enter a color (e.g. Red, Black).`);
+      if (!variant.sizeValue && !variant.colorValue) {
+        setSaveError(`Variant ${i + 1}: Enter at least a size or color.`);
         return;
       }
       if (!variant.price || isNaN(Number(variant.price)) || Number(variant.price) <= 0) {

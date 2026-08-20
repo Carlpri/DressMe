@@ -11,13 +11,13 @@ const imagesHaveExactlyOnePrimary = (images?: { isPrimary?: boolean }[]) => {
   return images.filter((image) => image.isPrimary === true).length === 1;
 };
 
-const variantsAreUnique = (variants?: { sizeValue: string; colorValue: string }[]) => {
+const variantsAreUnique = (variants?: { sizeValue?: string; colorValue?: string }[]) => {
   if (!variants) {
     return true;
   }
 
   const keys = variants.map((variant) =>
-    `${variant.sizeValue.trim().toLowerCase()}::${variant.colorValue.trim().toLowerCase()}`
+    `${(variant.sizeValue || "").trim().toLowerCase()}::${(variant.colorValue || "").trim().toLowerCase()}`
   );
 
   return new Set(keys).size === keys.length;
@@ -43,8 +43,8 @@ const variantSchema = z.object({
   id: z.string().min(1).optional(),
   sizeId: z.string().min(1).optional(),
   colorId: z.string().min(1).optional(),
-  sizeValue: z.string().trim().min(1),
-  colorValue: z.string().trim().min(1),
+  sizeValue: z.string().trim().min(1).optional(),
+  colorValue: z.string().trim().min(1).optional(),
   stock: z.number().int().min(0),
   sku: z.string().trim().min(2),
   price: z.number().positive().finite(),
