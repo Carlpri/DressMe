@@ -184,7 +184,7 @@ export function AdminProductsPage() {
         // Show specific field errors if available (Zod uses 'path')
         if (response?.errors && Array.isArray(response.errors)) {
           message = response.errors.map((e: any) => {
-            const fieldName = e.path ? e.path.join('.') : e.field || 'Field';
+            const fieldName = Array.isArray(e.path) ? e.path.join('.') : e.field || 'Field';
             return `${fieldName}: ${e.message || e.details}`;
           }).join(' | ');
         }
