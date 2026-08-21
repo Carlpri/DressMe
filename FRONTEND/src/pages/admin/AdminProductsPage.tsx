@@ -177,6 +177,8 @@ export function AdminProductsPage() {
       if (error && typeof error === "object" && "response" in error) {
         const response = (error as { response?: { data?: any } }).response?.data;
         
+        console.log("Validation error response:", response);
+        
         if (response?.message) {
           message = response.message;
         }
