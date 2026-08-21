@@ -37,10 +37,12 @@ import { apiClient } from "../../api/client";
 import { MediaPickerModal } from "../../components/admin/MediaPickerModal";
 import { ImageUploader } from "../../components/admin/ImageUploader";
 import { useFormatCurrency } from "../../utils/currency";
+import { useAuth } from "../../hooks/useAuth";
 
 export function AdminProductsPage() {
   const queryClient = useQueryClient();
   const formatCurrency = useFormatCurrency();
+  const { user } = useAuth();
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<any | null>(null);
@@ -79,9 +81,7 @@ export function AdminProductsPage() {
   const [galleryUrls, setGalleryUrls] = useState<string[]>([]);
   const [variants, setVariants] = useState<any[]>([
     {
-      sizeId: "",
-      sizeValue: "",
-      colorId: "",
+      sizeValue: "M",
       colorValue: "",
       price: 2500,
       compareAtPrice: 3000,
@@ -225,9 +225,7 @@ export function AdminProductsPage() {
     setGalleryUrls([]);
     setVariants([
       {
-        sizeId: "",
-        sizeValue: "",
-        colorId: "",
+        sizeValue: "M",
         colorValue: "",
         price: 2500,
         compareAtPrice: 3000,
@@ -307,9 +305,7 @@ export function AdminProductsPage() {
     setUploadingCount(0);
     setVariants([
       {
-        sizeId: "",
-        sizeValue: "",
-        colorId: "",
+        sizeValue: "M",
         colorValue: "",
         price: 2500,
         compareAtPrice: 3000,
@@ -331,9 +327,7 @@ export function AdminProductsPage() {
     setVariants([
       ...variants,
       {
-        sizeId: "",
         sizeValue: "",
-        colorId: "",
         colorValue: "",
         price: 2500,
         compareAtPrice: 3000,
@@ -350,25 +344,17 @@ export function AdminProductsPage() {
   const updateVariant = (index: number, field: string, value: any) => {
     const updated = [...variants];
     updated[index] = { ...updated[index], [field]: value };
-    
-    // Auto-derive sizeValue when sizeId changes
-    if (field === "sizeId") {
-      const selectedSize = sizes.find((s) => s.id === value);
-      updated[index].sizeValue = selectedSize?.name || "";
-    }
-    
-    // Auto-derive colorValue when colorId changes
-    if (field === "colorId") {
-      const selectedColor = colors.find((c) => c.id === value);
-      updated[index].colorValue = selectedColor?.name || "";
-    }
-    
     setVariants(updated);
   };
 
   const handleSave = () => {
     if (!name || name.trim().length < 2) {
       setSaveError("Product name must be at least 2 characters.");
+      return;
+    }
+
+    if (user?.role === "ADMIN" && !vendorId) {
+      setSaveError("Please select a vendor. If the list is empty, create a Vendor first in the Vendors page.");
       return;
     }
 
@@ -379,6 +365,21 @@ export function AdminProductsPage() {
 
     if (!categoryIds || categoryIds.length === 0) {
       setSaveError("Please select at least one category. If the list is empty, create a Category first.");
+      return;
+    }
+
+    if (!description || description.trim().length < 5) {
+      setSaveError("Product description must be at least 5 characters.");
+      return;
+    }
+
+    if (!price || Number(price) <= 0) {
+      setSaveError("Please enter a valid selling price greater than 0.");
+      return;
+    }
+
+    if (stock < 0) {
+      setSaveError("Stock cannot be negative.");
       return;
     }
 
@@ -395,15 +396,11 @@ export function AdminProductsPage() {
     // Validate variants
     for (let i = 0; i < variants.length; i++) {
       const variant = variants[i];
-      if (!variant.sizeId) {
-        setSaveError(`Variant ${i + 1}: Select a size.`);
+      if (!variant.sizeValue && !variant.colorValue) {
+        setSaveError(`Variant ${i + 1}: Enter at least a size or color.`);
         return;
       }
-      if (!variant.colorId) {
-        setSaveError(`Variant ${i + 1}: Select a color.`);
-        return;
-      }
-      if (!variant.price || variant.price <= 0) {
+      if (!variant.price || isNaN(Number(variant.price)) || Number(variant.price) <= 0) {
         setSaveError(`Variant ${i + 1}: Enter a valid price.`);
         return;
       }
@@ -419,9 +416,11 @@ export function AdminProductsPage() {
     if (primaryImageUrl) {
       imagesPayload.push({ imageUrl: primaryImageUrl, isPrimary: true, displayOrder: 0 });
     }
-    galleryUrls.forEach((gUrl, idx) => {
-      imagesPayload.push({ imageUrl: gUrl, isPrimary: false, displayOrder: idx + 1 });
-    });
+    galleryUrls
+      .filter((gUrl) => gUrl && gUrl.trim() !== "")
+      .forEach((gUrl, idx) => {
+        imagesPayload.push({ imageUrl: gUrl, isPrimary: false, displayOrder: idx + 1 });
+      });
 
     // Generate unique SKUs for variants that don't have one yet.
     // We use an index + random suffix to prevent timestamp collisions when
@@ -429,9 +428,7 @@ export function AdminProductsPage() {
     const baseTs = Date.now().toString(36).toUpperCase();
     const variantsPayload = variants.map((v, i) => ({
       ...(v.id ? { id: v.id } : {}), // preserve id for updates
-      sizeId: v.sizeId || undefined,
       sizeValue: v.sizeValue,
-      colorId: v.colorId || undefined,
       colorValue: v.colorValue,
       price: Number(v.price),
       compareAtPrice: v.compareAtPrice ? Number(v.compareAtPrice) : null,
@@ -821,39 +818,23 @@ export function AdminProductsPage() {
 
                   <Grid container spacing={2}>
                     <Grid size={{ xs: 12, md: 3 }}>
-                      <FormControl fullWidth size="small">
-                        <InputLabel>Size</InputLabel>
-                        <Select
-                          value={variant.sizeId}
-                          label="Size"
-                          onChange={(e) => updateVariant(index, "sizeId", e.target.value)}
-                        >
-                          <MenuItem value="">Select size</MenuItem>
-                          {sizes.map((s) => (
-                            <MenuItem key={s.id} value={s.id}>
-                              {s.name}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
+                      <TextField
+                        fullWidth
+                        size="small"
+                        label="Size (e.g. M, L, 42)"
+                        value={variant.sizeValue || ""}
+                        onChange={(e) => updateVariant(index, "sizeValue", e.target.value)}
+                      />
                     </Grid>
 
                     <Grid size={{ xs: 12, md: 3 }}>
-                      <FormControl fullWidth size="small">
-                        <InputLabel>Color</InputLabel>
-                        <Select
-                          value={variant.colorId}
-                          label="Color"
-                          onChange={(e) => updateVariant(index, "colorId", e.target.value)}
-                        >
-                          <MenuItem value="">Select color</MenuItem>
-                          {colors.map((c) => (
-                            <MenuItem key={c.id} value={c.id}>
-                              {c.name}
-                            </MenuItem>
-                          ))}
-                        </Select>
-                      </FormControl>
+                      <TextField
+                        fullWidth
+                        size="small"
+                        label="Color (e.g. Red, Black)"
+                        value={variant.colorValue || ""}
+                        onChange={(e) => updateVariant(index, "colorValue", e.target.value)}
+                      />
                     </Grid>
 
                     <Grid size={{ xs: 12, md: 2 }}>

@@ -12,8 +12,8 @@ export interface ProductVariantDto {
   id?: string;
   sizeId?: string;
   colorId?: string;
-  sizeValue: string;
-  colorValue: string;
+  sizeValue?: string;
+  colorValue?: string;
   stock: number;
   sku: string;
   price?: number;
