@@ -4,7 +4,8 @@ import { z } from "zod";
 const priceSchema = z.number().positive().finite();
 
 const imagesHaveExactlyOnePrimary = (images?: { isPrimary?: boolean }[]) => {
-  if (!images) {
+  // undefined or empty array → no images in payload → no constraint to enforce
+  if (!images || images.length === 0) {
     return true;
   }
 

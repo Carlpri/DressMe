@@ -138,11 +138,13 @@ export function AdminProductsPage() {
     },
   });
 
+  // Auto-select first vendor only for ADMIN users — VENDOR role users have their
+  // vendor profile resolved server-side from their userId, no selection needed.
   useEffect(() => {
-    if (!editingProduct && !vendorId && vendors.length > 0) {
+    if (user?.role === "ADMIN" && !editingProduct && !vendorId && vendors.length > 0) {
       setVendorId(vendors[0].id);
     }
-  }, [editingProduct, vendorId, vendors]);
+  }, [user?.role, editingProduct, vendorId, vendors]);
 
   const saveProductMutation = useMutation({
     mutationFn: async (payload: any) => {
@@ -176,19 +178,26 @@ export function AdminProductsPage() {
       
       if (error && typeof error === "object" && "response" in error) {
         const response = (error as { response?: { data?: any } }).response?.data;
-        
+
         console.log("Validation error response:", response);
-        
+
         if (response?.message) {
           message = response.message;
         }
-        
-        // Show specific field errors if available (Zod uses 'path')
+
+        // The validate middleware serializes issue.path to a string via .join('.').
+        // Guard against both the serialized-string form and any future array form.
         if (response?.errors && Array.isArray(response.errors)) {
-          message = response.errors.map((e: any) => {
-            const fieldName = Array.isArray(e.path) ? e.path.join('.') : e.field || 'Field';
-            return `${fieldName}: ${e.message || e.details}`;
-          }).join(' | ');
+          message = response.errors
+            .map((e: any) => {
+              const fieldName = Array.isArray(e.path)
+                ? e.path.join('.')
+                : typeof e.path === "string"
+                ? e.path
+                : "Field";
+              return `${fieldName}: ${e.message || e.details}`;
+            })
+            .join(' | ');
         }
       }
       
@@ -696,24 +705,28 @@ export function AdminProductsPage() {
               </FormControl>
             </Grid>
 
-            <Grid size={{ xs: 12, md: 4 }}>
-              <FormControl fullWidth>
-                <InputLabel>Vendor</InputLabel>
-                <Select value={vendorId} label="Vendor" onChange={(e) => setVendorId(e.target.value)}>
-                  {vendors.length === 0 ? (
-                    <MenuItem disabled value="">
-                      No vendors are available yet.
-                    </MenuItem>
-                  ) : (
-                    vendors.map((v) => (
-                      <MenuItem key={v.id} value={v.id}>
-                        {v.businessName || "Vendor"} ({v.user?.name || "Unknown User"})
+            {/* Vendor selector is only meaningful for ADMIN — VENDOR-role users have their
+                vendor profile resolved server-side via their userId automatically. */}
+            {user?.role === "ADMIN" && (
+              <Grid size={{ xs: 12, md: 4 }}>
+                <FormControl fullWidth>
+                  <InputLabel>Vendor</InputLabel>
+                  <Select value={vendorId} label="Vendor" onChange={(e) => setVendorId(e.target.value)}>
+                    {vendors.length === 0 ? (
+                      <MenuItem disabled value="">
+                        No vendors are available yet.
                       </MenuItem>
-                    ))
-                  )}
-                </Select>
-              </FormControl>
-            </Grid>
+                    ) : (
+                      vendors.map((v) => (
+                        <MenuItem key={v.id} value={v.id}>
+                          {v.businessName || "Vendor"} ({v.user?.name || "Unknown User"})
+                        </MenuItem>
+                      ))
+                    )}
+                  </Select>
+                </FormControl>
+              </Grid>
+            )}
 
             {/* Images & Gallery Section */}
             <Grid size={{ xs: 12 }}>
@@ -952,7 +965,8 @@ export function AdminProductsPage() {
               !price ||
               categoryIds.length === 0 ||
               !brandId ||
-              !vendorId ||
+              // ADMIN must pick a vendor; VENDOR users have theirs resolved server-side
+              (user?.role === "ADMIN" && !vendorId) ||
               !primaryImageUrl ||
               saveProductMutation.isPending ||
               isUploading

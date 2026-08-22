@@ -16,7 +16,7 @@ export interface ProductVariantDto {
   colorValue?: string;
   stock: number;
   sku: string;
-  price?: number;
+  price: number;
   compareAtPrice?: number | null;
   costPrice?: number | null;
   isAvailable?: boolean;
