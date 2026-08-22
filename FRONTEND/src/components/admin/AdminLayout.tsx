@@ -130,6 +130,21 @@ export function AdminLayout() {
       <Box sx={{ p: 2 }}>
         <Button
           component={RouterLink}
+          to="/studio/vendor"
+          fullWidth
+          variant="outlined"
+          startIcon={<StorefrontIcon />}
+          sx={{
+            color: "#94A3B8",
+            borderColor: "rgba(255,255,255,0.2)",
+            mb: 1,
+            "&:hover": { borderColor: "white", color: "white" },
+          }}
+        >
+          Vendor Portal
+        </Button>
+        <Button
+          component={RouterLink}
           to="/studio"
           fullWidth
           variant="outlined"

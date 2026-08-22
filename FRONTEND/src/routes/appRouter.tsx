@@ -27,6 +27,7 @@ import { CartPage } from "../features/customer/CartPage";
 import { AddressesPage } from "../features/customer/AddressesPage";
 import { OrdersPage } from "../features/customer/OrdersPage";
 import { OutfitsPage } from "../features/customer/OutfitsPage";
+import { VendorDashboardPage } from "../pages/vendor/VendorDashboardPage";
 
 import { AdminLayout } from "../components/admin/AdminLayout";
 import { AdminDashboardPage } from "../pages/admin/AdminDashboardPage";
@@ -186,7 +187,7 @@ export const appRouter = createBrowserRouter([
       { 
         path: "vendor", 
         element: <ProtectedRoute allowedRoles={["VENDOR", "ADMIN"]} />,
-        children: [{ index: true, element: <PlaceholderPage title="Vendor workspace" description="Vendor QA tools are planned after customer workflows." /> }]
+        children: [{ index: true, element: <VendorDashboardPage /> }]
       },
       {
         path: "admin",
