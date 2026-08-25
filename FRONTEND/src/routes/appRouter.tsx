@@ -69,11 +69,7 @@ export const appRouter = createBrowserRouter([
         element: <ProtectedRoute allowedRoles={["USER", "ADMIN"]} />,
         children: [{ index: true, element: <WishlistPage /> }]
       },
-      {
-        path: "cart",
-        element: <ProtectedRoute allowedRoles={["USER", "ADMIN"]} />,
-        children: [{ index: true, element: <CartPage /> }]
-      },
+      { path: "cart", element: <CartPage /> },
       {
         path: "checkout",
         element: <ProtectedRoute allowedRoles={["USER", "ADMIN"]} />,

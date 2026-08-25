@@ -1,0 +1,69 @@
+2026-08-25 15:19:53.372 EAT [13692] LOG:  starting PostgreSQL 17.10 on x86_64-windows, compiled by msvc-19.44.35227, 64-bit
+2026-08-25 15:19:53.541 EAT [13692] LOG:  listening on IPv4 address "127.0.0.1", port 55432
+2026-08-25 15:19:53.544 EAT [13692] LOG:  listening on IPv6 address "::1", port 55432
+2026-08-25 15:19:54.768 EAT [19660] LOG:  database system was shut down at 2026-08-25 15:19:30 EAT
+2026-08-25 15:19:55.411 EAT [13692] LOG:  database system is ready to accept connections
+2026-08-25 15:24:54.436 EAT [19324] LOG:  checkpoint starting: time
+2026-08-25 15:25:15.832 EAT [19416] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-08-25 15:27:20.917 EAT [19324] LOG:  checkpoint complete: wrote 1027 buffers (6.3%); 0 WAL file(s) added, 0 removed, 0 recycled; write=145.018 s, sync=0.294 s, total=146.482 s; sync files=444, longest=0.003 s, average=0.001 s; distance=5321 kB, estimate=5321 kB; lsn=0/1AA5898, redo lsn=0/1A9F740
+2026-08-25 15:27:57.937 EAT [19324] LOG:  checkpoint starting: immediate force wait
+2026-08-25 15:27:59.407 EAT [19324] LOG:  checkpoint complete: wrote 2 buffers (0.0%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.302 s, sync=0.151 s, total=1.470 s; sync files=2, longest=0.103 s, average=0.076 s; distance=25 kB, estimate=4791 kB; lsn=0/1AA5D08, redo lsn=0/1AA5C78
+2026-08-25 15:31:24.015 EAT [19604] ERROR:  duplicate key value violates unique constraint "SavedOutfit_userId_outfitId_key"
+2026-08-25 15:31:24.015 EAT [19604] DETAIL:  Key ("userId", "outfitId")=(cmt8n8fi5000396qse80xsk7v, cmt8n93gb01na96qsp5ktmadz) already exists.
+2026-08-25 15:31:24.015 EAT [19604] STATEMENT:  INSERT INTO "public"."SavedOutfit" ("id","userId","outfitId","createdAt") VALUES ($1,$2,$3,$4) RETURNING "public"."SavedOutfit"."id", "public"."SavedOutfit"."userId", "public"."SavedOutfit"."outfitId", "public"."SavedOutfit"."createdAt"
+2026-08-25 15:31:24.342 EAT [19604] ERROR:  duplicate key value violates unique constraint "SavedOutfit_userId_outfitId_key"
+2026-08-25 15:31:24.342 EAT [19604] DETAIL:  Key ("userId", "outfitId")=(cmt8n8fij000596qsjv0b29s0, cmt8n91qb01em96qs8i4ms26q) already exists.
+2026-08-25 15:31:24.342 EAT [19604] STATEMENT:  INSERT INTO "public"."SavedOutfit" ("id","userId","outfitId","createdAt") VALUES ($1,$2,$3,$4) RETURNING "public"."SavedOutfit"."id", "public"."SavedOutfit"."userId", "public"."SavedOutfit"."outfitId", "public"."SavedOutfit"."createdAt"
+2026-08-25 15:31:24.519 EAT [19604] ERROR:  duplicate key value violates unique constraint "SavedOutfit_userId_outfitId_key"
+2026-08-25 15:31:24.519 EAT [19604] DETAIL:  Key ("userId", "outfitId")=(cmt8n8fj7000896qs0rikd0bs, cmt8n93nw01p096qs9dhmlsig) already exists.
+2026-08-25 15:31:24.519 EAT [19604] STATEMENT:  INSERT INTO "public"."SavedOutfit" ("id","userId","outfitId","createdAt") VALUES ($1,$2,$3,$4) RETURNING "public"."SavedOutfit"."id", "public"."SavedOutfit"."userId", "public"."SavedOutfit"."outfitId", "public"."SavedOutfit"."createdAt"
+2026-08-25 15:31:24.828 EAT [19604] ERROR:  duplicate key value violates unique constraint "SavedOutfit_userId_outfitId_key"
+2026-08-25 15:31:24.828 EAT [19604] DETAIL:  Key ("userId", "outfitId")=(cmt8n8fjn000b96qs1ocyf00p, cmt8n92a001gk96qsi96fvlb3) already exists.
+2026-08-25 15:31:24.828 EAT [19604] STATEMENT:  INSERT INTO "public"."SavedOutfit" ("id","userId","outfitId","createdAt") VALUES ($1,$2,$3,$4) RETURNING "public"."SavedOutfit"."id", "public"."SavedOutfit"."userId", "public"."SavedOutfit"."outfitId", "public"."SavedOutfit"."createdAt"
+2026-08-25 15:31:49.803 EAT [19240] ERROR:  invalid name syntax at character 1015
+2026-08-25 15:31:49.803 EAT [19240] STATEMENT:  SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_type = 'BASE TABLE' ORDER BY table_name; SELECT t.typname AS enum_name, string_agg(e.enumlabel, ',' ORDER BY e.enumsortorder) AS values FROM pg_type t JOIN pg_enum e ON e.enumtypid=t.oid JOIN pg_namespace n ON n.oid=t.typnamespace WHERE n.nspname='public' GROUP BY t.typname ORDER BY t.typname; SELECT table_name, column_name FROM information_schema.columns WHERE (table_name='Vendor' AND column_name IN ('shopName','phone','verified')) OR (table_name='Product' AND column_name='categoryId') OR (table_name='ProductVariant' AND column_name IN ('size','color')); SELECT column_name,is_nullable,column_default FROM information_schema.columns WHERE table_name='ProductVariant' AND column_name IN ('price','imageUrl','colorId','colorValue','compareAtPrice','costPrice','sizeId','sizeValue','stock','isAvailable') ORDER BY column_name; SELECT conname, pg_get_constraintdef(oid) AS definition FROM pg_constraint WHERE conrelid IN ('" ProductVariant\'::regclass,'\ProductCategory\'::regclass)
+2026-08-25 15:32:57.425 EAT [19324] LOG:  checkpoint starting: time
+2026-08-25 15:35:24.225 EAT [19324] LOG:  checkpoint complete: wrote 1213 buffers (7.4%); 0 WAL file(s) added, 0 removed, 1 recycled; write=145.450 s, sync=0.910 s, total=146.801 s; sync files=453, longest=0.040 s, average=0.003 s; distance=6388 kB, estimate=6388 kB; lsn=0/20E2EA0, redo lsn=0/20E2E10
+2026-08-25 15:51:27.568 EAT [17724] FATAL:  role "postgres" does not exist
+2026-08-25 15:51:27.678 EAT [18800] FATAL:  role "postgres" does not exist
+2026-08-25 15:51:58.579 EAT [22252] FATAL:  role "Carlos" does not exist
+2026-08-25 15:51:58.671 EAT [20736] FATAL:  role "Carlos" does not exist
+2026-08-25 15:52:26.675 EAT [21464] FATAL:  role "postgres" does not exist
+2026-08-25 15:52:35.359 EAT [21016] FATAL:  role "Carlos" does not exist
+2026-08-25 15:53:10.851 EAT [21700] FATAL:  role "carl.prit" does not exist
+2026-08-25 15:54:00.383 EAT [19976] FATAL:  role "carl_prit" does not exist
+2026-08-25 15:54:08.752 EAT [18948] FATAL:  role "carl" does not exist
+2026-08-25 15:54:33.562 EAT [12004] FATAL:  role "madahanacarlos" does not exist
+2026-08-25 15:54:40.910 EAT [15372] FATAL:  role "dressme" does not exist
+2026-08-25 15:54:48.363 EAT [19972] FATAL:  role "dressme_db_cc7z_user" does not exist
+2026-08-25 15:56:04.494 EAT [18740] FATAL:  role "carlprit" does not exist
+2026-08-25 15:56:20.532 EAT [19932] FATAL:  role ""CARL.PRIT"" does not exist
+2026-08-25 15:56:30.398 EAT [2244] FATAL:  role "CARL.PRIT" does not exist
+2026-08-25 15:56:44.860 EAT [21580] FATAL:  role "administrator" does not exist
+2026-08-25 15:56:53.111 EAT [20484] FATAL:  role "SYSTEM" does not exist
+2026-08-25 15:57:30.762 EAT [14104] FATAL:  role "admin" does not exist
+2026-08-25 16:05:03.354 EAT [21120] ERROR:  DROP DATABASE cannot run inside a transaction block
+2026-08-25 16:05:03.354 EAT [21120] STATEMENT:  DROP DATABASE IF EXISTS dressme_canonical_baseline; CREATE DATABASE dressme_canonical_baseline;
+2026-08-25 16:07:58.122 EAT [19324] LOG:  checkpoint starting: time
+2026-08-25 16:08:08.603 EAT [19324] LOG:  checkpoint complete: wrote 78 buffers (0.5%); 0 WAL file(s) added, 0 removed, 0 recycled; write=9.572 s, sync=0.754 s, total=10.488 s; sync files=23, longest=0.237 s, average=0.033 s; distance=679 kB, estimate=5817 kB; lsn=0/218CB48, redo lsn=0/218CAB8
+2026-08-25 16:12:58.608 EAT [19324] LOG:  checkpoint starting: time
+2026-08-25 16:13:28.761 EAT [19324] LOG:  checkpoint complete: wrote 180 buffers (1.1%); 0 WAL file(s) added, 0 removed, 0 recycled; write=29.967 s, sync=0.152 s, total=30.153 s; sync files=198, longest=0.046 s, average=0.001 s; distance=1312 kB, estimate=5366 kB; lsn=0/22D4CD0, redo lsn=0/22D4C40
+2026-08-25 16:17:44.077 EAT [18860] ERROR:  duplicate key value violates unique constraint "SavedOutfit_userId_outfitId_key"
+2026-08-25 16:17:44.077 EAT [18860] DETAIL:  Key ("userId", "outfitId")=(cmt8owgw100039640067blhme, cmt8owpbq01sc9640ci0uig4d) already exists.
+2026-08-25 16:17:44.077 EAT [18860] STATEMENT:  INSERT INTO "public"."SavedOutfit" ("id","userId","outfitId","createdAt") VALUES ($1,$2,$3,$4) RETURNING "public"."SavedOutfit"."id", "public"."SavedOutfit"."userId", "public"."SavedOutfit"."outfitId", "public"."SavedOutfit"."createdAt"
+2026-08-25 16:17:44.311 EAT [18860] ERROR:  duplicate key value violates unique constraint "SavedOutfit_userId_outfitId_key"
+2026-08-25 16:17:44.311 EAT [18860] DETAIL:  Key ("userId", "outfitId")=(cmt8owgxd000e96405sj0p077, cmt8owp4o01ny964063qfp3u0) already exists.
+2026-08-25 16:17:44.311 EAT [18860] STATEMENT:  INSERT INTO "public"."SavedOutfit" ("id","userId","outfitId","createdAt") VALUES ($1,$2,$3,$4) RETURNING "public"."SavedOutfit"."id", "public"."SavedOutfit"."userId", "public"."SavedOutfit"."outfitId", "public"."SavedOutfit"."createdAt"
+2026-08-25 16:17:44.336 EAT [18860] ERROR:  duplicate key value violates unique constraint "SavedOutfit_userId_outfitId_key"
+2026-08-25 16:17:44.336 EAT [18860] DETAIL:  Key ("userId", "outfitId")=(cmt8owgxg000f9640z2by4npj, cmt8owoxj01js9640q1kwuusx) already exists.
+2026-08-25 16:17:44.336 EAT [18860] STATEMENT:  INSERT INTO "public"."SavedOutfit" ("id","userId","outfitId","createdAt") VALUES ($1,$2,$3,$4) RETURNING "public"."SavedOutfit"."id", "public"."SavedOutfit"."userId", "public"."SavedOutfit"."outfitId", "public"."SavedOutfit"."createdAt"
+2026-08-25 16:17:44.381 EAT [18860] ERROR:  duplicate key value violates unique constraint "SavedOutfit_userId_outfitId_key"
+2026-08-25 16:17:44.381 EAT [18860] DETAIL:  Key ("userId", "outfitId")=(cmt8owgxq000i9640q91dxtic, cmt8owovi01iu9640z0dyv8zr) already exists.
+2026-08-25 16:17:44.381 EAT [18860] STATEMENT:  INSERT INTO "public"."SavedOutfit" ("id","userId","outfitId","createdAt") VALUES ($1,$2,$3,$4) RETURNING "public"."SavedOutfit"."id", "public"."SavedOutfit"."userId", "public"."SavedOutfit"."outfitId", "public"."SavedOutfit"."createdAt"
+2026-08-25 16:17:58.116 EAT [19324] LOG:  checkpoint starting: time
+2026-08-25 16:18:22.776 EAT [19324] LOG:  checkpoint complete: wrote 216 buffers (1.3%); 0 WAL file(s) added, 0 removed, 0 recycled; write=24.510 s, sync=0.073 s, total=24.660 s; sync files=94, longest=0.007 s, average=0.001 s; distance=1141 kB, estimate=4944 kB; lsn=0/241BEC0, redo lsn=0/23F2108
+2026-08-25 16:20:56.500 EAT [22220] LOG:  could not receive data from client: An existing connection was forcibly closed by the remote host.
+	
+2026-08-25 16:27:58.817 EAT [19324] LOG:  checkpoint starting: time
+2026-08-25 16:28:08.978 EAT [19324] LOG:  checkpoint complete: wrote 91 buffers (0.6%); 0 WAL file(s) added, 0 removed, 0 recycled; write=10.124 s, sync=0.024 s, total=10.161 s; sync files=42, longest=0.003 s, average=0.001 s; distance=260 kB, estimate=4475 kB; lsn=0/24332A8, redo lsn=0/2433218

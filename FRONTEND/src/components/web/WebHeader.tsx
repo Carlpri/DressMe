@@ -25,6 +25,7 @@ import { ROUTES } from "../../constants/routes";
 import { useAuth } from "../../hooks/useAuth";
 import { useSiteSettingsContext } from "../../contexts/SiteSettingsContext";
 import { useFavorites } from "../../hooks/useFavorites";
+import { useCart } from "../../hooks/useCart";
 
 const NAVIGATION_ITEMS = [
   { label: "Products", path: ROUTES.customerDashboard },
@@ -42,6 +43,8 @@ export function WebHeader() {
   const { user, isAuthenticated, logout } = useAuth();
   const { settings } = useSiteSettingsContext();
   const { data: favorites } = useFavorites();
+  const { data: cart } = useCart();
+  const cartCount = cart?.items?.reduce((sum, item) => sum + item.quantity, 0) || 0;
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -139,6 +142,7 @@ export function WebHeader() {
                   to={ROUTES.wishlist}
                   size="small"
                   sx={{ color: "text.primary" }}
+                  aria-label="Wishlist"
                 >
                   <Badge badgeContent={favorites?.length || 0} color="error">
                     <FavoriteBorderIcon />
@@ -149,8 +153,11 @@ export function WebHeader() {
                   to={ROUTES.customerCart}
                   size="small"
                   sx={{ color: "text.primary" }}
+                  aria-label="Shopping Cart"
                 >
-                  <ShoppingCartIcon />
+                  <Badge badgeContent={cartCount} color="primary">
+                    <ShoppingCartIcon />
+                  </Badge>
                 </IconButton>
                 <Button
                   component={RouterLink}
@@ -172,6 +179,17 @@ export function WebHeader() {
               </>
             ) : (
               <>
+                <IconButton
+                  component={RouterLink}
+                  to={ROUTES.customerCart}
+                  size="small"
+                  sx={{ color: "text.primary" }}
+                  aria-label="Shopping Cart"
+                >
+                  <Badge badgeContent={cartCount} color="primary">
+                    <ShoppingCartIcon />
+                  </Badge>
+                </IconButton>
                 <Button
                   component={RouterLink}
                   to={ROUTES.webLogin}

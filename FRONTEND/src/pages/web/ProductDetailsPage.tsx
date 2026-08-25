@@ -83,13 +83,23 @@ export function ProductDetailsPage() {
   useEffect(() => {
     if (product) {
       addRecentlyViewed(product);
+      if (product.variants?.length > 0 && !selectedVariant) {
+        const inStockVariant = product.variants.find((v) => (v.stock ?? 0) > 0) || product.variants[0];
+        if (inStockVariant) {
+          setSelectedVariant(inStockVariant.id);
+        }
+      }
     }
-  }, [product, addRecentlyViewed]);
+  }, [product, addRecentlyViewed, selectedVariant]);
 
   const currentVariant = product?.variants.find((v) => v.id === selectedVariant);
   const displayPrice = currentVariant?.price || product?.price || 0;
   const compareAtPrice = product?.compareAtPrice;
-  const availableStock = currentVariant?.stock ?? 0;
+  const availableStock = currentVariant
+    ? (currentVariant.stock ?? 0)
+    : product?.variants?.length
+    ? 0
+    : 99;
   const savings = compareAtPrice && compareAtPrice > displayPrice ? compareAtPrice - displayPrice : 0;
 
   const handleAddToCart = () => {
@@ -99,6 +109,7 @@ export function ProductDetailsPage() {
           productId: product.id,
           variantId: selectedVariant || undefined,
           quantity,
+          product,
         },
         {
           onSuccess: () => setShowCartSuccess(true),
