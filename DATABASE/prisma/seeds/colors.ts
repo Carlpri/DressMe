@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { randomUUID } from "node:crypto";
 
 const DEFAULT_COLORS = [
   { name: "Black", hexCode: "#000000" },
@@ -45,6 +46,7 @@ export async function seedColors(
     const color = await prisma.color.upsert({
       where: { name: colorData.name },
       create: {
+        id: randomUUID(),
         name: colorData.name,
         hexCode: colorData.hexCode,
       },

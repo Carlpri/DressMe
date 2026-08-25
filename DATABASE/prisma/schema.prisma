@@ -58,12 +58,12 @@ model Vendor {
 }
 
 model Category {
-  id        String    @id @default(cuid())
-  name      String    @unique
-  slug      String    @unique
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  image     String?
+  id              String            @id @default(cuid())
+  name            String            @unique
+  slug            String            @unique
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  image           String?
   ProductCategory ProductCategory[]
 }
 
@@ -80,38 +80,38 @@ model Brand {
 }
 
 model Product {
-  id             String            @id @default(cuid())
-  name           String
-  slug           String            @unique
-  description    String
-  price          Float
-  gender         Gender
-  vendorId       String
-  brandId        String
-  createdAt      DateTime          @default(now())
-  updatedAt      DateTime          @updatedAt
-  stock          Int               @default(0)
-  sku            String?           @unique
-  featured       Boolean           @default(false)
-  status         ProductStatus     @default(DRAFT)
-  views          Int               @default(0)
-  sales          Int               @default(0)
-  averageRating  Float             @default(0)
-  reviewCount    Int               @default(0)
-  compareAtPrice Float?
-  isBestSeller   Boolean           @default(false)
-  isNewArrival   Boolean           @default(false)
-  isTrending     Boolean           @default(false)
-  cartItems      CartItem[]
-  favorites      FavoriteProduct[]
-  orderItems     OrderItem[]
-  outfitItems    OutfitItem[]
-  brand          Brand             @relation(fields: [brandId], references: [id])
-  vendor         Vendor            @relation(fields: [vendorId], references: [id])
+  id              String            @id @default(cuid())
+  name            String
+  slug            String            @unique
+  description     String
+  price           Float
+  gender          Gender
+  vendorId        String
+  brandId         String
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  stock           Int               @default(0)
+  sku             String?           @unique
+  featured        Boolean           @default(false)
+  status          ProductStatus     @default(DRAFT)
+  views           Int               @default(0)
+  sales           Int               @default(0)
+  averageRating   Float             @default(0)
+  reviewCount     Int               @default(0)
+  compareAtPrice  Float?
+  isBestSeller    Boolean           @default(false)
+  isNewArrival    Boolean           @default(false)
+  isTrending      Boolean           @default(false)
+  cartItems       CartItem[]
+  favorites       FavoriteProduct[]
+  orderItems      OrderItem[]
+  outfitItems     OutfitItem[]
+  brand           Brand             @relation(fields: [brandId], references: [id])
+  vendor          Vendor            @relation(fields: [vendorId], references: [id])
   ProductCategory ProductCategory[]
-  images         ProductImage[]
-  variants       ProductVariant[]
-  reviews        Review[]
+  images          ProductImage[]
+  variants        ProductVariant[]
+  reviews         Review[]
 
   @@index([vendorId])
   @@index([brandId])
@@ -218,23 +218,23 @@ model AttributeValue {
 }
 
 model Color {
-  id           String   @id
-  name         String   @unique
-  hexCode      String?
-  isActive     Boolean  @default(true)
-  displayOrder Int      @default(0)
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id             String           @id
+  name           String           @unique
+  hexCode        String?
+  isActive       Boolean          @default(true)
+  displayOrder   Int              @default(0)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
   ProductVariant ProductVariant[]
 }
 
 model Size {
-  id           String       @id
-  name         String       @unique
-  category     SizeCategory @default(ADULT)
-  displayOrder Int          @default(0)
-  createdAt    DateTime     @default(now())
-  updatedAt    DateTime     @updatedAt
+  id             String           @id
+  name           String           @unique
+  category       SizeCategory     @default(ADULT)
+  displayOrder   Int              @default(0)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
   ProductVariant ProductVariant[]
 }
 
