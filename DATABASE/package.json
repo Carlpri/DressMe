@@ -8,6 +8,7 @@
     "test:coverage": "vitest --coverage",
     "dev": "tsx watch src/server.ts",
     "build": "prisma generate && tsc",
+    "seed:admin": "tsx prisma/seedAdmin.ts",
     "start": "node dist/server.js",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
@@ -43,6 +44,5 @@
     "tsx": "^4.23.1",
     "typescript": "^5.9.2",
     "vitest": "^4.1.10"
-  
-}
+  }
 }
