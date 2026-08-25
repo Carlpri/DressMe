@@ -6,6 +6,7 @@ import { seedBrands } from "./seeds/brands.js";
 import { seedCategories } from "./seeds/categories.js";
 import { seedSizes } from "./seeds/sizes.js";
 import { seedColors } from "./seeds/colors.js";
+import { seedAttributes } from "./seeds/attributes.js";
 import { seedProducts } from "./seeds/products.js";
 import { seedProductVariants } from "./seeds/productVariants.js";
 import { seedAddresses } from "./seeds/addresses.js";
@@ -78,6 +79,7 @@ async function main() {
   const categoryIds = await seedCategories(prisma, seedConfig.categories);
   const sizeIds = await seedSizes(prisma, seedConfig.sizes);
   const colorIds = await seedColors(prisma, seedConfig.colors);
+  await seedAttributes(prisma);
   const productIds = await seedProducts(
     prisma,
     vendorIds,

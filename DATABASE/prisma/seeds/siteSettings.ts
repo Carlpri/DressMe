@@ -3,14 +3,14 @@ import { PrismaClient } from "@prisma/client";
 export async function seedSiteSettings(prisma: PrismaClient) {
   console.log("🌐 Seeding site settings...");
 
-  const existing = await prisma.siteSettings.findFirst();
+  const existing = await prisma.appSettings.findFirst();
 
   if (existing) {
     console.log("   Site settings already exist, skipping...");
     return existing;
   }
 
-  const settings = await prisma.siteSettings.create({
+  const settings = await prisma.appSettings.create({
     data: {
       siteName: "DressMe",
       tagline: "Your Style. Powered by AI. Inspired by You.",
@@ -20,7 +20,7 @@ export async function seedSiteSettings(prisma: PrismaClient) {
       heroBannerUrl: "",
       supportEmail: "support@dressme.co.ke",
       supportPhone: "+254700000000",
-      whatsapp: "+254700000000",
+      whatsappNumber: "+254700000000",
       facebook: "https://facebook.com/dressme",
       instagram: "https://instagram.com/dressme",
       tiktok: "https://tiktok.com/@dressme",

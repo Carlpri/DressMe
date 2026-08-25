@@ -1,4 +1,5 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, SizeCategory } from "@prisma/client";
+import { randomUUID } from "node:crypto";
 
 const DEFAULT_SIZES = [
   { name: "XS", category: "ADULT" },
@@ -9,16 +10,16 @@ const DEFAULT_SIZES = [
   { name: "XXL", category: "ADULT" },
   { name: "3XL", category: "ADULT" },
   { name: "4XL", category: "ADULT" },
-  { name: "Newborn", category: "KIDS" },
-  { name: "0-3 Months", category: "KIDS" },
-  { name: "3-6 Months", category: "KIDS" },
-  { name: "6-12 Months", category: "KIDS" },
-  { name: "12-18 Months", category: "KIDS" },
-  { name: "18-24 Months", category: "KIDS" },
-  { name: "2T", category: "KIDS" },
-  { name: "3T", category: "KIDS" },
-  { name: "4T", category: "KIDS" },
-  { name: "5T", category: "KIDS" },
+  { name: "Newborn", category: "UNIVERSAL" },
+  { name: "0-3 Months", category: "UNIVERSAL" },
+  { name: "3-6 Months", category: "UNIVERSAL" },
+  { name: "6-12 Months", category: "UNIVERSAL" },
+  { name: "12-18 Months", category: "UNIVERSAL" },
+  { name: "18-24 Months", category: "UNIVERSAL" },
+  { name: "2T", category: "UNIVERSAL" },
+  { name: "3T", category: "UNIVERSAL" },
+  { name: "4T", category: "UNIVERSAL" },
+  { name: "5T", category: "UNIVERSAL" },
   { name: "Universal", category: "ADULT" },
 ];
 
@@ -39,11 +40,12 @@ export async function seedSizes(
     const sizeData =
       i <= DEFAULT_SIZES.length
         ? DEFAULT_SIZES[i - 1]
-        : { name: `SIZE${index}`, category: "ADULT" };
+        : { name: `SIZE${index}`, category: "ADULT" as SizeCategory };
 
     const size = await prisma.size.upsert({
       where: { name: sizeData.name },
       create: {
+        id: randomUUID(),
         name: sizeData.name,
         category: sizeData.category,
       },

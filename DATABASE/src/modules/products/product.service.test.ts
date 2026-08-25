@@ -10,8 +10,10 @@ describe("ProductService", () => {
   let repository: ProductRepository;
 
   beforeEach(() => {
-    repository = new ProductRepository();
     service = new ProductService();
+    repository = (service as any).repository;
+    vi.spyOn(repository, "findBySlug").mockResolvedValue(null);
+    vi.spyOn(repository, "findByNameCategoryBrand").mockResolvedValue(null);
   });
 
   describe("create", () => {
@@ -261,6 +263,7 @@ describe("ProductService", () => {
       vi.spyOn(repository, "findBySku").mockResolvedValue(null);
       vi.spyOn(repository, "findVariantBySku").mockResolvedValue({
         id: "existingVariant",
+        productId: "otherProduct",
         sku: "DM-V1-TEST-001",
       } as any);
 
