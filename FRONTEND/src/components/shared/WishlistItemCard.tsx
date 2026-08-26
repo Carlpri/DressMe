@@ -36,7 +36,7 @@ export function WishlistItemCard({ product, onRemove, isRemoving }: WishlistItem
   const handleAddToCart = () => {
     if (totalStock > 0) {
       addToCart.mutate(
-        { productId: product.id, quantity: 1 },
+        { productId: product.id, quantity: 1, product },
         {
           onSuccess: () => {
             setShowCartSuccess(true);

@@ -45,7 +45,7 @@ export function WishlistItemCard({ product, onRemove, isRemoving = false }: Wish
     if (isOutOfStock) return;
 
     addToCart.mutate(
-      { productId: product.id, quantity: 1 },
+      { productId: product.id, quantity: 1, product },
       { onSuccess: () => setShowCartSuccess(true) },
     );
   };
