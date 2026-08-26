@@ -1,6 +1,6 @@
 import "dotenv/config";
 import { Role } from "@prisma/client";
-import { generateToken } from "../../dist/utils/jwt.js";
+import { generateToken } from "../utils/jwt.js";
 
 const BASE_URL = "http://localhost:5000/api";
 
