@@ -25,16 +25,14 @@ if (!apiKey) {
   process.exit(1);
 }
 
-// ── Configure the Vercel AI Gateway provider ──────────────────────────────────
-// The Vercel AI Gateway sits in front of OpenAI — you authenticate with your
-// AI_GATEWAY_API_KEY instead of an OpenAI key directly.
+
 const gateway = createOpenAI({
-  // Vercel AI Gateway base URL (routes through Vercel's proxy)
+ 
   baseURL: "https://ai-gateway.vercel.sh/v1",
   apiKey,
 });
 
-const MODEL = "openai/gpt-5.4";
+const MODEL = "minimax/minimax-m3";
 const PROMPT =
   "You are a luxury fashion AI assistant for DressMe, a Kenya-based fashion store. " +
   "In 3 concise sentences, describe what makes a perfect capsule wardrobe for a modern professional.";

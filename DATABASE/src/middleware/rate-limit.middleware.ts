@@ -19,3 +19,18 @@ export const generalRateLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
 });
+
+export const aiRateLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 10, // Limit each user/IP to 10 AI stylist requests per hour
+  message: "You have reached the AI Stylist hourly request limit (10 per hour). Please try again later.",
+  standardHeaders: true,
+  legacyHeaders: false,
+  keyGenerator: (req) => {
+    return req.user?.userId || req.ip || "anonymous";
+  },
+  skip: (req) => {
+    return process.env.NODE_ENV === "development" && process.env.SKIP_RATE_LIMIT === "true";
+  },
+});
+
