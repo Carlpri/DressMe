@@ -573,15 +573,14 @@ export function ProductCard({ product }: ProductCardProps) {
             mt: "auto",
             position: "relative",
             zIndex: 6,
-            // No horizontal margin — flush with card edges; small bottom margin so card border-radius shows
             mx: 0,
             mb: 0,
             p: { xs: 1.5, sm: 1.75 },
             borderRadius: "0 0 22px 22px",
             background:
-              "linear-gradient(135deg, rgba(18, 24, 32, 0.82) 0%, rgba(10, 14, 20, 0.9) 100%)",
-            backdropFilter: "blur(20px) saturate(190%)",
-            WebkitBackdropFilter: "blur(20px) saturate(190%)",
+              "linear-gradient(135deg, rgba(18, 24, 32, 0.88) 0%, rgba(10, 14, 20, 0.95) 100%)",
+            backdropFilter: "blur(24px) saturate(200%)",
+            WebkitBackdropFilter: "blur(24px) saturate(200%)",
             borderTop: "1px solid rgba(255, 255, 255, 0.22)",
             borderLeft: "none",
             borderRight: "none",
@@ -590,8 +589,8 @@ export function ProductCard({ product }: ProductCardProps) {
               "0 14px 36px 0 rgba(0, 0, 0, 0.55), inset 0 1px 0 0 rgba(255, 255, 255, 0.15)",
             display: "flex",
             flexDirection: "column",
-            gap: 1,
-            transition: "transform 0.3s ease, background 0.3s ease, border-color 0.3s ease",
+            gap: 0.85,
+            transition: "border-color 0.3s ease",
             "&:hover": {
               borderTopColor: "rgba(0, 200, 150, 0.5)",
             },
@@ -669,200 +668,181 @@ export function ProductCard({ product }: ProductCardProps) {
             ) : null}
           </Stack>
 
-          {/* Row 2: Product Name */}
+          {/* Row 2: Product Name — Large & Bold (reference style) */}
           <Typography
             sx={{
-              fontWeight: 600,
-              fontSize: "0.98rem",
-              lineHeight: 1.3,
-              color: "rgba(255, 255, 255, 0.95)",
+              fontWeight: 800,
+              fontSize: { xs: "1.15rem", sm: "1.25rem" },
+              lineHeight: 1.2,
+              color: "#FFFFFF",
               display: "-webkit-box",
               WebkitLineClamp: 2,
               WebkitBoxOrient: "vertical",
               overflow: "hidden",
               textOverflow: "ellipsis",
-              transition: "color 0.2s ease",
-              "&:hover": {
-                color: "#00C896",
-              },
+              letterSpacing: "-0.02em",
             }}
           >
             {product.name}
           </Typography>
 
-          {/* Row 3: Price & Compare-At Savings */}
-          <Stack
-            direction="row"
-            justifyContent="space-between"
-            alignItems="baseline"
-            spacing={1}
-          >
-            <Stack direction="row" alignItems="baseline" spacing={1}>
+          {/* Row 3: Price + Compare-at strikethrough */}
+          <Stack direction="row" alignItems="baseline" spacing={1}>
+            <Typography
+              sx={{
+                fontWeight: 800,
+                fontSize: "1.05rem",
+                color: "#FFFFFF",
+                letterSpacing: "-0.01em",
+              }}
+            >
+              {formatCurrency(product.price)}
+            </Typography>
+            {hasSalePrice && (
               <Typography
                 sx={{
-                  fontWeight: 800,
-                  fontSize: "1.15rem",
-                  color: "#FFFFFF",
-                  letterSpacing: "-0.01em",
+                  fontSize: "0.8rem",
+                  color: "rgba(255, 255, 255, 0.38)",
+                  textDecoration: "line-through",
+                  fontWeight: 500,
                 }}
               >
-                {formatCurrency(product.price)}
+                {formatCurrency(product.compareAtPrice!)}
               </Typography>
-              {hasSalePrice && (
-                <Typography
-                  sx={{
-                    fontSize: "0.82rem",
-                    color: "rgba(255, 255, 255, 0.4)",
-                    textDecoration: "line-through",
-                    fontWeight: 500,
-                  }}
-                >
-                  {formatCurrency(product.compareAtPrice!)}
-                </Typography>
-              )}
-            </Stack>
-
-            {product.vendor?.isVerified && (
-              <Stack direction="row" alignItems="center" spacing={0.3}>
-                <VerifiedIcon sx={{ fontSize: 14, color: "#00C896" }} />
-                <Typography sx={{ fontSize: "0.65rem", color: "#00C896", fontWeight: 700 }}>
-                  Verified
-                </Typography>
-              </Stack>
             )}
           </Stack>
 
-          {/* Row 4: Subtle Size & Color Swatches Preview on Hover / Mobile */}
-          {(visibleSizes.length > 0 || visibleColors.length > 0) && (
-            <Stack
-              direction="row"
-              spacing={1}
-              alignItems="center"
-              flexWrap="wrap"
+          {/* Row 4: Sizes · Colors (left)  |  Add to Cart button (right) — one line */}
+          <Stack
+            direction="row"
+            alignItems="center"
+            spacing={0.6}
+            sx={{ pt: 0.25, borderTop: "1px solid rgba(255,255,255,0.06)" }}
+          >
+            {/* Size chips – up to 3 */}
+            {visibleSizes.slice(0, 3).map(([label, { id, inStock }]) => (
+              <Box
+                key={label}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  if (inStock) setSelectedVariantId(id);
+                }}
+                sx={{
+                  px: 0.75,
+                  py: 0.2,
+                  borderRadius: "5px",
+                  bgcolor:
+                    selectedVariantId === id
+                      ? "rgba(0, 200, 150, 0.22)"
+                      : inStock
+                      ? "rgba(255, 255, 255, 0.09)"
+                      : "rgba(255, 255, 255, 0.03)",
+                  border: "1px solid",
+                  borderColor:
+                    selectedVariantId === id
+                      ? "#00C896"
+                      : inStock
+                      ? "rgba(255, 255, 255, 0.18)"
+                      : "rgba(255, 255, 255, 0.05)",
+                  fontSize: "0.6rem",
+                  fontWeight: 700,
+                  color:
+                    selectedVariantId === id
+                      ? "#00C896"
+                      : inStock
+                      ? "rgba(255, 255, 255, 0.85)"
+                      : "rgba(255, 255, 255, 0.22)",
+                  textDecoration: inStock ? "none" : "line-through",
+                  cursor: inStock ? "pointer" : "default",
+                  flexShrink: 0,
+                  transition: "all 0.2s ease",
+                }}
+              >
+                {label}
+              </Box>
+            ))}
+            {sizeOverflow > 0 && (
+              <Typography
+                sx={{ fontSize: "0.58rem", color: "rgba(255,255,255,0.38)", flexShrink: 0 }}
+              >
+                +{sizeOverflow}
+              </Typography>
+            )}
+
+            {/* Color swatches */}
+            {useSwatches &&
+              visibleColors.slice(0, 3).map(([label, { inStock }]) => (
+                <Box
+                  key={label}
+                  title={label}
+                  sx={{
+                    width: 12,
+                    height: 12,
+                    borderRadius: "50%",
+                    bgcolor: label.toLowerCase(),
+                    border: "1.5px solid rgba(255, 255, 255, 0.28)",
+                    opacity: inStock ? 1 : 0.3,
+                    flexShrink: 0,
+                  }}
+                />
+              ))}
+
+            {/* Verified icon (compact) */}
+            {product.vendor?.isVerified && (
+              <VerifiedIcon sx={{ fontSize: 13, color: "#00C896", flexShrink: 0 }} />
+            )}
+
+            {/* Push button to the right */}
+            <Box sx={{ flex: 1, minWidth: 0 }} />
+
+            {/* Add to Cart — pinned right, compact */}
+            <Button
+              variant="contained"
+              size="small"
+              startIcon={
+                addToCart.isPending ? (
+                  <CircularProgress size={12} color="inherit" />
+                ) : (
+                  <ShoppingBagOutlinedIcon sx={{ fontSize: "13px !important" }} />
+                )
+              }
+              disabled={isOutOfStock || addToCart.isPending}
+              onClick={handleAddToCart}
               sx={{
-                pt: 0.25,
-                borderTop: "1px solid rgba(255, 255, 255, 0.06)",
+                py: 0.7,
+                px: { xs: 1.1, sm: 1.4 },
+                borderRadius: "10px",
+                fontWeight: 700,
+                fontSize: "0.7rem",
+                letterSpacing: "0.03em",
+                bgcolor: isOutOfStock ? "rgba(255, 255, 255, 0.07)" : "#00C896",
+                color: isOutOfStock ? "rgba(255, 255, 255, 0.3)" : "#07130F",
+                border: "1px solid",
+                borderColor: isOutOfStock ? "rgba(255, 255, 255, 0.07)" : "#00C896",
+                boxShadow: isOutOfStock ? "none" : "0 4px 14px rgba(0, 200, 150, 0.32)",
+                textTransform: "none",
+                whiteSpace: "nowrap",
+                flexShrink: 0,
+                minWidth: "auto",
+                transition: "all 0.25s ease",
+                "&:hover": {
+                  bgcolor: "#00E0A7",
+                  borderColor: "#00E0A7",
+                  color: "#050E0B",
+                  boxShadow: "0 6px 20px rgba(0, 200, 150, 0.48)",
+                  transform: "translateY(-1px)",
+                },
+                "&.Mui-disabled": {
+                  bgcolor: "rgba(255, 255, 255, 0.05)",
+                  color: "rgba(255, 255, 255, 0.2)",
+                  borderColor: "transparent",
+                },
               }}
             >
-              {visibleSizes.length > 0 && (
-                <Stack direction="row" spacing={0.5} alignItems="center">
-                  {visibleSizes.map(([label, { id, inStock }]) => (
-                    <Box
-                      key={label}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        if (inStock) setSelectedVariantId(id);
-                      }}
-                      sx={{
-                        px: 0.6,
-                        py: 0.15,
-                        borderRadius: "4px",
-                        bgcolor:
-                          selectedVariantId === id
-                            ? "rgba(0, 200, 150, 0.25)"
-                            : inStock
-                            ? "rgba(255, 255, 255, 0.08)"
-                            : "rgba(255, 255, 255, 0.02)",
-                        border: "1px solid",
-                        borderColor:
-                          selectedVariantId === id
-                            ? "#00C896"
-                            : inStock
-                            ? "rgba(255, 255, 255, 0.15)"
-                            : "rgba(255, 255, 255, 0.05)",
-                        fontSize: "0.6rem",
-                        fontWeight: 700,
-                        color:
-                          selectedVariantId === id
-                            ? "#00C896"
-                            : inStock
-                            ? "rgba(255, 255, 255, 0.85)"
-                            : "rgba(255, 255, 255, 0.25)",
-                        textDecoration: inStock ? "none" : "line-through",
-                        cursor: inStock ? "pointer" : "default",
-                      }}
-                    >
-                      {label}
-                    </Box>
-                  ))}
-                  {sizeOverflow > 0 && (
-                    <Typography sx={{ fontSize: "0.6rem", color: "rgba(255,255,255,0.4)" }}>
-                      +{sizeOverflow}
-                    </Typography>
-                  )}
-                </Stack>
-              )}
-
-              {visibleColors.length > 0 && (
-                <Stack direction="row" spacing={0.4} alignItems="center" sx={{ ml: "auto" }}>
-                  {visibleColors.map(([label, { inStock }]) =>
-                    useSwatches ? (
-                      <Box
-                        key={label}
-                        title={label}
-                        sx={{
-                          width: 12,
-                          height: 12,
-                          borderRadius: "50%",
-                          bgcolor: label.toLowerCase(),
-                          border: "1.5px solid rgba(255, 255, 255, 0.3)",
-                          opacity: inStock ? 1 : 0.3,
-                        }}
-                      />
-                    ) : null
-                  )}
-                </Stack>
-              )}
-            </Stack>
-          )}
-
-          {/* Row 5: Action Button (Add to Cart) */}
-          <Button
-            variant="contained"
-            fullWidth
-            size="small"
-            startIcon={
-              addToCart.isPending ? (
-                <CircularProgress size={14} color="inherit" />
-              ) : (
-                <ShoppingBagOutlinedIcon sx={{ fontSize: "16px !important" }} />
-              )
-            }
-            disabled={isOutOfStock || addToCart.isPending}
-            onClick={handleAddToCart}
-            sx={{
-              mt: 0.5,
-              py: 0.85,
-              borderRadius: "11px",
-              fontWeight: 700,
-              fontSize: "0.78rem",
-              letterSpacing: "0.04em",
-              bgcolor: isOutOfStock ? "rgba(255, 255, 255, 0.08)" : "#00C896",
-              color: isOutOfStock ? "rgba(255, 255, 255, 0.3)" : "#07130F",
-              border: "1px solid",
-              borderColor: isOutOfStock ? "rgba(255, 255, 255, 0.08)" : "#00C896",
-              boxShadow: isOutOfStock
-                ? "none"
-                : "0 4px 14px rgba(0, 200, 150, 0.3)",
-              textTransform: "none",
-              transition: "all 0.25s ease",
-              "&:hover": {
-                bgcolor: "#00E0A7",
-                borderColor: "#00E0A7",
-                color: "#050E0B",
-                boxShadow: "0 6px 20px rgba(0, 200, 150, 0.45)",
-                transform: "translateY(-1px)",
-              },
-              "&.Mui-disabled": {
-                bgcolor: "rgba(255, 255, 255, 0.05)",
-                color: "rgba(255, 255, 255, 0.2)",
-                borderColor: "transparent",
-              },
-            }}
-          >
-            {isOutOfStock ? "Out of Stock" : "Add to Cart"}
-          </Button>
+              {isOutOfStock ? "Sold Out" : "Add to Cart"}
+            </Button>
+          </Stack>
         </Box>
       </Box>
 
