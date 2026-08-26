@@ -16,6 +16,7 @@ import orderRoutes from "./modules/orders/order.routes.js";
 import siteSettingsRoutes from "./modules/site-settings/site-settings.routes.js";
 import mediaRoutes from "./modules/media/media.routes.js";
 import referenceRoutes from "./modules/references/reference.routes.js";
+import aiRoutes from "./modules/ai/ai.routes.js";
 
 const app = express();
 
@@ -77,6 +78,7 @@ app.use("/api/settings", siteSettingsRoutes);
 app.use("/api/app-settings", siteSettingsRoutes);
 app.use("/api/media", mediaRoutes);
 app.use("/api/references", referenceRoutes);
+app.use("/api/ai", aiRoutes);
 
 app.get("/api/health", (_req, res) => {
   res.status(200).json({
