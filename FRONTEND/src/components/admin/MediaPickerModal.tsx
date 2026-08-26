@@ -18,9 +18,11 @@ import {
 import SearchIcon from "@mui/icons-material/Search";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import LinkIcon from "@mui/icons-material/Link";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../../api/client";
+import { ImageUploader } from "./ImageUploader";
 
 export interface MediaItem {
   id: string;
@@ -80,7 +82,7 @@ export function MediaPickerModal({
     if (tabIndex === 0 && selectedUrl) {
       onSelect(selectedUrl);
       onClose();
-    } else if (tabIndex === 1 && customUrl) {
+    } else if (tabIndex === 2 && customUrl) {
       const name = filename.trim() || `image_${Date.now()}`;
       createMediaMutation.mutate({ filename: name, url: customUrl });
     }
@@ -93,6 +95,7 @@ export function MediaPickerModal({
         <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 2 }}>
           <Tabs value={tabIndex} onChange={(_, val) => setTabIndex(val)}>
             <Tab label="Media Gallery" icon={<AddPhotoAlternateIcon />} iconPosition="start" />
+            <Tab label="Upload from Local PC" icon={<CloudUploadIcon />} iconPosition="start" />
             <Tab label="Add External URL" icon={<LinkIcon />} iconPosition="start" />
           </Tabs>
         </Box>
@@ -186,6 +189,22 @@ export function MediaPickerModal({
         )}
 
         {tabIndex === 1 && (
+          <Box sx={{ pt: 1 }}>
+            <ImageUploader
+              label="Upload File from PC / Drag & Drop (Direct Cloudinary Upload)"
+              folder="cms"
+              persistToMediaLibrary
+              mediaLibraryFolder="cms"
+              previewHeight={220}
+              onChange={(url) => {
+                onSelect(url);
+                onClose();
+              }}
+            />
+          </Box>
+        )}
+
+        {tabIndex === 2 && (
           <Stack spacing={3} sx={{ pt: 1 }}>
             <TextField
               label="Image Title / Filename"
@@ -235,8 +254,9 @@ export function MediaPickerModal({
           variant="contained"
           onClick={handleConfirmSelection}
           disabled={
+            tabIndex === 1 ||
             (tabIndex === 0 && !selectedUrl) ||
-            (tabIndex === 1 && !customUrl) ||
+            (tabIndex === 2 && !customUrl) ||
             createMediaMutation.isPending
           }
         >

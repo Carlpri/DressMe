@@ -21,6 +21,7 @@ import CollectionsIcon from "@mui/icons-material/Collections";
 import { useSiteSettings, useUpdateSiteSettings, type UpdateSiteSettingsData } from "../../hooks/useSiteSettings";
 import { LoadingSkeleton } from "../../components/shared/LoadingSkeleton";
 import { MediaPickerModal } from "../../components/admin/MediaPickerModal";
+import { ImageUploader } from "../../components/admin/ImageUploader";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -190,54 +191,69 @@ export function AdminSettingsPage() {
             <TabPanel value={tabValue} index={1}>
               <Stack spacing={3}>
                 <Box>
+                  <ImageUploader
+                    label="Light Theme Logo (Upload from local PC or enter URL)"
+                    value={(formData.logoUrl ?? currentData.logoUrl) ?? ""}
+                    onChange={(url) => setFormData((prev) => ({ ...prev, logoUrl: url }))}
+                    folder="branding"
+                    previewHeight={120}
+                    persistToMediaLibrary
+                    mediaLibraryFolder="branding"
+                    mediaFilename="logo-light"
+                  />
                   <Button
-                    variant="outlined"
+                    variant="text"
+                    size="small"
                     startIcon={<CollectionsIcon />}
                     onClick={() => openMediaPicker("logoUrl")}
-                    sx={{ mb: 1 }}
+                    sx={{ mt: 1 }}
                   >
-                    Choose Light Logo from Media Library
+                    Or choose from Media Library
                   </Button>
-                  <TextField
-                    fullWidth
-                    label="Logo URL (Light Theme)"
-                    value={(formData.logoUrl ?? currentData.logoUrl) ?? ""}
-                    onChange={handleInputChange("logoUrl")}
-                  />
                 </Box>
 
                 <Box>
+                  <ImageUploader
+                    label="Dark Theme Logo (Upload from local PC or enter URL)"
+                    value={(formData.logoDarkUrl ?? currentData.logoDarkUrl) ?? ""}
+                    onChange={(url) => setFormData((prev) => ({ ...prev, logoDarkUrl: url }))}
+                    folder="branding"
+                    previewHeight={120}
+                    persistToMediaLibrary
+                    mediaLibraryFolder="branding"
+                    mediaFilename="logo-dark"
+                  />
                   <Button
-                    variant="outlined"
+                    variant="text"
+                    size="small"
                     startIcon={<CollectionsIcon />}
                     onClick={() => openMediaPicker("logoDarkUrl")}
-                    sx={{ mb: 1 }}
+                    sx={{ mt: 1 }}
                   >
-                    Choose Dark Logo from Media Library
+                    Or choose from Media Library
                   </Button>
-                  <TextField
-                    fullWidth
-                    label="Dark Logo URL"
-                    value={(formData.logoDarkUrl ?? currentData.logoDarkUrl) ?? ""}
-                    onChange={handleInputChange("logoDarkUrl")}
-                  />
                 </Box>
 
                 <Box>
+                  <ImageUploader
+                    label="Favicon Image (Upload from local PC or enter URL)"
+                    value={(formData.faviconUrl ?? currentData.faviconUrl) ?? ""}
+                    onChange={(url) => setFormData((prev) => ({ ...prev, faviconUrl: url }))}
+                    folder="branding"
+                    previewHeight={80}
+                    persistToMediaLibrary
+                    mediaLibraryFolder="branding"
+                    mediaFilename="favicon"
+                  />
                   <Button
-                    variant="outlined"
+                    variant="text"
+                    size="small"
                     startIcon={<CollectionsIcon />}
                     onClick={() => openMediaPicker("faviconUrl")}
-                    sx={{ mb: 1 }}
+                    sx={{ mt: 1 }}
                   >
-                    Choose Favicon from Media Library
+                    Or choose from Media Library
                   </Button>
-                  <TextField
-                    fullWidth
-                    label="Favicon URL"
-                    value={(formData.faviconUrl ?? currentData.faviconUrl) ?? ""}
-                    onChange={handleInputChange("faviconUrl")}
-                  />
                 </Box>
               </Stack>
             </TabPanel>
@@ -269,20 +285,25 @@ export function AdminSettingsPage() {
                   placeholder="e.g. Shop Collection"
                 />
                 <Box>
+                  <ImageUploader
+                    label="Hero Banner Image (Upload from local PC or enter URL)"
+                    value={(formData.heroBannerUrl ?? currentData.heroBannerUrl) ?? ""}
+                    onChange={(url) => setFormData((prev) => ({ ...prev, heroBannerUrl: url }))}
+                    folder="cms"
+                    previewHeight={160}
+                    persistToMediaLibrary
+                    mediaLibraryFolder="cms"
+                    mediaFilename="hero-banner"
+                  />
                   <Button
-                    variant="outlined"
+                    variant="text"
+                    size="small"
                     startIcon={<CollectionsIcon />}
                     onClick={() => openMediaPicker("heroBannerUrl")}
-                    sx={{ mb: 1 }}
+                    sx={{ mt: 1 }}
                   >
-                    Choose Hero Banner from Media Library
+                    Or choose from Media Library
                   </Button>
-                  <TextField
-                    fullWidth
-                    label="Hero Banner Image URL"
-                    value={(formData.heroBannerUrl ?? currentData.heroBannerUrl) ?? ""}
-                    onChange={handleInputChange("heroBannerUrl")}
-                  />
                 </Box>
               </Stack>
             </TabPanel>
@@ -395,20 +416,25 @@ export function AdminSettingsPage() {
                   placeholder="fashion, clothing, shoes, Kenya, online shopping"
                 />
                 <Box>
+                  <ImageUploader
+                    label="Open Graph (OG) Image (Upload from local PC or enter URL)"
+                    value={(formData.ogImageUrl ?? (currentData as any).ogImageUrl) ?? ""}
+                    onChange={(url) => setFormData((prev) => ({ ...prev, ogImageUrl: url }))}
+                    folder="cms"
+                    previewHeight={140}
+                    persistToMediaLibrary
+                    mediaLibraryFolder="cms"
+                    mediaFilename="og-image"
+                  />
                   <Button
-                    variant="outlined"
+                    variant="text"
+                    size="small"
                     startIcon={<CollectionsIcon />}
                     onClick={() => openMediaPicker("ogImageUrl")}
-                    sx={{ mb: 1 }}
+                    sx={{ mt: 1 }}
                   >
-                    Choose Open Graph (OG) Image
+                    Or choose from Media Library
                   </Button>
-                  <TextField
-                    fullWidth
-                    label="OG Image URL"
-                    value={(formData.ogImageUrl ?? (currentData as any).ogImageUrl) ?? ""}
-                    onChange={handleInputChange("ogImageUrl" as any)}
-                  />
                 </Box>
               </Stack>
             </TabPanel>
