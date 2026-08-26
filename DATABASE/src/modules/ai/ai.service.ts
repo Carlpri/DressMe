@@ -378,7 +378,7 @@ Extract the following structured shopping intent:
   let whereClause: any = { ...baseWhere };
 
   if (uniqueTerms.length > 0) {
-    whereClause.OR = uniqueTerms.map((term) => ({
+    whereClause.AND = uniqueTerms.map((term) => ({
       OR: [
         { name: { contains: term, mode: "insensitive" } },
         { description: { contains: term, mode: "insensitive" } },
