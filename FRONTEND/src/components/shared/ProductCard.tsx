@@ -173,7 +173,7 @@ export function ProductCard({ product }: ProductCardProps) {
 
   return (
     <>
-      {/* ────────────────────────── CARD ────────────────────────── */}
+      {/* ────────────────────────── LUXURY MINIMAL CONTINUOUS CARD ────────────────────────── */}
       <Box
         onClick={handleCardClick}
         onMouseEnter={() => setIsHovered(true)}
@@ -189,31 +189,33 @@ export function ProductCard({ product }: ProductCardProps) {
         sx={{
           position: "relative",
           height: "100%",
-          minHeight: { xs: 390, sm: 430, md: 450 },
-          borderRadius: "20px",
+          minHeight: { xs: 410, sm: 450, md: 470 },
+          borderRadius: "24px",
           overflow: "hidden",
           cursor: "pointer",
-          bgcolor: "#0B0E13",
-          border: "1px solid rgba(255,255,255,0.07)",
+          bgcolor: "#0B0E14",
+          border: "1px solid rgba(255, 255, 255, 0.08)",
           boxShadow: isHovered
-            ? "0 28px 52px -10px rgba(0,0,0,0.75), 0 0 0 1px rgba(0,200,150,0.28)"
-            : "0 8px 24px -4px rgba(0,0,0,0.5)",
-          transform: isHovered ? "translateY(-5px) scale(1.006)" : "translateY(0) scale(1)",
-          transition: "transform 0.35s cubic-bezier(0.25,1,0.5,1), box-shadow 0.35s ease",
+            ? "0 24px 48px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(0, 200, 150, 0.35)"
+            : "0 10px 30px -5px rgba(0, 0, 0, 0.5)",
+          transform: isHovered ? "translateY(-6px)" : "translateY(0)",
+          transition: "all 0.38s cubic-bezier(0.16, 1, 0.3, 1)",
           outline: "none",
           "&:focus-visible": { boxShadow: "0 0 0 3px #00C896" },
         }}
       >
-        {/* ── Full-bleed image background ───────────────────────── */}
+        {/* ── 1. FULL CARD PRODUCT IMAGE (100% COVERAGE BACKSTAGE) ───────────────────────── */}
         <Box
           sx={{
             position: "absolute",
             inset: 0,
+            width: "100%",
+            height: "100%",
             display: "flex",
-            alignItems: "flex-start",
+            alignItems: "center",
             justifyContent: "center",
             background:
-              "radial-gradient(ellipse at 50% 28%, #1C2230 0%, #0E1218 55%, #080A0D 100%)",
+              "radial-gradient(circle at 50% 30%, #1A212D 0%, #0E131C 60%, #080A0E 100%)",
             overflow: "hidden",
           }}
         >
@@ -227,14 +229,12 @@ export function ProductCard({ product }: ProductCardProps) {
                 width: "100%",
                 height: "100%",
                 objectFit: "contain",
-                objectPosition: "center 28%",
+                objectPosition: "center 30%",
                 display: "block",
-                pt: "9%",
-                pb: "38%",
-                px: "6%",
-                transition: "transform 0.45s ease",
-                transform: isHovered ? "scale(1.045)" : "scale(1)",
-                filter: "drop-shadow(0 18px 36px rgba(0,0,0,0.65))",
+                p: 2, // Minimal padding so full product fits gracefully within card
+                transition: "transform 0.5s ease",
+                transform: isHovered ? "scale(1.035)" : "scale(1)",
+                filter: "drop-shadow(0 14px 28px rgba(0, 0, 0, 0.55))",
               }}
             />
           ) : (
@@ -244,58 +244,60 @@ export function ProductCard({ product }: ProductCardProps) {
                 flexDirection: "column",
                 alignItems: "center",
                 justifyContent: "center",
-                width: "100%",
-                height: "100%",
-                pb: "38%",
-                color: "rgba(255,255,255,0.14)",
+                color: "rgba(255, 255, 255, 0.15)",
               }}
             >
               <Typography sx={{ fontWeight: 900, fontSize: "3rem", letterSpacing: -1 }}>
                 DM
               </Typography>
               <Typography
-                sx={{ fontSize: "0.68rem", letterSpacing: "0.18em", textTransform: "uppercase" }}
+                sx={{ fontSize: "0.7rem", letterSpacing: "0.15em", textTransform: "uppercase" }}
               >
                 DressMe
               </Typography>
             </Box>
           )}
 
-          {/* Deep vignette — top subtle + bottom strong into glass */}
+          {/* Ambient top vignette for top badge contrast */}
           <Box
             sx={{
               position: "absolute",
-              inset: 0,
+              top: 0,
+              left: 0,
+              right: 0,
+              height: "35%",
               pointerEvents: "none",
               background:
-                "linear-gradient(to bottom, rgba(8,10,13,0.3) 0%, transparent 18%, transparent 42%, rgba(8,10,13,0.65) 70%, rgba(8,10,13,0.95) 100%)",
+                "linear-gradient(to bottom, rgba(8, 10, 14, 0.55) 0%, transparent 100%)",
             }}
           />
         </Box>
 
-        {/* ── Top bar: badges (left) + counter + wishlist (right) ── */}
+        {/* ── 2. TOP BAR BADGES & WISHLIST ────────────────────── */}
         <Stack
           direction="row"
           justifyContent="space-between"
           alignItems="flex-start"
-          sx={{ position: "relative", zIndex: 4, p: 1.5, pointerEvents: "none" }}
+          sx={{ position: "relative", zIndex: 5, p: 1.5, pointerEvents: "none" }}
         >
+          {/* Top-Left Badges */}
           <Stack direction="column" spacing={0.5} sx={{ pointerEvents: "auto" }}>
             {isOutOfStock ? (
               <Chip
                 label="Sold Out"
                 size="small"
                 sx={{
-                  bgcolor: "rgba(180,20,20,0.82)",
+                  bgcolor: "rgba(220, 38, 38, 0.85)",
                   color: "#FFF",
                   fontWeight: 800,
                   fontSize: "0.62rem",
-                  letterSpacing: "0.07em",
+                  letterSpacing: "0.06em",
                   height: 22,
-                  px: 0.4,
+                  px: 0.5,
                   backdropFilter: "blur(10px)",
                   WebkitBackdropFilter: "blur(10px)",
-                  border: "1px solid rgba(255,255,255,0.18)",
+                  border: "1px solid rgba(255, 255, 255, 0.2)",
+                  boxShadow: "0 4px 12px rgba(220, 38, 38, 0.35)",
                 }}
               />
             ) : (
@@ -305,16 +307,16 @@ export function ProductCard({ product }: ProductCardProps) {
                     label={`-${discountPercent}%`}
                     size="small"
                     sx={{
-                      bgcolor: "rgba(220,38,38,0.86)",
+                      bgcolor: "rgba(220, 38, 38, 0.88)",
                       color: "#FFF",
                       fontWeight: 800,
                       fontSize: "0.65rem",
                       height: 22,
-                      px: 0.4,
+                      px: 0.5,
                       backdropFilter: "blur(10px)",
                       WebkitBackdropFilter: "blur(10px)",
-                      border: "1px solid rgba(255,255,255,0.18)",
-                      boxShadow: "0 3px 10px rgba(220,38,38,0.4)",
+                      border: "1px solid rgba(255, 255, 255, 0.2)",
+                      boxShadow: "0 4px 12px rgba(220, 38, 38, 0.3)",
                     }}
                   />
                 )}
@@ -323,17 +325,17 @@ export function ProductCard({ product }: ProductCardProps) {
                     label="NEW"
                     size="small"
                     sx={{
-                      bgcolor: "rgba(0,200,150,0.88)",
-                      color: "#061410",
+                      bgcolor: "rgba(0, 200, 150, 0.85)",
+                      color: "#07130F",
                       fontWeight: 800,
                       fontSize: "0.62rem",
-                      letterSpacing: "0.09em",
+                      letterSpacing: "0.08em",
                       height: 22,
-                      px: 0.4,
+                      px: 0.5,
                       backdropFilter: "blur(10px)",
                       WebkitBackdropFilter: "blur(10px)",
-                      border: "1px solid rgba(255,255,255,0.28)",
-                      boxShadow: "0 3px 10px rgba(0,200,150,0.4)",
+                      border: "1px solid rgba(255, 255, 255, 0.3)",
+                      boxShadow: "0 4px 12px rgba(0, 200, 150, 0.3)",
                     }}
                   />
                 )}
@@ -342,16 +344,16 @@ export function ProductCard({ product }: ProductCardProps) {
                     label="HOT"
                     size="small"
                     sx={{
-                      bgcolor: "rgba(245,158,11,0.9)",
+                      bgcolor: "rgba(245, 158, 11, 0.88)",
                       color: "#180E02",
                       fontWeight: 800,
                       fontSize: "0.62rem",
-                      letterSpacing: "0.07em",
+                      letterSpacing: "0.06em",
                       height: 22,
-                      px: 0.4,
+                      px: 0.5,
                       backdropFilter: "blur(10px)",
                       WebkitBackdropFilter: "blur(10px)",
-                      border: "1px solid rgba(255,255,255,0.22)",
+                      border: "1px solid rgba(255, 255, 255, 0.25)",
                     }}
                   />
                 )}
@@ -360,16 +362,16 @@ export function ProductCard({ product }: ProductCardProps) {
                     label="FEATURED"
                     size="small"
                     sx={{
-                      bgcolor: "rgba(20,30,50,0.82)",
-                      color: "rgba(255,255,255,0.9)",
+                      bgcolor: "rgba(30, 41, 59, 0.82)",
+                      color: "#FFF",
                       fontWeight: 700,
                       fontSize: "0.58rem",
-                      letterSpacing: "0.07em",
+                      letterSpacing: "0.06em",
                       height: 22,
-                      px: 0.4,
+                      px: 0.5,
                       backdropFilter: "blur(10px)",
                       WebkitBackdropFilter: "blur(10px)",
-                      border: "1px solid rgba(255,255,255,0.13)",
+                      border: "1px solid rgba(255, 255, 255, 0.15)",
                     }}
                   />
                 )}
@@ -378,13 +380,12 @@ export function ProductCard({ product }: ProductCardProps) {
                     label={`Only ${totalStock} left`}
                     size="small"
                     sx={{
-                      bgcolor: "rgba(234,88,12,0.84)",
+                      bgcolor: "rgba(234, 88, 12, 0.85)",
                       color: "#FFF",
                       fontWeight: 700,
                       fontSize: "0.6rem",
                       height: 22,
                       backdropFilter: "blur(8px)",
-                      WebkitBackdropFilter: "blur(8px)",
                     }}
                   />
                 )}
@@ -392,57 +393,61 @@ export function ProductCard({ product }: ProductCardProps) {
             )}
           </Stack>
 
+          {/* Top-Right: Image Counter & Wishlist Button */}
           <Stack direction="row" spacing={0.75} alignItems="center" sx={{ pointerEvents: "auto" }}>
             {images.length > 1 && (
               <Box
                 sx={{
-                  bgcolor: "rgba(10,14,20,0.68)",
+                  bgcolor: "rgba(15, 23, 42, 0.5)",
                   backdropFilter: "blur(12px)",
                   WebkitBackdropFilter: "blur(12px)",
-                  border: "1px solid rgba(255,255,255,0.1)",
-                  color: "rgba(255,255,255,0.8)",
+                  border: "1px solid rgba(255, 255, 255, 0.12)",
+                  color: "rgba(255, 255, 255, 0.85)",
                   fontSize: "0.6rem",
                   fontWeight: 700,
                   px: 0.9,
                   py: 0.35,
                   borderRadius: "20px",
-                  letterSpacing: "0.06em",
+                  letterSpacing: "0.05em",
                 }}
               >
-                {currentImageIndex + 1}/{images.length}
+                {currentImageIndex + 1} / {images.length}
               </Box>
             )}
+
             <IconButton
               onClick={handleToggleFavorite}
               disabled={addToFavorites.isPending || removeFromFavorites.isPending}
               aria-label={isFavorited ? "Remove from wishlist" : "Add to wishlist"}
               size="small"
               sx={{
-                bgcolor: "rgba(10,14,20,0.68)",
+                bgcolor: "rgba(15, 23, 42, 0.5)",
                 backdropFilter: "blur(14px)",
                 WebkitBackdropFilter: "blur(14px)",
-                border: "1px solid rgba(255,255,255,0.12)",
-                color: isFavorited ? "#00C896" : "rgba(255,255,255,0.82)",
-                width: 34,
-                height: 34,
-                transition: "all 0.22s ease",
+                border: "1px solid rgba(255, 255, 255, 0.15)",
+                color: isFavorited ? "#00C896" : "rgba(255, 255, 255, 0.85)",
+                width: 36,
+                height: 36,
+                transition: "all 0.25s ease",
                 "&:hover": {
-                  bgcolor: isFavorited ? "rgba(0,200,150,0.22)" : "rgba(255,255,255,0.16)",
-                  borderColor: isFavorited ? "#00C896" : "rgba(255,255,255,0.28)",
-                  transform: "scale(1.1)",
+                  bgcolor: isFavorited
+                    ? "rgba(0, 200, 150, 0.25)"
+                    : "rgba(255, 255, 255, 0.2)",
+                  borderColor: isFavorited ? "#00C896" : "rgba(255, 255, 255, 0.3)",
+                  transform: "scale(1.08)",
                 },
               }}
             >
               {isFavorited ? (
-                <FavoriteIcon sx={{ fontSize: 16, color: "#00C896" }} />
+                <FavoriteIcon sx={{ fontSize: 18, color: "#00C896" }} />
               ) : (
-                <FavoriteBorderIcon sx={{ fontSize: 16 }} />
+                <FavoriteBorderIcon sx={{ fontSize: 18 }} />
               )}
             </IconButton>
           </Stack>
         </Stack>
 
-        {/* ── Multi-image nav arrows ────────────────────────────── */}
+        {/* ── Multi-Image Left/Right Navigation Arrows ────────────────── */}
         {images.length > 1 && (
           <>
             <IconButton
@@ -451,44 +456,53 @@ export function ProductCard({ product }: ProductCardProps) {
               size="small"
               sx={{
                 position: "absolute",
-                top: "34%",
+                top: "40%",
                 left: 8,
                 zIndex: 5,
-                bgcolor: "rgba(10,14,20,0.7)",
+                bgcolor: "rgba(15, 23, 42, 0.6)",
                 backdropFilter: "blur(12px)",
                 WebkitBackdropFilter: "blur(12px)",
-                border: "1px solid rgba(255,255,255,0.13)",
+                border: "1px solid rgba(255, 255, 255, 0.15)",
                 color: "#FFF",
-                width: 30,
-                height: 30,
-                opacity: { xs: 0.8, md: isHovered ? 1 : 0 },
-                transform: isHovered ? "translateX(0)" : "translateX(-4px)",
-                transition: "all 0.22s ease",
-                "&:hover": { bgcolor: "#00C896", color: "#0B131E", borderColor: "#00C896" },
+                width: 32,
+                height: 32,
+                opacity: { xs: 0.85, md: isHovered ? 1 : 0 },
+                transform: isHovered ? "translateX(0)" : "translateX(-6px)",
+                transition: "all 0.25s ease",
+                "&:hover": {
+                  bgcolor: "#00C896",
+                  color: "#0B131E",
+                  borderColor: "#00C896",
+                },
               }}
             >
               <ChevronLeftIcon sx={{ fontSize: 18 }} />
             </IconButton>
+
             <IconButton
               onClick={handleNextImage}
               aria-label="Next product image"
               size="small"
               sx={{
                 position: "absolute",
-                top: "34%",
+                top: "40%",
                 right: 8,
                 zIndex: 5,
-                bgcolor: "rgba(10,14,20,0.7)",
+                bgcolor: "rgba(15, 23, 42, 0.6)",
                 backdropFilter: "blur(12px)",
                 WebkitBackdropFilter: "blur(12px)",
-                border: "1px solid rgba(255,255,255,0.13)",
+                border: "1px solid rgba(255, 255, 255, 0.15)",
                 color: "#FFF",
-                width: 30,
-                height: 30,
-                opacity: { xs: 0.8, md: isHovered ? 1 : 0 },
-                transform: isHovered ? "translateX(0)" : "translateX(4px)",
-                transition: "all 0.22s ease",
-                "&:hover": { bgcolor: "#00C896", color: "#0B131E", borderColor: "#00C896" },
+                width: 32,
+                height: 32,
+                opacity: { xs: 0.85, md: isHovered ? 1 : 0 },
+                transform: isHovered ? "translateX(0)" : "translateX(6px)",
+                transition: "all 0.25s ease",
+                "&:hover": {
+                  bgcolor: "#00C896",
+                  color: "#0B131E",
+                  borderColor: "#00C896",
+                },
               }}
             >
               <ChevronRightIcon sx={{ fontSize: 18 }} />
@@ -496,109 +510,75 @@ export function ProductCard({ product }: ProductCardProps) {
           </>
         )}
 
-        {/* ── Dot indicators — above glass panel ───────────────── */}
-        {images.length > 1 && (
-          <Stack
-            direction="row"
-            spacing={0.6}
-            justifyContent="center"
-            alignItems="center"
-            sx={{
-              position: "absolute",
-              bottom: "37%",
-              left: 0,
-              right: 0,
-              zIndex: 5,
-              pointerEvents: "auto",
-              opacity: isHovered ? 1 : 0.5,
-              transition: "opacity 0.25s ease",
-            }}
-          >
-            {images.map((img, idx) => (
-              <Box
-                key={img.id || idx}
-                onClick={(e) => handleDotClick(idx, e)}
-                sx={{
-                  width: currentImageIndex === idx ? 18 : 5,
-                  height: 5,
-                  borderRadius: "3px",
-                  bgcolor: currentImageIndex === idx ? "#00C896" : "rgba(255,255,255,0.38)",
-                  boxShadow: currentImageIndex === idx ? "0 0 7px rgba(0,200,150,0.8)" : "none",
-                  cursor: "pointer",
-                  transition: "all 0.28s cubic-bezier(0.34,1.56,0.64,1)",
-                  "&:hover": {
-                    bgcolor: currentImageIndex === idx ? "#00C896" : "rgba(255,255,255,0.7)",
-                  },
-                }}
-              />
-            ))}
-          </Stack>
-        )}
-
-        {/* ── Glassmorphism overlay — floats over image bottom ──── */}
+        {/* ── 3. FLOATING TRUE GLASSMORPHISM INFORMATION OVERLAY DECK ─────────────────── */}
         <Box
           sx={{
             position: "absolute",
-            bottom: 0,
-            left: 0,
-            right: 0,
+            bottom: 12,
+            left: 12,
+            right: 12,
             zIndex: 6,
-            borderRadius: "0 0 20px 20px",
-            background:
-              "linear-gradient(160deg, rgba(14,20,28,0.76) 0%, rgba(8,12,18,0.91) 100%)",
-            backdropFilter: "blur(28px) saturate(180%)",
-            WebkitBackdropFilter: "blur(28px) saturate(180%)",
-            borderTop: isHovered
-              ? "1px solid rgba(0,200,150,0.32)"
-              : "1px solid rgba(255,255,255,0.13)",
-            boxShadow: "0 -8px 32px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.07)",
-            px: { xs: 1.5, sm: 1.75 },
-            pt: 1.25,
-            pb: 1.5,
+            borderRadius: "16px",
+            background: "rgba(15, 23, 42, 0.45)",
+            backdropFilter: "blur(18px) saturate(180%)",
+            WebkitBackdropFilter: "blur(18px) saturate(180%)",
+            border: "1px solid rgba(255, 255, 255, 0.14)",
+            boxShadow:
+              "0 10px 30px 0 rgba(0, 0, 0, 0.4), inset 0 1px 0 0 rgba(255, 255, 255, 0.15)",
+            p: 1.5,
             display: "flex",
             flexDirection: "column",
             gap: 0.6,
-            transition: "border-color 0.3s ease",
+            transition: "all 0.3s ease",
+            "&:hover": {
+              borderColor: "rgba(0, 200, 150, 0.4)",
+              background: "rgba(15, 23, 42, 0.52)",
+            },
           }}
         >
-          {/* Row 1: Brand + verified | Rating or Vendor */}
-          <Stack direction="row" justifyContent="space-between" alignItems="center">
-            <Stack direction="row" alignItems="center" spacing={0.4}>
-              <Typography
-                sx={{
-                  fontSize: "0.67rem",
-                  fontWeight: 700,
-                  color: "#00C896",
-                  letterSpacing: "0.13em",
-                  textTransform: "uppercase",
-                  lineHeight: 1,
-                }}
-              >
-                {product.brand?.name || "DressMe"}
-              </Typography>
-              {product.vendor?.isVerified && (
-                <VerifiedIcon sx={{ fontSize: 11, color: "#00C896" }} />
-              )}
-            </Stack>
+          {/* Row 1: Brand (left) & Vendor / Rating (right) */}
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            alignItems="center"
+            spacing={1}
+          >
+            <Typography
+              sx={{
+                fontSize: "0.68rem",
+                fontWeight: 700,
+                color: "#00C896",
+                letterSpacing: "0.12em",
+                textTransform: "uppercase",
+                display: "flex",
+                alignItems: "center",
+                gap: 0.4,
+              }}
+            >
+              {product.brand?.name || "DressMe"}
+            </Typography>
 
+            {/* Rating / Vendor Badge */}
             {product.averageRating > 0 ? (
               <Stack
                 direction="row"
                 alignItems="center"
                 spacing={0.3}
                 sx={{
-                  bgcolor: "rgba(255,255,255,0.07)",
+                  bgcolor: "rgba(255, 255, 255, 0.08)",
                   px: 0.7,
                   py: 0.15,
                   borderRadius: "6px",
-                  border: "1px solid rgba(255,255,255,0.07)",
+                  border: "1px solid rgba(255, 255, 255, 0.08)",
                 }}
               >
-                <StarIcon sx={{ fontSize: 11, color: "#FBBF24" }} />
+                <StarIcon sx={{ fontSize: 12, color: "#FBBF24" }} />
                 <Typography sx={{ fontSize: "0.68rem", fontWeight: 700, color: "#FFF" }}>
                   {product.averageRating.toFixed(1)}
                 </Typography>
-                <Typography sx={{ fontSize: "0.6rem", color: "rgba(255,255,255,0.45)" }}>
+                <Typography
+                  sx={{ fontSize: "0.6rem", color: "rgba(255, 255, 255, 0.5)" }}
+                >
                   ({product.reviewCount})
                 </Typography>
               </Stack>
@@ -608,16 +588,20 @@ export function ProductCard({ product }: ProductCardProps) {
                 alignItems="center"
                 spacing={0.3}
                 sx={{
-                  bgcolor: "rgba(255,255,255,0.05)",
-                  px: 0.65,
+                  bgcolor: "rgba(255, 255, 255, 0.08)",
+                  px: 0.7,
                   py: 0.15,
                   borderRadius: "6px",
-                  border: "1px solid rgba(255,255,255,0.06)",
+                  border: "1px solid rgba(255, 255, 255, 0.08)",
                 }}
               >
-                <StorefrontIcon sx={{ fontSize: 11, color: "rgba(255,255,255,0.5)" }} />
+                <StorefrontIcon sx={{ fontSize: 11, color: "rgba(255, 255, 255, 0.7)" }} />
                 <Typography
-                  sx={{ fontSize: "0.6rem", color: "rgba(255,255,255,0.56)", fontWeight: 500 }}
+                  sx={{
+                    fontSize: "0.6rem",
+                    color: "rgba(255, 255, 255, 0.75)",
+                    fontWeight: 600,
+                  }}
                 >
                   {product.vendor.businessName}
                 </Typography>
@@ -625,13 +609,13 @@ export function ProductCard({ product }: ProductCardProps) {
             ) : null}
           </Stack>
 
-          {/* Row 2: Product name */}
+          {/* Row 2: Product Name — Prominent & Bold */}
           <Typography
             sx={{
               fontWeight: 700,
-              fontSize: { xs: "0.93rem", sm: "1.02rem" },
+              fontSize: { xs: "0.95rem", sm: "1.05rem" },
               lineHeight: 1.25,
-              color: "#FFFFFF",
+              color: "#FFF",
               display: "-webkit-box",
               WebkitLineClamp: 2,
               WebkitBoxOrient: "vertical",
@@ -643,159 +627,144 @@ export function ProductCard({ product }: ProductCardProps) {
             {product.name}
           </Typography>
 
-          {/* Row 3: Price + compare-at */}
-          <Stack direction="row" alignItems="baseline" spacing={0.85}>
-            <Typography
-              sx={{
-                fontWeight: 800,
-                fontSize: "1.08rem",
-                color: "#FFFFFF",
-                letterSpacing: "-0.02em",
-                lineHeight: 1,
-              }}
-            >
-              {formatCurrency(product.price)}
-            </Typography>
-            {hasSalePrice && (
+          {/* Row 3: Price + Compare-at strikethrough + Variants */}
+          <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1}>
+            <Stack direction="row" alignItems="baseline" spacing={0.75}>
               <Typography
                 sx={{
-                  fontSize: "0.77rem",
-                  color: "rgba(255,255,255,0.33)",
-                  textDecoration: "line-through",
-                  fontWeight: 500,
+                  fontWeight: 800,
+                  fontSize: "1.1rem",
+                  color: "#FFF",
+                  letterSpacing: "-0.02em",
+                  lineHeight: 1,
                 }}
               >
-                {formatCurrency(product.compareAtPrice!)}
+                {formatCurrency(product.price)}
               </Typography>
-            )}
-          </Stack>
+              {hasSalePrice && (
+                <Typography
+                  sx={{
+                    fontSize: "0.75rem",
+                    color: "rgba(255, 255, 255, 0.4)",
+                    textDecoration: "line-through",
+                    fontWeight: 500,
+                  }}
+                >
+                  {formatCurrency(product.compareAtPrice!)}
+                </Typography>
+              )}
+            </Stack>
 
-          {/* Row 4: Sizes · Colors · Add to Cart */}
-          <Stack
-            direction="row"
-            alignItems="center"
-            spacing={0.5}
-            sx={{ pt: 0.5, borderTop: "1px solid rgba(255,255,255,0.05)" }}
-          >
-            {visibleSizes.slice(0, 3).map(([label, { id, inStock }]) => (
-              <Box
-                key={label}
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  if (inStock) setSelectedVariantId(id);
-                }}
-                sx={{
-                  px: 0.65,
-                  py: 0.15,
-                  borderRadius: "4px",
-                  bgcolor:
-                    selectedVariantId === id
-                      ? "rgba(0,200,150,0.2)"
-                      : inStock
-                      ? "rgba(255,255,255,0.08)"
-                      : "rgba(255,255,255,0.03)",
-                  border: "1px solid",
-                  borderColor:
-                    selectedVariantId === id
-                      ? "#00C896"
-                      : inStock
-                      ? "rgba(255,255,255,0.15)"
-                      : "rgba(255,255,255,0.04)",
-                  fontSize: "0.58rem",
-                  fontWeight: 700,
-                  color:
-                    selectedVariantId === id
-                      ? "#00C896"
-                      : inStock
-                      ? "rgba(255,255,255,0.82)"
-                      : "rgba(255,255,255,0.2)",
-                  textDecoration: inStock ? "none" : "line-through",
-                  cursor: inStock ? "pointer" : "default",
-                  flexShrink: 0,
-                  transition: "all 0.18s ease",
-                }}
-              >
-                {label}
-              </Box>
-            ))}
-            {sizeOverflow > 0 && (
-              <Typography
-                sx={{ fontSize: "0.55rem", color: "rgba(255,255,255,0.32)", flexShrink: 0 }}
-              >
-                +{sizeOverflow}
-              </Typography>
-            )}
-
-            {useSwatches &&
-              visibleColors.slice(0, 3).map(([label, { inStock }]) => (
+            {/* Size & Color indicators */}
+            <Stack direction="row" alignItems="center" spacing={0.4}>
+              {visibleSizes.slice(0, 2).map(([label, { id, inStock }]) => (
                 <Box
                   key={label}
-                  title={label}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (inStock) setSelectedVariantId(id);
+                  }}
                   sx={{
-                    width: 11,
-                    height: 11,
-                    borderRadius: "50%",
-                    bgcolor: label.toLowerCase(),
-                    border: "1.5px solid rgba(255,255,255,0.25)",
-                    opacity: inStock ? 1 : 0.3,
+                    px: 0.55,
+                    py: 0.15,
+                    borderRadius: "4px",
+                    bgcolor:
+                      selectedVariantId === id
+                        ? "rgba(0, 200, 150, 0.25)"
+                        : inStock
+                        ? "rgba(255, 255, 255, 0.1)"
+                        : "rgba(255, 255, 255, 0.03)",
+                    border: "1px solid",
+                    borderColor:
+                      selectedVariantId === id
+                        ? "#00C896"
+                        : inStock
+                        ? "rgba(255, 255, 255, 0.2)"
+                        : "rgba(255, 255, 255, 0.05)",
+                    fontSize: "0.58rem",
+                    fontWeight: 700,
+                    color:
+                      selectedVariantId === id
+                        ? "#00C896"
+                        : inStock
+                        ? "rgba(255, 255, 255, 0.9)"
+                        : "rgba(255, 255, 255, 0.25)",
+                    textDecoration: inStock ? "none" : "line-through",
+                    cursor: inStock ? "pointer" : "default",
                     flexShrink: 0,
                   }}
-                />
+                >
+                  {label}
+                </Box>
               ))}
 
-            <Box sx={{ flex: 1, minWidth: 0 }} />
-
-            <Button
-              variant="contained"
-              size="small"
-              startIcon={
-                addToCart.isPending ? (
-                  <CircularProgress size={11} color="inherit" />
-                ) : (
-                  <ShoppingBagOutlinedIcon sx={{ fontSize: "12px !important" }} />
-                )
-              }
-              disabled={isOutOfStock || addToCart.isPending}
-              onClick={handleAddToCart}
-              sx={{
-                py: 0.6,
-                px: { xs: 1, sm: 1.25 },
-                borderRadius: "9px",
-                fontWeight: 700,
-                fontSize: "0.67rem",
-                letterSpacing: "0.02em",
-                bgcolor: isOutOfStock ? "rgba(255,255,255,0.06)" : "#00C896",
-                color: isOutOfStock ? "rgba(255,255,255,0.25)" : "#061410",
-                border: "1px solid",
-                borderColor: isOutOfStock ? "rgba(255,255,255,0.06)" : "#00C896",
-                boxShadow: isOutOfStock ? "none" : "0 3px 12px rgba(0,200,150,0.35)",
-                textTransform: "none",
-                whiteSpace: "nowrap",
-                flexShrink: 0,
-                minWidth: "auto",
-                transition: "all 0.22s ease",
-                "&:hover": {
-                  bgcolor: "#00DFA8",
-                  borderColor: "#00DFA8",
-                  color: "#050D09",
-                  boxShadow: "0 5px 18px rgba(0,200,150,0.5)",
-                  transform: "translateY(-1px)",
-                },
-                "&.Mui-disabled": {
-                  bgcolor: "rgba(255,255,255,0.04)",
-                  color: "rgba(255,255,255,0.18)",
-                  borderColor: "transparent",
-                },
-              }}
-            >
-              {isOutOfStock ? "Sold Out" : "Add to Cart"}
-            </Button>
+              {useSwatches &&
+                visibleColors.slice(0, 2).map(([label, { inStock }]) => (
+                  <Box
+                    key={label}
+                    title={label}
+                    sx={{
+                      width: 11,
+                      height: 11,
+                      borderRadius: "50%",
+                      bgcolor: label.toLowerCase(),
+                      border: "1.5px solid rgba(255, 255, 255, 0.3)",
+                      opacity: inStock ? 1 : 0.3,
+                      flexShrink: 0,
+                    }}
+                  />
+                ))}
+            </Stack>
           </Stack>
+
+          {/* Row 4: Full-width compact Add to Cart Button inside the Glass Panel */}
+          <Button
+            variant="contained"
+            fullWidth
+            size="small"
+            startIcon={
+              addToCart.isPending ? (
+                <CircularProgress size={12} color="inherit" />
+              ) : (
+                <ShoppingBagOutlinedIcon sx={{ fontSize: "14px !important" }} />
+              )
+            }
+            disabled={isOutOfStock || addToCart.isPending}
+            onClick={handleAddToCart}
+            sx={{
+              mt: 0.2,
+              py: 0.65,
+              borderRadius: "10px",
+              fontWeight: 700,
+              fontSize: "0.72rem",
+              letterSpacing: "0.03em",
+              bgcolor: isOutOfStock ? "rgba(255, 255, 255, 0.08)" : "#00C896",
+              color: isOutOfStock ? "rgba(255, 255, 255, 0.3)" : "#07130F",
+              border: "1px solid",
+              borderColor: isOutOfStock ? "transparent" : "#00C896",
+              boxShadow: isOutOfStock ? "none" : "0 4px 14px rgba(0, 200, 150, 0.35)",
+              textTransform: "none",
+              transition: "all 0.25s ease",
+              "&:hover": {
+                bgcolor: "#00E0A7",
+                borderColor: "#00E0A7",
+                color: "#050E0B",
+                boxShadow: "0 6px 20px rgba(0, 200, 150, 0.5)",
+                transform: "translateY(-1px)",
+              },
+              "&.Mui-disabled": {
+                bgcolor: "rgba(255, 255, 255, 0.05)",
+                color: "rgba(255, 255, 255, 0.2)",
+              },
+            }}
+          >
+            {isOutOfStock ? "Sold Out" : "Add to Cart"}
+          </Button>
         </Box>
       </Box>
 
-      {/* ── Feedback Snackbars ────────────────────────────────── */}
+      {/* Feedback Snackbars */}
       <Snackbar
         open={showCartSuccess}
         autoHideDuration={3000}
@@ -809,7 +778,7 @@ export function ProductCard({ product }: ProductCardProps) {
             bgcolor: "#00C896",
             color: "#07130F",
             fontWeight: 700,
-            boxShadow: "0 8px 24px rgba(0,200,150,0.4)",
+            boxShadow: "0 8px 24px rgba(0, 200, 150, 0.4)",
             "& .MuiAlert-icon": { color: "#07130F" },
           }}
         >
@@ -830,7 +799,7 @@ export function ProductCard({ product }: ProductCardProps) {
             bgcolor: "#1E293B",
             color: "#FFFFFF",
             fontWeight: 600,
-            border: "1px solid rgba(255,255,255,0.12)",
+            border: "1px solid rgba(255, 255, 255, 0.12)",
           }}
         >
           {favoriteMessage}
