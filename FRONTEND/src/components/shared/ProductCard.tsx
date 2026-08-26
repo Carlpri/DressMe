@@ -576,7 +576,6 @@ export function ProductCard({ product }: ProductCardProps) {
             // No horizontal margin — flush with card edges; small bottom margin so card border-radius shows
             mx: 0,
             mb: 0,
-            mt: "auto",
             p: { xs: 1.5, sm: 1.75 },
             borderRadius: "0 0 22px 22px",
             background:
