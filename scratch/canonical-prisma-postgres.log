@@ -67,3 +67,10 @@
 	
 2026-08-25 16:27:58.817 EAT [19324] LOG:  checkpoint starting: time
 2026-08-25 16:28:08.978 EAT [19324] LOG:  checkpoint complete: wrote 91 buffers (0.6%); 0 WAL file(s) added, 0 removed, 0 recycled; write=10.124 s, sync=0.024 s, total=10.161 s; sync files=42, longest=0.003 s, average=0.001 s; distance=260 kB, estimate=4475 kB; lsn=0/24332A8, redo lsn=0/2433218
+2026-08-25 22:18:06.958 GMT [19368] FATAL:  "C:/DressMe/scratch/canonical-prisma-pgdata" is not a valid data directory
+2026-08-25 22:18:06.958 GMT [19368] DETAIL:  File "C:/DressMe/scratch/canonical-prisma-pgdata/PG_VERSION" is missing.
+2026-08-26 01:19:06.991 EAT [13692] LOG:  could not open file "postmaster.pid": No such file or directory
+2026-08-26 01:19:06.993 EAT [13692] LOG:  performing immediate shutdown because data directory lock file is invalid
+2026-08-26 01:19:06.993 EAT [13692] LOG:  received immediate shutdown request
+2026-08-26 01:19:06.993 EAT [13692] LOG:  could not open file "postmaster.pid": No such file or directory
+2026-08-26 01:19:07.116 EAT [13692] LOG:  database system is shut down
