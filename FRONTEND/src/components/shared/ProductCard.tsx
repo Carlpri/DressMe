@@ -187,7 +187,7 @@ export function ProductCard({ product }: ProductCardProps) {
         }}
         sx={{
           height: "100%",
-          minHeight: { xs: 460, sm: 500, md: 520 },
+          minHeight: { xs: 410, sm: 440, md: 460 },
           display: "flex",
           flexDirection: "column",
           position: "relative",
@@ -236,7 +236,7 @@ export function ProductCard({ product }: ProductCardProps) {
                 objectPosition: "center",
                 display: "block",
                 p: { xs: 2.5, sm: 3 },
-                pb: { xs: 18, sm: 20 }, // Reserve space so product is clearly visible above the glass deck
+                pb: { xs: 15, sm: 17 }, // Reserve space so product is clearly visible above the glass deck
                 transition: "opacity 0.35s ease, transform 0.5s ease",
                 transform: isHovered ? "scale(1.025)" : "scale(1)",
                 filter: "drop-shadow(0 14px 28px rgba(0, 0, 0, 0.55))",
@@ -573,23 +573,27 @@ export function ProductCard({ product }: ProductCardProps) {
             mt: "auto",
             position: "relative",
             zIndex: 6,
-            m: { xs: 1.25, sm: 1.5 },
-            p: { xs: 1.75, sm: 2 },
-            borderRadius: "18px",
+            // No horizontal margin — flush with card edges; small bottom margin so card border-radius shows
+            mx: 0,
+            mb: 0,
+            mt: "auto",
+            p: { xs: 1.5, sm: 1.75 },
+            borderRadius: "0 0 22px 22px",
             background:
               "linear-gradient(135deg, rgba(18, 24, 32, 0.82) 0%, rgba(10, 14, 20, 0.9) 100%)",
             backdropFilter: "blur(20px) saturate(190%)",
             WebkitBackdropFilter: "blur(20px) saturate(190%)",
-            border: "1px solid rgba(255, 255, 255, 0.12)",
             borderTop: "1px solid rgba(255, 255, 255, 0.22)",
+            borderLeft: "none",
+            borderRight: "none",
+            borderBottom: "none",
             boxShadow:
               "0 14px 36px 0 rgba(0, 0, 0, 0.55), inset 0 1px 0 0 rgba(255, 255, 255, 0.15)",
             display: "flex",
             flexDirection: "column",
-            gap: 1.25,
+            gap: 1,
             transition: "transform 0.3s ease, background 0.3s ease, border-color 0.3s ease",
             "&:hover": {
-              borderColor: "rgba(255, 255, 255, 0.2)",
               borderTopColor: "rgba(0, 200, 150, 0.5)",
             },
           }}
