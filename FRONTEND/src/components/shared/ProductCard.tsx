@@ -283,17 +283,17 @@ export function ProductCard({ product }: ProductCardProps) {
             </Box>
           )}
 
-          {/* Permanent bottom gradient — keeps the peek area clean & legible */}
+          {/* Subtle bottom shadow gradient — delicate, allows full outfit view while making price/size legible */}
           <Box
             sx={{
               position: "absolute",
               bottom: 0,
               left: 0,
               right: 0,
-              height: "55%",
+              height: "28%",
               pointerEvents: "none",
               background:
-                "linear-gradient(to top, rgba(6,8,12,0.96) 0%, rgba(6,8,12,0.7) 35%, transparent 100%)",
+                "linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.25) 55%, transparent 100%)",
             }}
           />
         </Box>
@@ -503,11 +503,11 @@ export function ProductCard({ product }: ProductCardProps) {
             transform: isHovered
               ? "translateY(0)"
               : `translateY(calc(100% - ${PEEK_HEIGHT}px))`,
-            transition: "transform 0.38s cubic-bezier(0.16, 1, 0.3, 1)",
-            background: "rgba(8, 11, 18, 0.8)",
-            backdropFilter: "blur(20px) saturate(180%)",
-            WebkitBackdropFilter: "blur(20px) saturate(180%)",
-            borderTop: "1px solid rgba(255,255,255,0.09)",
+            transition: "transform 0.38s cubic-bezier(0.16, 1, 0.3, 1), background 0.3s ease, border-color 0.3s ease",
+            background: isHovered ? "rgba(8, 11, 18, 0.88)" : "transparent",
+            backdropFilter: isHovered ? "blur(20px) saturate(180%)" : "none",
+            WebkitBackdropFilter: isHovered ? "blur(20px) saturate(180%)" : "none",
+            borderTop: isHovered ? "1px solid rgba(255,255,255,0.12)" : "none",
             display: "flex",
             flexDirection: "column",
             gap: 0,
@@ -659,6 +659,7 @@ export function ProductCard({ product }: ProductCardProps) {
                   color: "#FFF",
                   letterSpacing: "-0.02em",
                   lineHeight: 1,
+                  textShadow: "0 1px 4px rgba(0,0,0,0.8)",
                 }}
               >
                 {formatCurrency(product.price)}
@@ -667,9 +668,10 @@ export function ProductCard({ product }: ProductCardProps) {
                 <Typography
                   sx={{
                     fontSize: { xs: "0.62rem", sm: "0.68rem" },
-                    color: "rgba(255,255,255,0.38)",
+                    color: "rgba(255,255,255,0.55)",
                     textDecoration: "line-through",
                     fontWeight: 500,
+                    textShadow: "0 1px 3px rgba(0,0,0,0.8)",
                   }}
                 >
                   {formatCurrency(product.compareAtPrice!)}
@@ -689,7 +691,8 @@ export function ProductCard({ product }: ProductCardProps) {
                         height: { xs: 9, sm: 10 },
                         borderRadius: "50%",
                         bgcolor: label.toLowerCase(),
-                        border: "1.5px solid rgba(255,255,255,0.3)",
+                        border: "1.5px solid rgba(255,255,255,0.4)",
+                        boxShadow: "0 1px 3px rgba(0,0,0,0.6)",
                         opacity: inStock ? 1 : 0.3,
                         flexShrink: 0,
                       }}
@@ -704,30 +707,33 @@ export function ProductCard({ product }: ProductCardProps) {
                         if (inStock) setSelectedVariantId(id);
                       }}
                       sx={{
-                        px: 0.45,
+                        px: 0.5,
                         py: 0.15,
-                        borderRadius: "3px",
+                        borderRadius: "4px",
                         bgcolor:
                           selectedVariantId === id
-                            ? "rgba(0,200,150,0.2)"
+                            ? "rgba(0,200,150,0.3)"
                             : inStock
-                            ? "rgba(255,255,255,0.1)"
-                            : "rgba(255,255,255,0.03)",
+                            ? "rgba(0,0,0,0.45)"
+                            : "rgba(0,0,0,0.2)",
+                        backdropFilter: "blur(4px)",
+                        WebkitBackdropFilter: "blur(4px)",
                         border: "1px solid",
                         borderColor:
                           selectedVariantId === id
                             ? "#00C896"
                             : inStock
-                            ? "rgba(255,255,255,0.2)"
-                            : "rgba(255,255,255,0.05)",
+                            ? "rgba(255,255,255,0.25)"
+                            : "rgba(255,255,255,0.08)",
+                        boxShadow: "0 1px 3px rgba(0,0,0,0.4)",
                         fontSize: "0.55rem",
                         fontWeight: 700,
                         color:
                           selectedVariantId === id
                             ? "#00C896"
                             : inStock
-                            ? "rgba(255,255,255,0.85)"
-                            : "rgba(255,255,255,0.2)",
+                            ? "#FFF"
+                            : "rgba(255,255,255,0.35)",
                         textDecoration: inStock ? "none" : "line-through",
                         cursor: inStock ? "pointer" : "default",
                         flexShrink: 0,
