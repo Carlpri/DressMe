@@ -49,9 +49,9 @@ export function ProductCard({ product }: ProductCardProps) {
   const addToFavorites = useAddToFavorites();
   const removeFromFavorites = useRemoveFromFavorites();
 
-  const isTouchDevice =
-    typeof window !== "undefined" &&
-    ("ontouchstart" in window || navigator.maxTouchPoints > 0);
+  // Long-press refs for touch reveal
+  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const didLongPress = useRef(false);  // true if the touch was a hold, not a tap
 
   // Close card when user clicks or touches outside
   useEffect(() => {
@@ -134,21 +134,39 @@ export function ProductCard({ product }: ProductCardProps) {
     }
   };
 
-  // Card click / tap behavior:
-  // On touchscreen, 1st tap reveals details if closed. 2nd tap (or desktop click) navigates.
+  // ── Mouse click: always navigate ────────────────────────────────────────
   const handleCardClick = (e: React.MouseEvent) => {
-    if (isTouchDevice && !isHovered) {
+    // If this click was synthesised from a long-press touch, swallow it
+    if (didLongPress.current) {
+      didLongPress.current = false;
       e.preventDefault();
-      setIsHovered(true);
       return;
     }
     navigate(`/products/${product.slug}`);
   };
 
-  // Touch / Hold event handlers
-  const handleTouchStart = () => {
-    if (!isHovered) {
+  // ── Touch: short tap → navigate, long press (≥350 ms) → reveal panel ───
+  const handleTouchStart = (e: React.TouchEvent) => {
+    didLongPress.current = false;
+    longPressTimer.current = setTimeout(() => {
+      didLongPress.current = true;
       setIsHovered(true);
+    }, 350);
+  };
+
+  const handleTouchEnd = () => {
+    // Cancel the timer — if it hadn't fired yet this was a short tap (→ click handler navigates)
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+  };
+
+  // If the finger moves (scroll), cancel the long-press
+  const handleTouchMove = () => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
     }
   };
 
@@ -189,6 +207,8 @@ export function ProductCard({ product }: ProductCardProps) {
         ref={cardRef}
         onClick={handleCardClick}
         onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        onTouchMove={handleTouchMove}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         role="article"
@@ -196,7 +216,7 @@ export function ProductCard({ product }: ProductCardProps) {
         onKeyDown={(e) => {
           if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
-            handleCardClick(e as unknown as React.MouseEvent);
+            navigate(`/products/${product.slug}`);
           }
         }}
         sx={{
