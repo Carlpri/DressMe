@@ -3,7 +3,6 @@ import { useSearchParams } from "react-router-dom";
 import {
   Box,
   Container,
-  Grid,
   Stack,
   Typography,
   TextField,
@@ -25,6 +24,7 @@ import { useProducts } from "../../hooks/useProducts";
 import { useCategories } from "../../hooks/useCategories";
 import { useBrands } from "../../hooks/useBrands";
 import { ProductCard } from "../../components/shared/ProductCard";
+import { MasonryGrid } from "../../components/shared/MasonryGrid";
 import { LoadingSkeleton } from "../../components/shared/LoadingSkeleton";
 import type { ProductFilters } from "../../types/product";
 
@@ -215,13 +215,11 @@ export function ProductsPage() {
             <Box sx={{ width: 250, flexShrink: 0 }}>{filterContent}</Box>
             <Box sx={{ flex: 1 }}>
               {isLoading ? (
-                <Grid container spacing={3}>
+                <MasonryGrid columns={{ xs: 2, sm: 2, md: 3, lg: 4 }}>
                   {[...Array(8)].map((_, i) => (
-                    <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={i}>
-                      <LoadingSkeleton height={400} />
-                    </Grid>
+                    <LoadingSkeleton key={i} height={360} />
                   ))}
-                </Grid>
+                </MasonryGrid>
               ) : error ? (
                 <Alert severity="error" action={<Button onClick={() => refetch()}>Retry</Button>}>
                   Failed to load products
@@ -237,13 +235,11 @@ export function ProductsPage() {
                 </Box>
               ) : (
                 <>
-                  <Grid container spacing={3}>
+                  <MasonryGrid columns={{ xs: 2, sm: 2, md: 3, lg: 4 }}>
                     {products?.items.map((product) => (
-                      <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={product.id}>
-                        <ProductCard product={product} />
-                      </Grid>
+                      <ProductCard key={product.id} product={product} />
                     ))}
-                  </Grid>
+                  </MasonryGrid>
 
                   {products && products.totalPages > 1 && (
                     <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
@@ -267,13 +263,11 @@ export function ProductsPage() {
           <>
             <Box>
               {isLoading ? (
-                <Grid container spacing={2}>
+                <MasonryGrid columns={{ xs: 2, sm: 2 }}>
                   {[...Array(4)].map((_, i) => (
-                    <Grid size={6} key={i}>
-                      <LoadingSkeleton height={300} />
-                    </Grid>
+                    <LoadingSkeleton key={i} height={300} />
                   ))}
-                </Grid>
+                </MasonryGrid>
               ) : error ? (
                 <Alert severity="error" action={<Button onClick={() => refetch()}>Retry</Button>}>
                   Failed to load products
@@ -289,13 +283,11 @@ export function ProductsPage() {
                 </Box>
               ) : (
                 <>
-                  <Grid container spacing={2}>
+                  <MasonryGrid columns={{ xs: 2, sm: 2 }}>
                     {products?.items.map((product) => (
-                      <Grid size={6} key={product.id}>
-                        <ProductCard product={product} />
-                      </Grid>
+                      <ProductCard key={product.id} product={product} />
                     ))}
-                  </Grid>
+                  </MasonryGrid>
 
                   {products && products.totalPages > 1 && (
                     <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>

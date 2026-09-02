@@ -28,6 +28,7 @@ import { useBrands } from "../../hooks/useBrands";
 import { useVendors } from "../../hooks/useVendors";
 import { ROUTES } from "../../constants/routes";
 import { ProductCard } from "../../components/shared/ProductCard";
+import { MasonryGrid } from "../../components/shared/MasonryGrid";
 import { LoadingSkeleton } from "../../components/shared/LoadingSkeleton";
 import { useSiteSettingsContext } from "../../contexts/SiteSettingsContext";
 
@@ -576,21 +577,17 @@ export function LandingPage() {
             </Stack>
 
             {trendingLoading ? (
-              <Grid container spacing={3}>
+              <MasonryGrid columns={{ xs: 2, sm: 2, md: 3, lg: 4 }}>
                 {[...Array(4)].map((_, i) => (
-                  <Grid size={{ xs: 6, sm: 4, md: 3 }} key={i}>
-                    <LoadingSkeleton height={420} />
-                  </Grid>
+                  <LoadingSkeleton key={i} height={340} />
                 ))}
-              </Grid>
+              </MasonryGrid>
             ) : (
-              <Grid container spacing={3}>
+              <MasonryGrid columns={{ xs: 2, sm: 2, md: 3, lg: 4 }}>
                 {trendingProducts?.items.slice(0, 8).map((product) => (
-                  <Grid size={{ xs: 6, sm: 4, md: 3 }} key={product.id}>
-                    <ProductCard product={product} />
-                  </Grid>
+                  <ProductCard key={product.id} product={product} />
                 ))}
-              </Grid>
+              </MasonryGrid>
             )}
 
             <Box sx={{ display: { xs: "flex", md: "none" }, justifyContent: "center" }}>
@@ -938,21 +935,17 @@ export function LandingPage() {
             </Stack>
 
             {newLoading ? (
-              <Grid container spacing={3}>
+              <MasonryGrid columns={{ xs: 2, sm: 2, md: 3, lg: 4 }}>
                 {[...Array(4)].map((_, i) => (
-                  <Grid size={{ xs: 6, sm: 4, md: 3 }} key={i}>
-                    <LoadingSkeleton height={420} />
-                  </Grid>
+                  <LoadingSkeleton key={i} height={340} />
                 ))}
-              </Grid>
+              </MasonryGrid>
             ) : (
-              <Grid container spacing={3}>
+              <MasonryGrid columns={{ xs: 2, sm: 2, md: 3, lg: 4 }}>
                 {newProducts?.items.slice(0, 4).map((product) => (
-                  <Grid size={{ xs: 6, sm: 4, md: 3 }} key={product.id}>
-                    <ProductCard product={product} />
-                  </Grid>
+                  <ProductCard key={product.id} product={product} />
                 ))}
-              </Grid>
+              </MasonryGrid>
             )}
           </Stack>
         </Container>

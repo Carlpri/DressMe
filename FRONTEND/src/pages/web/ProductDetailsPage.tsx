@@ -36,6 +36,7 @@ import { useAddToCart } from "../../hooks/useCart";
 import { useFavorites, useAddToFavorites, useRemoveFromFavorites } from "../../hooks/useFavorites";
 import { useReviews, useAddReview } from "../../hooks/useReviews";
 import { ProductCard } from "../../components/shared/ProductCard";
+import { MasonryGrid } from "../../components/shared/MasonryGrid";
 import { LoadingSkeleton } from "../../components/shared/LoadingSkeleton";
 import { ROUTES } from "../../constants/routes";
 import { Link as RouterLink } from "react-router-dom";
@@ -602,16 +603,14 @@ export function ProductDetailsPage() {
             <Typography variant="h4" sx={{ fontWeight: 700, mb: 3 }}>
               Related Products
             </Typography>
-            <Grid container spacing={3}>
+            <MasonryGrid columns={{ xs: 2, sm: 2, md: 3, lg: 4 }}>
               {relatedProducts.items
                 .filter((p) => p.id !== product.id)
                 .slice(0, 4)
                 .map((relatedProduct) => (
-                  <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={relatedProduct.id}>
-                    <ProductCard product={relatedProduct} />
-                  </Grid>
+                  <ProductCard key={relatedProduct.id} product={relatedProduct} />
                 ))}
-            </Grid>
+            </MasonryGrid>
           </Box>
         )}
 
@@ -621,16 +620,14 @@ export function ProductDetailsPage() {
             <Typography variant="h4" sx={{ fontWeight: 700, mb: 3 }}>
               Recently Viewed
             </Typography>
-            <Grid container spacing={3}>
+            <MasonryGrid columns={{ xs: 2, sm: 2, md: 3, lg: 4 }}>
               {recentProducts
                 .filter((p) => p.id !== product.id)
                 .slice(0, 4)
                 .map((recentItem) => (
-                  <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={recentItem.id}>
-                    <ProductCard product={recentItem} />
-                  </Grid>
+                  <ProductCard key={recentItem.id} product={recentItem} />
                 ))}
-            </Grid>
+            </MasonryGrid>
           </Box>
         )}
       </Stack>

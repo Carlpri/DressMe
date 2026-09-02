@@ -15,6 +15,7 @@ import {
 import { useBrands, useBrand } from "../../hooks/useBrands";
 import { useProducts } from "../../hooks/useProducts";
 import { ProductCard } from "../../components/shared/ProductCard";
+import { MasonryGrid } from "../../components/shared/MasonryGrid";
 import { LoadingSkeleton } from "../../components/shared/LoadingSkeleton";
 import { ROUTES } from "../../constants/routes";
 import { Link as RouterLink } from "react-router-dom";
@@ -226,13 +227,11 @@ export function BrandsPage() {
               </Button>
             </Box>
           ) : (
-            <Grid container spacing={3}>
+            <MasonryGrid columns={{ xs: 2, sm: 2, md: 3, lg: 4 }}>
               {products?.items.map((product) => (
-                <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={product.id}>
-                  <ProductCard product={product} />
-                </Grid>
+                <ProductCard key={product.id} product={product} />
               ))}
-            </Grid>
+            </MasonryGrid>
           )}
         </Box>
       </Stack>
