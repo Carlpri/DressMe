@@ -22,10 +22,13 @@ import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
 import ShieldOutlinedIcon from "@mui/icons-material/ShieldOutlined";
 import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined";
 import VerifiedOutlinedIcon from "@mui/icons-material/VerifiedOutlined";
+import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import { useCart, useUpdateCartItem, useRemoveFromCart } from "../../hooks/useCart";
+import { useAuth } from "../../hooks/useAuth";
 import { ROUTES } from "../../constants/routes";
 import { useSiteSettingsContext } from "../../contexts/SiteSettingsContext";
 import { useFormatCurrency } from "../../utils/currency";
+import { buildAdminCheckoutNotificationMessage, buildWhatsAppUrl } from "../../utils/whatsapp";
 
 export function CartPage() {
   const { data: cart, isLoading, error, refetch } = useCart();
@@ -115,6 +118,26 @@ export function CartPage() {
       </Box>
     );
   }
+
+  const { user } = useAuth();
+  const adminWhatsApp = settings?.whatsappNumber || settings?.supportPhone || "254700000000";
+
+  const handleWhatsAppAdminCheckout = () => {
+    const message = buildAdminCheckoutNotificationMessage({
+      customerName: user?.name || "Guest Customer",
+      customerEmail: user?.email || undefined,
+      items,
+      currency: settings?.currency ?? "KES",
+      subtotal,
+      shipping,
+      total,
+    });
+
+    const url = buildWhatsAppUrl(adminWhatsApp, message);
+    if (url) {
+      window.open(url, "_blank", "noopener,noreferrer");
+    }
+  };
 
   return (
     <Box sx={{ minHeight: "100vh", bgcolor: "#07090E", py: { xs: 4, sm: 6, md: 8 } }}>
@@ -612,7 +635,7 @@ export function CartPage() {
                       </Stack>
                     </Box>
 
-                    {/* Primary Checkout Button (Edgy, bold luxury button) */}
+                    {/* Primary Checkout Buttons */}
                     <Stack spacing={1.5}>
                       <Button
                         component={RouterLink}
@@ -639,6 +662,31 @@ export function CartPage() {
                         }}
                       >
                         Proceed to Checkout
+                      </Button>
+
+                      <Button
+                        variant="outlined"
+                        fullWidth
+                        startIcon={<WhatsAppIcon sx={{ color: "#25D366 !important" }} />}
+                        onClick={handleWhatsAppAdminCheckout}
+                        sx={{
+                          borderRadius: "14px",
+                          py: 1.2,
+                          fontWeight: 800,
+                          fontSize: "0.85rem",
+                          textTransform: "none",
+                          color: "#FFF",
+                          borderColor: "rgba(37, 211, 102, 0.4)",
+                          bgcolor: "rgba(37, 211, 102, 0.08)",
+                          transition: "all 0.25s ease",
+                          "&:hover": {
+                            bgcolor: "rgba(37, 211, 102, 0.18)",
+                            borderColor: "#25D366",
+                            transform: "translateY(-1px)",
+                          },
+                        }}
+                      >
+                        Quick Order via Admin WhatsApp
                       </Button>
 
                       <Button

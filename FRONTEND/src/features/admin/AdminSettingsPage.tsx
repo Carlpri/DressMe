@@ -325,10 +325,10 @@ export function AdminSettingsPage() {
                 />
                 <TextField
                   fullWidth
-                  label="WhatsApp Phone Number"
+                  label="Admin WhatsApp Phone Number"
                   value={(formData.whatsappNumber ?? (currentData as any).whatsappNumber ?? (currentData as any).whatsapp) ?? ""}
                   onChange={handleInputChange("whatsappNumber" as any)}
-                  helperText="Format e.g. 254712345678 (Used for direct WhatsApp order messaging)"
+                  helperText="Format e.g. 254712345678 (Receives real-time checkout alerts and customer WhatsApp orders)"
                 />
                 <TextField
                   fullWidth
