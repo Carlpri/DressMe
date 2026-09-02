@@ -4,17 +4,16 @@ import {
   Alert,
   Box,
   Button,
-  Card,
-  CardMedia,
   Chip,
+  IconButton,
   Snackbar,
   Stack,
   Typography,
 } from "@mui/material";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import StarIcon from "@mui/icons-material/Star";
-import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
+import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded";
+import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
+import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
+import StarRoundedIcon from "@mui/icons-material/StarRounded";
 import type { Product } from "../../types/product";
 import { ROUTES } from "../../constants/routes";
 import { useAddToCart } from "../../hooks/useCart";
@@ -42,134 +41,345 @@ export function WishlistItemCard({ product, onRemove, isRemoving = false }: Wish
   const productUrl = `${ROUTES.customerDashboard}/${product.slug}`;
 
   const handleAddToCart = () => {
-    if (isOutOfStock) return;
+    if (isOutOfStock || addToCart.isPending) return;
 
     addToCart.mutate(
       { productId: product.id, quantity: 1, product },
-      { onSuccess: () => setShowCartSuccess(true) },
+      { onSuccess: () => setShowCartSuccess(true) }
     );
   };
 
   return (
     <>
-      <Card
+      <Box
         sx={{
-          display: "grid",
-          gridTemplateColumns: { xs: "1fr", sm: "180px minmax(0, 1fr) auto auto" },
-          gap: { xs: 0, sm: 2.5 },
+          display: "flex",
+          flexDirection: { xs: "column", sm: "row" },
+          bgcolor: "#0B0E14",
+          borderRadius: { xs: "18px", sm: "22px" },
+          border: "1px solid rgba(255, 255, 255, 0.08)",
           overflow: "hidden",
-          alignItems: "stretch",
           opacity: isRemoving ? 0 : 1,
-          transform: isRemoving ? "translateY(8px)" : "translateY(0)",
-          transition: "opacity 180ms ease, transform 180ms ease, box-shadow 180ms ease",
+          transform: isRemoving ? "scale(0.96)" : "translateY(0)",
+          transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
+          boxShadow: "0 8px 30px -6px rgba(0, 0, 0, 0.5)",
           "&:hover": {
-            boxShadow: "0 10px 24px rgba(15, 23, 42, 0.12)",
-            transform: isRemoving ? "translateY(8px)" : "translateY(-2px)",
+            borderColor: "rgba(0, 200, 150, 0.35)",
+            boxShadow: "0 20px 40px -10px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(0, 200, 150, 0.2)",
+            transform: "translateY(-4px)",
           },
         }}
       >
+        {/* ── IMAGE WRAPPER ─────────────────────────────────────────── */}
         <Box
           component={RouterLink}
           to={productUrl}
           aria-label={`View ${product.name}`}
           sx={{
             position: "relative",
-            minHeight: { xs: 220, sm: "100%" },
-            bgcolor: "grey.100",
+            width: { xs: "100%", sm: 220, md: 240 },
+            minHeight: { xs: 240, sm: 240 },
+            flexShrink: 0,
+            bgcolor: "#0E131C",
             display: "block",
             textDecoration: "none",
+            overflow: "hidden",
           }}
         >
           {primaryImage ? (
-            <CardMedia
+            <Box
               component="img"
-              image={primaryImage.imageUrl}
+              src={primaryImage.imageUrl}
               alt={primaryImage.altText || product.name}
-              sx={{ width: "100%", height: "100%", minHeight: { xs: 220, sm: 190 }, objectFit: "cover" }}
+              loading="lazy"
+              sx={{
+                width: "100%",
+                height: "100%",
+                objectFit: "cover",
+                objectPosition: "center top",
+                display: "block",
+                transition: "transform 0.5s ease",
+                "&:hover": {
+                  transform: "scale(1.06)",
+                },
+              }}
             />
           ) : (
-            <Box sx={{ height: "100%", minHeight: { xs: 220, sm: 190 }, display: "grid", placeItems: "center", p: 2 }}>
-              <Typography color="text.secondary" align="center">{product.name}</Typography>
+            <Box
+              sx={{
+                height: "100%",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                p: 2,
+                color: "rgba(255, 255, 255, 0.15)",
+              }}
+            >
+              <Typography sx={{ fontWeight: 900, fontSize: "2rem" }}>DM</Typography>
             </Box>
           )}
-          {hasDiscount && (
-            <Chip
-              label={`${discountPercent}% off`}
-              color="error"
-              size="small"
-              sx={{ position: "absolute", top: 12, left: 12, fontWeight: 700 }}
-            />
-          )}
+
+          {/* Badges on Image */}
+          <Stack
+            direction="row"
+            spacing={0.6}
+            sx={{ position: "absolute", top: 12, left: 12, zIndex: 2 }}
+          >
+            {hasDiscount && (
+              <Chip
+                label={`-${discountPercent}%`}
+                size="small"
+                sx={{
+                  bgcolor: "rgba(220, 38, 38, 0.9)",
+                  color: "#FFF",
+                  fontWeight: 800,
+                  fontSize: "0.65rem",
+                  height: 22,
+                  px: 0.5,
+                  backdropFilter: "blur(8px)",
+                  border: "1px solid rgba(255, 255, 255, 0.2)",
+                }}
+              />
+            )}
+            {product.isNewArrival && (
+              <Chip
+                label="NEW"
+                size="small"
+                sx={{
+                  bgcolor: "rgba(0, 200, 150, 0.9)",
+                  color: "#07130F",
+                  fontWeight: 800,
+                  fontSize: "0.62rem",
+                  height: 22,
+                  px: 0.5,
+                  backdropFilter: "blur(8px)",
+                }}
+              />
+            )}
+          </Stack>
         </Box>
 
-        <Stack spacing={1} sx={{ p: { xs: 2, sm: 2.5 }, minWidth: 0, justifyContent: "center" }}>
-          <Typography variant="overline" color="text.secondary" sx={{ lineHeight: 1.2, fontWeight: 700 }}>
-            {product.brand?.name || "Brand"} · {(product.categories ?? []).map((category) => category.name).join(", ") || "Uncategorized"}
-          </Typography>
-          <Typography component={RouterLink} to={productUrl} variant="h6" color="text.primary" sx={{ textDecoration: "none", fontWeight: 700, lineHeight: 1.3 }}>
-            {product.name}
-          </Typography>
-          <Typography variant="body2" color={isOutOfStock ? "error.main" : isLowStock ? "warning.main" : "success.main"} sx={{ fontWeight: 700 }}>
-            {isOutOfStock ? "Out of stock" : isLowStock ? `Only ${totalStock} left` : "In stock"}
-          </Typography>
-          {product.averageRating > 0 && (
-            <Stack direction="row" alignItems="center" spacing={0.5}>
-              <StarIcon sx={{ color: "warning.main", fontSize: 18 }} />
-              <Typography variant="body2" color="text.secondary">
-                {product.averageRating.toFixed(1)}{product.reviewCount > 0 ? ` (${product.reviewCount})` : ""}
+        {/* ── DETAILS & ACTIONS AREA (SPACIOUS & EDGY) ──────────────── */}
+        <Box
+          sx={{
+            flex: 1,
+            p: { xs: 2.5, sm: 3 },
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "space-between",
+            gap: 2,
+          }}
+        >
+          {/* Top meta & title */}
+          <Stack spacing={1}>
+            <Stack direction="row" justifyContent="space-between" alignItems="center">
+              <Typography
+                sx={{
+                  fontSize: "0.7rem",
+                  fontWeight: 800,
+                  color: "#00C896",
+                  letterSpacing: "0.12em",
+                  textTransform: "uppercase",
+                }}
+              >
+                {product.brand?.name || "DressMe"}
               </Typography>
+
+              {/* Delete button */}
+              <IconButton
+                onClick={() => onRemove(product.id)}
+                disabled={isRemoving}
+                size="small"
+                aria-label={`Remove ${product.name} from wishlist`}
+                sx={{
+                  color: "rgba(255, 255, 255, 0.4)",
+                  bgcolor: "rgba(255, 255, 255, 0.04)",
+                  border: "1px solid rgba(255, 255, 255, 0.08)",
+                  borderRadius: "10px",
+                  p: 0.8,
+                  transition: "all 0.2s ease",
+                  "&:hover": {
+                    color: "#EF4444",
+                    bgcolor: "rgba(239, 68, 68, 0.12)",
+                    borderColor: "rgba(239, 68, 68, 0.3)",
+                    transform: "scale(1.08)",
+                  },
+                }}
+              >
+                <DeleteOutlineRoundedIcon sx={{ fontSize: 18 }} />
+              </IconButton>
             </Stack>
-          )}
-        </Stack>
 
-        <Stack spacing={0.5} sx={{ px: { xs: 2, sm: 0 }, pb: { xs: 2, sm: 2.5 }, justifyContent: "center", minWidth: { sm: 120 } }}>
-          <Typography variant="h6" color={hasDiscount ? "error.main" : "primary.main"} sx={{ fontWeight: 800 }}>
-            {formatCurrency(product.price)}
-          </Typography>
-          {hasDiscount && (
-            <Typography variant="body2" color="text.secondary" sx={{ textDecoration: "line-through" }}>
-              {formatCurrency(product.compareAtPrice!)}
+            <Typography
+              component={RouterLink}
+              to={productUrl}
+              sx={{
+                color: "#FFF",
+                textDecoration: "none",
+                fontWeight: 700,
+                fontSize: { xs: "1.05rem", sm: "1.15rem" },
+                lineHeight: 1.3,
+                display: "-webkit-box",
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: "vertical",
+                overflow: "hidden",
+                letterSpacing: "-0.01em",
+                transition: "color 0.2s ease",
+                "&:hover": { color: "#00C896" },
+              }}
+            >
+              {product.name}
             </Typography>
-          )}
-        </Stack>
 
-        <Stack spacing={1} sx={{ p: { xs: 2, sm: 2.5 }, pt: { xs: 0, sm: 2.5 }, justifyContent: "center", minWidth: { sm: 150 } }}>
-          <Button
-            variant="contained"
-            fullWidth
-            startIcon={<ShoppingCartIcon />}
-            onClick={handleAddToCart}
-            disabled={isOutOfStock || addToCart.isPending}
-            aria-label={`Add ${product.name} to cart`}
-          >
-            {isOutOfStock ? "Out of stock" : "Add to cart"}
-          </Button>
-          <Button
-            component={RouterLink}
-            to={productUrl}
-            variant="outlined"
-            fullWidth
-            startIcon={<VisibilityOutlinedIcon />}
-            aria-label={`View ${product.name}`}
-          >
-            View product
-          </Button>
-          <Button
-            color="inherit"
-            fullWidth
-            startIcon={<DeleteOutlineIcon />}
-            onClick={() => onRemove(product.id)}
-            disabled={isRemoving}
-            aria-label={`Remove ${product.name} from wishlist`}
-          >
-            Remove
-          </Button>
-        </Stack>
-      </Card>
+            <Stack direction="row" spacing={1.5} alignItems="center" flexWrap="wrap">
+              <Chip
+                label={isOutOfStock ? "Sold Out" : isLowStock ? `Only ${totalStock} left` : "In Stock"}
+                size="small"
+                sx={{
+                  bgcolor: isOutOfStock
+                    ? "rgba(220, 38, 38, 0.15)"
+                    : isLowStock
+                    ? "rgba(245, 158, 11, 0.15)"
+                    : "rgba(0, 200, 150, 0.12)",
+                  color: isOutOfStock ? "#EF4444" : isLowStock ? "#F59E0B" : "#00C896",
+                  border: "1px solid",
+                  borderColor: isOutOfStock
+                    ? "rgba(220, 38, 38, 0.3)"
+                    : isLowStock
+                    ? "rgba(245, 158, 11, 0.3)"
+                    : "rgba(0, 200, 150, 0.25)",
+                  fontWeight: 700,
+                  fontSize: "0.68rem",
+                  height: 22,
+                }}
+              />
 
-      <Snackbar open={showCartSuccess} autoHideDuration={3000} onClose={() => setShowCartSuccess(false)} anchorOrigin={{ vertical: "bottom", horizontal: "center" }}>
-        <Alert severity="success" onClose={() => setShowCartSuccess(false)} variant="filled">
-          {product.name} was added to your cart.
+              {product.averageRating > 0 && (
+                <Stack direction="row" alignItems="center" spacing={0.4}>
+                  <StarRoundedIcon sx={{ color: "#FBBF24", fontSize: 16 }} />
+                  <Typography sx={{ color: "rgba(255, 255, 255, 0.8)", fontSize: "0.75rem", fontWeight: 700 }}>
+                    {product.averageRating.toFixed(1)}
+                  </Typography>
+                  <Typography sx={{ color: "rgba(255, 255, 255, 0.4)", fontSize: "0.7rem" }}>
+                    ({product.reviewCount})
+                  </Typography>
+                </Stack>
+              )}
+            </Stack>
+          </Stack>
+
+          {/* Bottom row: Price & Action Buttons */}
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            justifyContent="space-between"
+            alignItems={{ xs: "stretch", sm: "center" }}
+            spacing={2}
+            sx={{ pt: 1, borderTop: "1px solid rgba(255, 255, 255, 0.06)" }}
+          >
+            {/* Price display */}
+            <Stack direction="row" alignItems="baseline" spacing={1}>
+              <Typography sx={{ fontWeight: 800, fontSize: "1.3rem", color: "#FFF", letterSpacing: "-0.02em" }}>
+                {formatCurrency(product.price)}
+              </Typography>
+              {hasDiscount && (
+                <Typography
+                  sx={{
+                    fontSize: "0.85rem",
+                    color: "rgba(255, 255, 255, 0.35)",
+                    textDecoration: "line-through",
+                    fontWeight: 500,
+                  }}
+                >
+                  {formatCurrency(product.compareAtPrice!)}
+                </Typography>
+              )}
+            </Stack>
+
+            {/* Action buttons (Edgy & modern) */}
+            <Stack direction="row" spacing={1.2}>
+              <Button
+                component={RouterLink}
+                to={productUrl}
+                variant="outlined"
+                endIcon={<ArrowForwardRoundedIcon sx={{ fontSize: "16px !important" }} />}
+                sx={{
+                  borderRadius: "12px",
+                  py: 0.9,
+                  px: 2,
+                  fontWeight: 700,
+                  fontSize: "0.78rem",
+                  letterSpacing: "0.02em",
+                  textTransform: "none",
+                  color: "#FFF",
+                  borderColor: "rgba(255, 255, 255, 0.15)",
+                  bgcolor: "rgba(255, 255, 255, 0.03)",
+                  transition: "all 0.25s ease",
+                  "&:hover": {
+                    bgcolor: "rgba(255, 255, 255, 0.1)",
+                    borderColor: "rgba(255, 255, 255, 0.35)",
+                    transform: "translateY(-1px)",
+                  },
+                }}
+              >
+                View
+              </Button>
+
+              <Button
+                variant="contained"
+                startIcon={<ShoppingBagOutlinedIcon sx={{ fontSize: "17px !important" }} />}
+                onClick={handleAddToCart}
+                disabled={isOutOfStock || addToCart.isPending}
+                sx={{
+                  borderRadius: "12px",
+                  py: 0.9,
+                  px: 2.5,
+                  fontWeight: 800,
+                  fontSize: "0.78rem",
+                  letterSpacing: "0.03em",
+                  textTransform: "none",
+                  bgcolor: isOutOfStock ? "rgba(255, 255, 255, 0.08)" : "#00C896",
+                  color: isOutOfStock ? "rgba(255, 255, 255, 0.3)" : "#07130F",
+                  boxShadow: isOutOfStock ? "none" : "0 4px 16px rgba(0, 200, 150, 0.35)",
+                  transition: "all 0.25s ease",
+                  "&:hover": {
+                    bgcolor: "#00E0A7",
+                    boxShadow: "0 6px 24px rgba(0, 200, 150, 0.5)",
+                    transform: "translateY(-2px)",
+                  },
+                  "&.Mui-disabled": {
+                    bgcolor: "rgba(255, 255, 255, 0.05)",
+                    color: "rgba(255, 255, 255, 0.2)",
+                  },
+                }}
+              >
+                {isOutOfStock ? "Sold Out" : "Move to Cart"}
+              </Button>
+            </Stack>
+          </Stack>
+        </Box>
+      </Box>
+
+      {/* Snackbar feedback */}
+      <Snackbar
+        open={showCartSuccess}
+        autoHideDuration={3000}
+        onClose={() => setShowCartSuccess(false)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          severity="success"
+          onClose={() => setShowCartSuccess(false)}
+          sx={{
+            bgcolor: "#00C896",
+            color: "#07130F",
+            fontWeight: 800,
+            borderRadius: "12px",
+            boxShadow: "0 8px 30px rgba(0, 200, 150, 0.4)",
+            "& .MuiAlert-icon": { color: "#07130F" },
+          }}
+        >
+          {product.name} moved to your cart!
         </Alert>
       </Snackbar>
     </>
