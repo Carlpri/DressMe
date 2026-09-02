@@ -76,8 +76,8 @@ export function CartPage() {
                     <Skeleton
                       key={i}
                       variant="rounded"
-                      height={160}
-                      sx={{ borderRadius: "20px", bgcolor: "rgba(255, 255, 255, 0.05)" }}
+                      height={300}
+                      sx={{ borderRadius: "22px", bgcolor: "rgba(255, 255, 255, 0.05)" }}
                     />
                   ))}
                 </Stack>
@@ -226,35 +226,41 @@ export function CartPage() {
                       <Box
                         key={item.id}
                         sx={{
-                          p: { xs: 2, sm: 2.5 },
                           bgcolor: "#0B0E14",
                           borderRadius: { xs: "18px", sm: "22px" },
                           border: "1px solid rgba(255, 255, 255, 0.08)",
                           display: "flex",
                           flexDirection: { xs: "column", sm: "row" },
-                          alignItems: { xs: "stretch", sm: "center" },
-                          gap: { xs: 2, sm: 2.5 },
-                          transition: "all 0.25s ease",
+                          alignItems: "stretch",
+                          overflow: "hidden",
+                          transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
                           "&:hover": {
-                            borderColor: "rgba(0, 200, 150, 0.3)",
-                            boxShadow: "0 12px 30px -8px rgba(0, 0, 0, 0.6)",
+                            borderColor: "rgba(0, 200, 150, 0.35)",
+                            boxShadow: "0 16px 40px -10px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(0, 200, 150, 0.15)",
+                            transform: "translateY(-2px)",
                           },
                         }}
                       >
-                        {/* Image */}
+                        {/* ── LARGE PORTRAIT IMAGE ──────────────────────────────── */}
                         <Box
                           component={RouterLink}
                           to={productUrl}
                           sx={{
                             position: "relative",
-                            width: { xs: "100%", sm: 130, md: 140 },
-                            height: { xs: 160, sm: 140 },
+                            width: { xs: "100%", sm: 200, md: 220 },
+                            minHeight: { xs: 260, sm: 300, md: 320 },
                             flexShrink: 0,
                             bgcolor: "#0E131C",
-                            borderRadius: "14px",
-                            overflow: "hidden",
                             display: "block",
-                            border: "1px solid rgba(255, 255, 255, 0.05)",
+                            overflow: "hidden",
+                            // subtle gradient over image for luxury feel
+                            "&::after": {
+                              content: '""',
+                              position: "absolute",
+                              inset: 0,
+                              background: "linear-gradient(135deg, transparent 60%, rgba(0,200,150,0.06) 100%)",
+                              pointerEvents: "none",
+                            },
                           }}
                         >
                           {primaryImage ? (
@@ -269,6 +275,8 @@ export function CartPage() {
                                 objectFit: "cover",
                                 objectPosition: "center top",
                                 display: "block",
+                                transition: "transform 0.55s cubic-bezier(0.16, 1, 0.3, 1)",
+                                "&:hover": { transform: "scale(1.05)" },
                               }}
                             />
                           ) : (
@@ -279,188 +287,206 @@ export function CartPage() {
                                 display: "flex",
                                 alignItems: "center",
                                 justifyContent: "center",
-                                color: "rgba(255, 255, 255, 0.2)",
+                                background: "radial-gradient(circle at 50% 40%, #1A212D 0%, #0B0E14 100%)",
+                                color: "rgba(255, 255, 255, 0.1)",
                               }}
                             >
-                              <Typography variant="caption">No image</Typography>
+                              <Typography sx={{ fontWeight: 900, fontSize: "2.5rem" }}>DM</Typography>
                             </Box>
                           )}
                         </Box>
 
-                        {/* Product info & variants */}
-                        <Box sx={{ flex: 1, minWidth: 0 }}>
-                          <Typography
-                            sx={{
-                              fontSize: "0.68rem",
-                              fontWeight: 800,
-                              color: "#00C896",
-                              letterSpacing: "0.1em",
-                              textTransform: "uppercase",
-                              mb: 0.3,
-                            }}
-                          >
-                            {item.product.vendor?.businessName || "DressMe"}
-                          </Typography>
-
-                          <Typography
-                            component={RouterLink}
-                            to={productUrl}
-                            sx={{
-                              color: "#FFF",
-                              textDecoration: "none",
-                              fontWeight: 700,
-                              fontSize: { xs: "0.98rem", sm: "1.05rem" },
-                              lineHeight: 1.3,
-                              display: "-webkit-box",
-                              WebkitLineClamp: 2,
-                              WebkitBoxOrient: "vertical",
-                              overflow: "hidden",
-                              letterSpacing: "-0.01em",
-                              transition: "color 0.2s ease",
-                              "&:hover": { color: "#00C896" },
-                              mb: 0.8,
-                            }}
-                          >
-                            {item.product.name}
-                          </Typography>
-
-                          {/* Variant chips */}
-                          <Stack direction="row" spacing={0.8} flexWrap="wrap" sx={{ mb: 1 }}>
-                            {item.variant?.sizeValue && (
-                              <Chip
-                                label={`Size: ${item.variant.sizeValue}`}
-                                size="small"
-                                sx={{
-                                  bgcolor: "rgba(255, 255, 255, 0.06)",
-                                  color: "rgba(255, 255, 255, 0.8)",
-                                  border: "1px solid rgba(255, 255, 255, 0.08)",
-                                  fontWeight: 600,
-                                  fontSize: "0.68rem",
-                                  height: 22,
-                                }}
-                              />
-                            )}
-                            {item.variant?.colorValue && (
-                              <Chip
-                                label={`Color: ${item.variant.colorValue}`}
-                                size="small"
-                                sx={{
-                                  bgcolor: "rgba(255, 255, 255, 0.06)",
-                                  color: "rgba(255, 255, 255, 0.8)",
-                                  border: "1px solid rgba(255, 255, 255, 0.08)",
-                                  fontWeight: 600,
-                                  fontSize: "0.68rem",
-                                  height: 22,
-                                }}
-                              />
-                            )}
-                          </Stack>
-
-                          {/* Unit price */}
-                          <Typography sx={{ color: "rgba(255, 255, 255, 0.45)", fontSize: "0.82rem" }}>
-                            Unit: {formatCurrency(price)}
-                          </Typography>
-                        </Box>
-
-                        {/* Right side controls: Stepper + Total + Delete */}
-                        <Stack
-                          direction={{ xs: "row", sm: "column" }}
-                          alignItems={{ xs: "center", sm: "flex-end" }}
-                          justifyContent={{ xs: "space-between", sm: "center" }}
-                          spacing={1.5}
-                          sx={{ flexShrink: 0, pt: { xs: 1, sm: 0 }, borderTop: { xs: "1px solid rgba(255, 255, 255, 0.06)", sm: "none" } }}
+                        {/* ── DETAILS + CONTROLS ────────────────────────────────── */}
+                        <Box
+                          sx={{
+                            flex: 1,
+                            minWidth: 0,
+                            p: { xs: 2.5, sm: 3 },
+                            display: "flex",
+                            flexDirection: "column",
+                            justifyContent: "space-between",
+                            gap: 2,
+                          }}
                         >
-                          {/* Item total price */}
-                          <Typography
-                            sx={{
-                              fontWeight: 800,
-                              fontSize: { xs: "1.1rem", sm: "1.2rem" },
-                              color: "#FFF",
-                              letterSpacing: "-0.02em",
-                            }}
-                          >
-                            {formatCurrency(itemTotal)}
-                          </Typography>
-
-                          {/* Stepper + Delete button */}
-                          <Stack direction="row" alignItems="center" spacing={1}>
-                            {/* Edgy Glass Stepper */}
-                            <Box
+                          {/* Top: brand + name + chips */}
+                          <Stack spacing={1}>
+                            <Typography
                               sx={{
-                                display: "inline-flex",
-                                alignItems: "center",
-                                bgcolor: "rgba(255, 255, 255, 0.04)",
-                                border: "1px solid rgba(255, 255, 255, 0.12)",
-                                borderRadius: "10px",
-                                p: 0.3,
+                                fontSize: "0.68rem",
+                                fontWeight: 800,
+                                color: "#00C896",
+                                letterSpacing: "0.12em",
+                                textTransform: "uppercase",
                               }}
                             >
-                              <IconButton
-                                size="small"
-                                onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
-                                disabled={item.quantity <= 1 || updateItem.isPending}
-                                sx={{
-                                  color: "#FFF",
-                                  p: 0.4,
-                                  "&:hover": { bgcolor: "rgba(255, 255, 255, 0.1)" },
-                                  "&.Mui-disabled": { color: "rgba(255, 255, 255, 0.2)" },
-                                }}
-                              >
-                                <RemoveRoundedIcon sx={{ fontSize: 15 }} />
-                              </IconButton>
+                              {item.product.vendor?.businessName || "DressMe"}
+                            </Typography>
 
+                            <Typography
+                              component={RouterLink}
+                              to={productUrl}
+                              sx={{
+                                color: "#FFF",
+                                textDecoration: "none",
+                                fontWeight: 700,
+                                fontSize: { xs: "1.05rem", sm: "1.15rem", md: "1.25rem" },
+                                lineHeight: 1.3,
+                                letterSpacing: "-0.01em",
+                                transition: "color 0.2s ease",
+                                "&:hover": { color: "#00C896" },
+                              }}
+                            >
+                              {item.product.name}
+                            </Typography>
+
+                            {/* Variant chips */}
+                            <Stack direction="row" spacing={0.8} flexWrap="wrap">
+                              {item.variant?.sizeValue && (
+                                <Chip
+                                  label={`Size: ${item.variant.sizeValue}`}
+                                  size="small"
+                                  sx={{
+                                    bgcolor: "rgba(255, 255, 255, 0.06)",
+                                    color: "rgba(255, 255, 255, 0.8)",
+                                    border: "1px solid rgba(255, 255, 255, 0.1)",
+                                    fontWeight: 600,
+                                    fontSize: "0.72rem",
+                                    height: 24,
+                                    borderRadius: "6px",
+                                  }}
+                                />
+                              )}
+                              {item.variant?.colorValue && (
+                                <Chip
+                                  label={`Color: ${item.variant.colorValue}`}
+                                  size="small"
+                                  sx={{
+                                    bgcolor: "rgba(255, 255, 255, 0.06)",
+                                    color: "rgba(255, 255, 255, 0.8)",
+                                    border: "1px solid rgba(255, 255, 255, 0.1)",
+                                    fontWeight: 600,
+                                    fontSize: "0.72rem",
+                                    height: 24,
+                                    borderRadius: "6px",
+                                  }}
+                                />
+                              )}
+                            </Stack>
+                          </Stack>
+
+                          {/* Bottom: price + stepper + delete */}
+                          <Box
+                            sx={{
+                              pt: 2,
+                              borderTop: "1px solid rgba(255, 255, 255, 0.07)",
+                              display: "flex",
+                              flexDirection: { xs: "column", sm: "row" },
+                              alignItems: { xs: "stretch", sm: "center" },
+                              justifyContent: "space-between",
+                              gap: 2,
+                            }}
+                          >
+                            {/* Prices */}
+                            <Stack spacing={0.3}>
                               <Typography
                                 sx={{
-                                  minWidth: 28,
-                                  textAlign: "center",
-                                  fontWeight: 800,
-                                  fontSize: "0.85rem",
+                                  fontWeight: 900,
+                                  fontSize: { xs: "1.3rem", sm: "1.45rem" },
                                   color: "#FFF",
+                                  letterSpacing: "-0.02em",
+                                  lineHeight: 1,
                                 }}
                               >
-                                {item.quantity}
+                                {formatCurrency(itemTotal)}
                               </Typography>
+                              <Typography sx={{ color: "rgba(255,255,255,0.38)", fontSize: "0.78rem" }}>
+                                {formatCurrency(price)} &times; {item.quantity}
+                              </Typography>
+                            </Stack>
 
+                            {/* Stepper + Delete */}
+                            <Stack direction="row" alignItems="center" spacing={1}>
+                              {/* Glass quantity stepper */}
+                              <Box
+                                sx={{
+                                  display: "inline-flex",
+                                  alignItems: "center",
+                                  bgcolor: "rgba(255, 255, 255, 0.04)",
+                                  border: "1px solid rgba(255, 255, 255, 0.12)",
+                                  borderRadius: "12px",
+                                  p: 0.4,
+                                  gap: 0.5,
+                                }}
+                              >
+                                <IconButton
+                                  size="small"
+                                  onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
+                                  disabled={item.quantity <= 1 || updateItem.isPending}
+                                  sx={{
+                                    color: "#FFF",
+                                    p: 0.6,
+                                    borderRadius: "8px",
+                                    "&:hover": { bgcolor: "rgba(255,255,255,0.12)" },
+                                    "&.Mui-disabled": { color: "rgba(255,255,255,0.2)" },
+                                  }}
+                                >
+                                  <RemoveRoundedIcon sx={{ fontSize: 16 }} />
+                                </IconButton>
+
+                                <Typography
+                                  sx={{
+                                    minWidth: 32,
+                                    textAlign: "center",
+                                    fontWeight: 800,
+                                    fontSize: "0.92rem",
+                                    color: "#FFF",
+                                  }}
+                                >
+                                  {item.quantity}
+                                </Typography>
+
+                                <IconButton
+                                  size="small"
+                                  onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
+                                  disabled={updateItem.isPending}
+                                  sx={{
+                                    color: "#FFF",
+                                    p: 0.6,
+                                    borderRadius: "8px",
+                                    "&:hover": { bgcolor: "rgba(255,255,255,0.12)" },
+                                    "&.Mui-disabled": { color: "rgba(255,255,255,0.2)" },
+                                  }}
+                                >
+                                  <AddRoundedIcon sx={{ fontSize: 16 }} />
+                                </IconButton>
+                              </Box>
+
+                              {/* Delete */}
                               <IconButton
                                 size="small"
-                                onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
-                                disabled={updateItem.isPending}
+                                onClick={() => handleRemove(item.id)}
+                                disabled={removeItem.isPending}
+                                aria-label="Remove item"
                                 sx={{
-                                  color: "#FFF",
-                                  p: 0.4,
-                                  "&:hover": { bgcolor: "rgba(255, 255, 255, 0.1)" },
-                                  "&.Mui-disabled": { color: "rgba(255, 255, 255, 0.2)" },
+                                  color: "rgba(255,255,255,0.35)",
+                                  bgcolor: "rgba(255,255,255,0.03)",
+                                  border: "1px solid rgba(255,255,255,0.08)",
+                                  borderRadius: "12px",
+                                  p: 0.9,
+                                  transition: "all 0.2s ease",
+                                  "&:hover": {
+                                    color: "#EF4444",
+                                    bgcolor: "rgba(239,68,68,0.12)",
+                                    borderColor: "rgba(239,68,68,0.3)",
+                                    transform: "scale(1.08)",
+                                  },
                                 }}
                               >
-                                <AddRoundedIcon sx={{ fontSize: 15 }} />
+                                <DeleteOutlineRoundedIcon sx={{ fontSize: 18 }} />
                               </IconButton>
-                            </Box>
-
-                            {/* Delete button */}
-                            <IconButton
-                              size="small"
-                              onClick={() => handleRemove(item.id)}
-                              disabled={removeItem.isPending}
-                              aria-label="Remove item"
-                              sx={{
-                                color: "rgba(255, 255, 255, 0.35)",
-                                bgcolor: "rgba(255, 255, 255, 0.03)",
-                                border: "1px solid rgba(255, 255, 255, 0.08)",
-                                borderRadius: "10px",
-                                p: 0.7,
-                                transition: "all 0.2s ease",
-                                "&:hover": {
-                                  color: "#EF4444",
-                                  bgcolor: "rgba(239, 68, 68, 0.12)",
-                                  borderColor: "rgba(239, 68, 68, 0.3)",
-                                  transform: "scale(1.06)",
-                                },
-                              }}
-                            >
-                              <DeleteOutlineRoundedIcon sx={{ fontSize: 17 }} />
-                            </IconButton>
-                          </Stack>
-                        </Stack>
+                            </Stack>
+                          </Box>
+                        </Box>
                       </Box>
                     );
                   })}
