@@ -2,6 +2,7 @@ import { Box } from "@mui/material";
 import { Outlet } from "react-router-dom";
 import { WebHeader } from "./WebHeader";
 import { WebFooter } from "./WebFooter";
+import { ScrollToTop } from "../shared/ScrollToTop";
 
 export function WebLayout() {
   return (
@@ -13,6 +14,7 @@ export function WebLayout() {
         bgcolor: "#FFFFFF",
       }}
     >
+      <ScrollToTop />
       <WebHeader />
       <Box component="main" sx={{ flexGrow: 1 }}>
         <Outlet />

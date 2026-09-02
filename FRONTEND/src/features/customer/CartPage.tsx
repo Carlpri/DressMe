@@ -49,6 +49,9 @@ export function CartPage() {
   const shipping = isFreeShipping ? 0 : defaultShippingFee;
   const total = subtotal + shipping;
 
+  const { user } = useAuth();
+  const adminWhatsApp = settings?.whatsappNumber || settings?.supportPhone || "254700000000";
+
   const handleQuantityChange = (itemId: string, newQuantity: number) => {
     if (newQuantity > 0) {
       updateItem.mutate({ itemId, quantity: newQuantity });
@@ -65,62 +68,6 @@ export function CartPage() {
       setPromoApplied(true);
     }
   };
-
-  if (isLoading) {
-    return (
-      <Box sx={{ minHeight: "100vh", bgcolor: "#07090E", py: { xs: 4, sm: 6, md: 8 } }}>
-        <Container maxWidth="xl">
-          <Stack spacing={4}>
-            <Skeleton variant="text" width={240} height={48} sx={{ bgcolor: "rgba(255, 255, 255, 0.05)" }} />
-            <Grid container spacing={4}>
-              <Grid size={{ xs: 12, md: 8 }}>
-                <Stack spacing={2.5}>
-                  {[...Array(3)].map((_, i) => (
-                    <Skeleton
-                      key={i}
-                      variant="rounded"
-                      height={300}
-                      sx={{ borderRadius: "22px", bgcolor: "rgba(255, 255, 255, 0.05)" }}
-                    />
-                  ))}
-                </Stack>
-              </Grid>
-              <Grid size={{ xs: 12, md: 4 }}>
-                <Skeleton
-                  variant="rounded"
-                  height={380}
-                  sx={{ borderRadius: "24px", bgcolor: "rgba(255, 255, 255, 0.05)" }}
-                />
-              </Grid>
-            </Grid>
-          </Stack>
-        </Container>
-      </Box>
-    );
-  }
-
-  if (error) {
-    return (
-      <Box sx={{ minHeight: "100vh", bgcolor: "#07090E", py: 8 }}>
-        <Container maxWidth="xl">
-          <Alert
-            severity="error"
-            action={
-              <Button color="inherit" size="small" onClick={() => refetch()}>
-                Retry
-              </Button>
-            }
-            sx={{ borderRadius: "14px", bgcolor: "rgba(239, 68, 68, 0.15)", color: "#FFF" }}
-          >
-            Failed to load your cart. Please try again.
-          </Alert>
-        </Container>
-      </Box>
-    );
-  }
-
-  const { user } = useAuth();
-  const adminWhatsApp = settings?.whatsappNumber || settings?.supportPhone || "254700000000";
 
   const handleWhatsAppAdminCheckout = () => {
     const message = buildAdminCheckoutNotificationMessage({
@@ -139,8 +86,61 @@ export function CartPage() {
     }
   };
 
+  if (isLoading) {
+    return (
+      <Box sx={{ minHeight: "100vh", bgcolor: "#F8FAFC", py: { xs: 4, sm: 6, md: 8 } }}>
+        <Container maxWidth="xl">
+          <Stack spacing={4}>
+            <Skeleton variant="text" width={240} height={48} />
+            <Grid container spacing={4}>
+              <Grid size={{ xs: 12, md: 8 }}>
+                <Stack spacing={2.5}>
+                  {[...Array(3)].map((_, i) => (
+                    <Skeleton
+                      key={i}
+                      variant="rounded"
+                      height={300}
+                      sx={{ borderRadius: "22px" }}
+                    />
+                  ))}
+                </Stack>
+              </Grid>
+              <Grid size={{ xs: 12, md: 4 }}>
+                <Skeleton
+                  variant="rounded"
+                  height={380}
+                  sx={{ borderRadius: "24px" }}
+                />
+              </Grid>
+            </Grid>
+          </Stack>
+        </Container>
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box sx={{ minHeight: "100vh", bgcolor: "#F8FAFC", py: 8 }}>
+        <Container maxWidth="xl">
+          <Alert
+            severity="error"
+            action={
+              <Button color="inherit" size="small" onClick={() => refetch()}>
+                Retry
+              </Button>
+            }
+            sx={{ borderRadius: "14px" }}
+          >
+            Failed to load your cart. Please try again.
+          </Alert>
+        </Container>
+      </Box>
+    );
+  }
+
   return (
-    <Box sx={{ minHeight: "100vh", bgcolor: "#07090E", py: { xs: 4, sm: 6, md: 8 } }}>
+    <Box sx={{ minHeight: "100vh", bgcolor: "#F8FAFC", py: { xs: 4, sm: 6, md: 8 } }}>
       <Container maxWidth="xl">
         <Stack spacing={4}>
           {/* Header */}
@@ -157,11 +157,11 @@ export function CartPage() {
             >
               Review & Checkout
             </Typography>
-            <Typography variant="h3" sx={{ fontWeight: 800, color: "#FFF", letterSpacing: "-0.02em" }}>
+            <Typography variant="h3" sx={{ fontWeight: 800, color: "#0F172A", letterSpacing: "-0.02em" }}>
               Shopping Bag
             </Typography>
             {items.length > 0 && (
-              <Typography sx={{ color: "rgba(255, 255, 255, 0.5)", mt: 0.5 }}>
+              <Typography sx={{ color: "#64748B", mt: 0.5, fontSize: "0.95rem" }}>
                 {items.length} {items.length === 1 ? "item" : "items"} ready for order
               </Typography>
             )}
@@ -176,8 +176,9 @@ export function CartPage() {
                 py: { xs: 8, md: 12 },
                 px: 3,
                 borderRadius: "24px",
-                bgcolor: "#0B0E14",
-                border: "1px dashed rgba(255, 255, 255, 0.12)",
+                bgcolor: "#FFFFFF",
+                border: "1px dashed #CBD5E1",
+                boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
@@ -195,16 +196,16 @@ export function CartPage() {
                   borderRadius: "20px",
                   bgcolor: "rgba(0, 200, 150, 0.1)",
                   color: "#00C896",
-                  border: "1px solid rgba(0, 200, 150, 0.2)",
+                  border: "1px solid rgba(0, 200, 150, 0.25)",
                   mb: 2.5,
                 }}
               >
                 <ShoppingBagOutlinedIcon sx={{ fontSize: 38 }} />
               </Box>
-              <Typography variant="h5" sx={{ fontWeight: 800, color: "#FFF", mb: 1 }}>
+              <Typography variant="h5" sx={{ fontWeight: 800, color: "#0F172A", mb: 1 }}>
                 Your shopping bag is empty
               </Typography>
-              <Typography sx={{ color: "rgba(255, 255, 255, 0.5)", maxWidth: 380, mb: 4, fontSize: "0.95rem" }}>
+              <Typography sx={{ color: "#64748B", maxWidth: 380, mb: 4, fontSize: "0.95rem" }}>
                 Looks like you haven't added any items to your bag yet. Explore our curated catalog.
               </Typography>
               <Button
@@ -221,10 +222,10 @@ export function CartPage() {
                   py: 1.2,
                   fontSize: "0.88rem",
                   textTransform: "none",
-                  boxShadow: "0 4px 16px rgba(0, 200, 150, 0.35)",
+                  boxShadow: "0 4px 16px rgba(0, 200, 150, 0.3)",
                   "&:hover": {
                     bgcolor: "#00E0A7",
-                    boxShadow: "0 6px 22px rgba(0, 200, 150, 0.5)",
+                    boxShadow: "0 6px 22px rgba(0, 200, 150, 0.45)",
                     transform: "translateY(-1px)",
                   },
                 }}
@@ -234,7 +235,7 @@ export function CartPage() {
             </Box>
           ) : (
             <Grid container spacing={{ xs: 3, md: 4 }}>
-              {/* Left Column: Cart Items */}
+              {/* Left Column: Cart Items (Light Mode) */}
               <Grid size={{ xs: 12, md: 8 }}>
                 <Stack spacing={2.5}>
                   {items.map((item) => {
@@ -249,17 +250,18 @@ export function CartPage() {
                       <Box
                         key={item.id}
                         sx={{
-                          bgcolor: "#0B0E14",
+                          bgcolor: "#FFFFFF",
                           borderRadius: { xs: "18px", sm: "22px" },
-                          border: "1px solid rgba(255, 255, 255, 0.08)",
+                          border: "1px solid #E2E8F0",
+                          boxShadow: "0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0,0,0,0.02)",
                           display: "flex",
                           flexDirection: { xs: "column", sm: "row" },
                           alignItems: "stretch",
                           overflow: "hidden",
                           transition: "all 0.3s cubic-bezier(0.16, 1, 0.3, 1)",
                           "&:hover": {
-                            borderColor: "rgba(0, 200, 150, 0.35)",
-                            boxShadow: "0 16px 40px -10px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(0, 200, 150, 0.15)",
+                            borderColor: "#00C896",
+                            boxShadow: "0 12px 32px -8px rgba(0, 0, 0, 0.08)",
                             transform: "translateY(-2px)",
                           },
                         }}
@@ -273,17 +275,9 @@ export function CartPage() {
                             width: { xs: "100%", sm: 200, md: 220 },
                             minHeight: { xs: 260, sm: 300, md: 320 },
                             flexShrink: 0,
-                            bgcolor: "#0E131C",
+                            bgcolor: "#F1F5F9",
                             display: "block",
                             overflow: "hidden",
-                            // subtle gradient over image for luxury feel
-                            "&::after": {
-                              content: '""',
-                              position: "absolute",
-                              inset: 0,
-                              background: "linear-gradient(135deg, transparent 60%, rgba(0,200,150,0.06) 100%)",
-                              pointerEvents: "none",
-                            },
                           }}
                         >
                           {primaryImage ? (
@@ -310,8 +304,8 @@ export function CartPage() {
                                 display: "flex",
                                 alignItems: "center",
                                 justifyContent: "center",
-                                background: "radial-gradient(circle at 50% 40%, #1A212D 0%, #0B0E14 100%)",
-                                color: "rgba(255, 255, 255, 0.1)",
+                                bgcolor: "#E2E8F0",
+                                color: "#94A3B8",
                               }}
                             >
                               <Typography sx={{ fontWeight: 900, fontSize: "2.5rem" }}>DM</Typography>
@@ -349,7 +343,7 @@ export function CartPage() {
                               component={RouterLink}
                               to={productUrl}
                               sx={{
-                                color: "#FFF",
+                                color: "#0F172A",
                                 textDecoration: "none",
                                 fontWeight: 700,
                                 fontSize: { xs: "1.05rem", sm: "1.15rem", md: "1.25rem" },
@@ -369,9 +363,9 @@ export function CartPage() {
                                   label={`Size: ${item.variant.sizeValue}`}
                                   size="small"
                                   sx={{
-                                    bgcolor: "rgba(255, 255, 255, 0.06)",
-                                    color: "rgba(255, 255, 255, 0.8)",
-                                    border: "1px solid rgba(255, 255, 255, 0.1)",
+                                    bgcolor: "#F1F5F9",
+                                    color: "#334155",
+                                    border: "1px solid #E2E8F0",
                                     fontWeight: 600,
                                     fontSize: "0.72rem",
                                     height: 24,
@@ -384,9 +378,9 @@ export function CartPage() {
                                   label={`Color: ${item.variant.colorValue}`}
                                   size="small"
                                   sx={{
-                                    bgcolor: "rgba(255, 255, 255, 0.06)",
-                                    color: "rgba(255, 255, 255, 0.8)",
-                                    border: "1px solid rgba(255, 255, 255, 0.1)",
+                                    bgcolor: "#F1F5F9",
+                                    color: "#334155",
+                                    border: "1px solid #E2E8F0",
                                     fontWeight: 600,
                                     fontSize: "0.72rem",
                                     height: 24,
@@ -401,7 +395,7 @@ export function CartPage() {
                           <Box
                             sx={{
                               pt: 2,
-                              borderTop: "1px solid rgba(255, 255, 255, 0.07)",
+                              borderTop: "1px solid #F1F5F9",
                               display: "flex",
                               flexDirection: { xs: "column", sm: "row" },
                               alignItems: { xs: "stretch", sm: "center" },
@@ -415,27 +409,27 @@ export function CartPage() {
                                 sx={{
                                   fontWeight: 900,
                                   fontSize: { xs: "1.3rem", sm: "1.45rem" },
-                                  color: "#FFF",
+                                  color: "#0F172A",
                                   letterSpacing: "-0.02em",
                                   lineHeight: 1,
                                 }}
                               >
                                 {formatCurrency(itemTotal)}
                               </Typography>
-                              <Typography sx={{ color: "rgba(255,255,255,0.38)", fontSize: "0.78rem" }}>
+                              <Typography sx={{ color: "#64748B", fontSize: "0.78rem" }}>
                                 {formatCurrency(price)} &times; {item.quantity}
                               </Typography>
                             </Stack>
 
                             {/* Stepper + Delete */}
                             <Stack direction="row" alignItems="center" spacing={1}>
-                              {/* Glass quantity stepper */}
+                              {/* Quantity Stepper */}
                               <Box
                                 sx={{
                                   display: "inline-flex",
                                   alignItems: "center",
-                                  bgcolor: "rgba(255, 255, 255, 0.04)",
-                                  border: "1px solid rgba(255, 255, 255, 0.12)",
+                                  bgcolor: "#F8FAFC",
+                                  border: "1px solid #CBD5E1",
                                   borderRadius: "12px",
                                   p: 0.4,
                                   gap: 0.5,
@@ -446,11 +440,11 @@ export function CartPage() {
                                   onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
                                   disabled={item.quantity <= 1 || updateItem.isPending}
                                   sx={{
-                                    color: "#FFF",
+                                    color: "#0F172A",
                                     p: 0.6,
                                     borderRadius: "8px",
-                                    "&:hover": { bgcolor: "rgba(255,255,255,0.12)" },
-                                    "&.Mui-disabled": { color: "rgba(255,255,255,0.2)" },
+                                    "&:hover": { bgcolor: "#E2E8F0" },
+                                    "&.Mui-disabled": { color: "#CBD5E1" },
                                   }}
                                 >
                                   <RemoveRoundedIcon sx={{ fontSize: 16 }} />
@@ -462,7 +456,7 @@ export function CartPage() {
                                     textAlign: "center",
                                     fontWeight: 800,
                                     fontSize: "0.92rem",
-                                    color: "#FFF",
+                                    color: "#0F172A",
                                   }}
                                 >
                                   {item.quantity}
@@ -473,11 +467,11 @@ export function CartPage() {
                                   onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
                                   disabled={updateItem.isPending}
                                   sx={{
-                                    color: "#FFF",
+                                    color: "#0F172A",
                                     p: 0.6,
                                     borderRadius: "8px",
-                                    "&:hover": { bgcolor: "rgba(255,255,255,0.12)" },
-                                    "&.Mui-disabled": { color: "rgba(255,255,255,0.2)" },
+                                    "&:hover": { bgcolor: "#E2E8F0" },
+                                    "&.Mui-disabled": { color: "#CBD5E1" },
                                   }}
                                 >
                                   <AddRoundedIcon sx={{ fontSize: 16 }} />
@@ -491,16 +485,16 @@ export function CartPage() {
                                 disabled={removeItem.isPending}
                                 aria-label="Remove item"
                                 sx={{
-                                  color: "rgba(255,255,255,0.35)",
-                                  bgcolor: "rgba(255,255,255,0.03)",
-                                  border: "1px solid rgba(255,255,255,0.08)",
+                                  color: "#94A3B8",
+                                  bgcolor: "#F8FAFC",
+                                  border: "1px solid #E2E8F0",
                                   borderRadius: "12px",
                                   p: 0.9,
                                   transition: "all 0.2s ease",
                                   "&:hover": {
                                     color: "#EF4444",
-                                    bgcolor: "rgba(239,68,68,0.12)",
-                                    borderColor: "rgba(239,68,68,0.3)",
+                                    bgcolor: "#FEE2E2",
+                                    borderColor: "#FCA5A5",
                                     transform: "scale(1.08)",
                                   },
                                 }}
@@ -516,42 +510,42 @@ export function CartPage() {
                 </Stack>
               </Grid>
 
-              {/* Right Column: Order Summary (Edgy Glass Deck) */}
+              {/* Right Column: Order Summary (Light Mode Deck) */}
               <Grid size={{ xs: 12, md: 4 }}>
                 <Box
                   sx={{
                     p: { xs: 2.5, sm: 3.5 },
-                    bgcolor: "#0B0E14",
+                    bgcolor: "#FFFFFF",
                     borderRadius: "24px",
-                    border: "1px solid rgba(255, 255, 255, 0.1)",
-                    boxShadow: "0 16px 40px -10px rgba(0, 0, 0, 0.7)",
+                    border: "1px solid #E2E8F0",
+                    boxShadow: "0 4px 20px -4px rgba(0, 0, 0, 0.08)",
                     position: { md: "sticky" },
                     top: { md: 100 },
                   }}
                 >
                   <Stack spacing={3}>
-                    <Typography variant="h5" sx={{ fontWeight: 800, color: "#FFF", letterSpacing: "-0.01em" }}>
+                    <Typography variant="h5" sx={{ fontWeight: 800, color: "#0F172A", letterSpacing: "-0.01em" }}>
                       Order Summary
                     </Typography>
 
                     {/* Cost Breakdown */}
                     <Stack spacing={1.5}>
                       <Stack direction="row" justifyContent="space-between">
-                        <Typography sx={{ color: "rgba(255, 255, 255, 0.6)", fontSize: "0.92rem" }}>
+                        <Typography sx={{ color: "#64748B", fontSize: "0.92rem" }}>
                           Subtotal
                         </Typography>
-                        <Typography sx={{ color: "#FFF", fontWeight: 700, fontSize: "0.95rem" }}>
+                        <Typography sx={{ color: "#0F172A", fontWeight: 700, fontSize: "0.95rem" }}>
                           {formatCurrency(subtotal)}
                         </Typography>
                       </Stack>
 
                       <Stack direction="row" justifyContent="space-between" alignItems="center">
-                        <Typography sx={{ color: "rgba(255, 255, 255, 0.6)", fontSize: "0.92rem" }}>
+                        <Typography sx={{ color: "#64748B", fontSize: "0.92rem" }}>
                           Estimated Shipping
                         </Typography>
                         <Typography
                           sx={{
-                            color: isFreeShipping ? "#00C896" : "#FFF",
+                            color: isFreeShipping ? "#00C896" : "#0F172A",
                             fontWeight: 700,
                             fontSize: "0.95rem",
                           }}
@@ -571,10 +565,10 @@ export function CartPage() {
                         </Stack>
                       )}
 
-                      <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.08)", my: 1 }} />
+                      <Divider sx={{ borderColor: "#E2E8F0", my: 1 }} />
 
                       <Stack direction="row" justifyContent="space-between" alignItems="baseline">
-                        <Typography sx={{ color: "#FFF", fontWeight: 800, fontSize: "1.1rem" }}>
+                        <Typography sx={{ color: "#0F172A", fontWeight: 800, fontSize: "1.1rem" }}>
                           Total
                         </Typography>
                         <Typography
@@ -601,11 +595,10 @@ export function CartPage() {
                           size="small"
                           sx={{
                             "& .MuiOutlinedInput-root": {
-                              bgcolor: "rgba(255, 255, 255, 0.04)",
+                              bgcolor: "#F8FAFC",
                               borderRadius: "12px",
-                              color: "#FFF",
-                              "& fieldset": { borderColor: "rgba(255, 255, 255, 0.12)" },
-                              "&:hover fieldset": { borderColor: "rgba(255, 255, 255, 0.25)" },
+                              "& fieldset": { borderColor: "#CBD5E1" },
+                              "&:hover fieldset": { borderColor: "#94A3B8" },
                               "&.Mui-focused fieldset": { borderColor: "#00C896" },
                             },
                             "& .MuiInputBase-input": { fontSize: "0.85rem", py: 1.1 },
@@ -621,12 +614,12 @@ export function CartPage() {
                             fontWeight: 700,
                             fontSize: "0.78rem",
                             textTransform: "none",
-                            color: "#FFF",
-                            borderColor: "rgba(255, 255, 255, 0.18)",
-                            bgcolor: "rgba(255, 255, 255, 0.04)",
+                            color: "#0F172A",
+                            borderColor: "#CBD5E1",
+                            bgcolor: "#FFFFFF",
                             "&:hover": {
-                              bgcolor: "rgba(255, 255, 255, 0.1)",
-                              borderColor: "rgba(255, 255, 255, 0.35)",
+                              bgcolor: "#F1F5F9",
+                              borderColor: "#94A3B8",
                             },
                           }}
                         >
@@ -652,11 +645,11 @@ export function CartPage() {
                           textTransform: "none",
                           bgcolor: "#00C896",
                           color: "#07130F",
-                          boxShadow: "0 6px 24px rgba(0, 200, 150, 0.4)",
+                          boxShadow: "0 6px 24px rgba(0, 200, 150, 0.35)",
                           transition: "all 0.25s ease",
                           "&:hover": {
                             bgcolor: "#00E0A7",
-                            boxShadow: "0 8px 30px rgba(0, 200, 150, 0.6)",
+                            boxShadow: "0 8px 30px rgba(0, 200, 150, 0.5)",
                             transform: "translateY(-2px)",
                           },
                         }}
@@ -675,13 +668,13 @@ export function CartPage() {
                           fontWeight: 800,
                           fontSize: "0.85rem",
                           textTransform: "none",
-                          color: "#FFF",
-                          borderColor: "rgba(37, 211, 102, 0.4)",
+                          color: "#07130F",
+                          borderColor: "#25D366",
                           bgcolor: "rgba(37, 211, 102, 0.08)",
                           transition: "all 0.25s ease",
                           "&:hover": {
-                            bgcolor: "rgba(37, 211, 102, 0.18)",
-                            borderColor: "#25D366",
+                            bgcolor: "rgba(37, 211, 102, 0.16)",
+                            borderColor: "#1DA851",
                             transform: "translateY(-1px)",
                           },
                         }}
@@ -695,15 +688,15 @@ export function CartPage() {
                         variant="text"
                         fullWidth
                         sx={{
-                          color: "rgba(255, 255, 255, 0.6)",
+                          color: "#64748B",
                           fontWeight: 700,
                           fontSize: "0.85rem",
                           textTransform: "none",
                           borderRadius: "12px",
                           py: 1,
                           "&:hover": {
-                            color: "#FFF",
-                            bgcolor: "rgba(255, 255, 255, 0.05)",
+                            color: "#0F172A",
+                            bgcolor: "#F1F5F9",
                           },
                         }}
                       >
@@ -712,22 +705,22 @@ export function CartPage() {
                     </Stack>
 
                     {/* Trust / Security Highlights */}
-                    <Stack spacing={1.2} sx={{ pt: 1, borderTop: "1px solid rgba(255, 255, 255, 0.06)" }}>
+                    <Stack spacing={1.2} sx={{ pt: 1, borderTop: "1px solid #E2E8F0" }}>
                       <Stack direction="row" alignItems="center" spacing={1.2}>
                         <ShieldOutlinedIcon sx={{ color: "#00C896", fontSize: 18 }} />
-                        <Typography sx={{ color: "rgba(255, 255, 255, 0.6)", fontSize: "0.78rem" }}>
+                        <Typography sx={{ color: "#64748B", fontSize: "0.78rem" }}>
                           Encrypted 256-bit secure checkout
                         </Typography>
                       </Stack>
                       <Stack direction="row" alignItems="center" spacing={1.2}>
                         <VerifiedOutlinedIcon sx={{ color: "#00C896", fontSize: 18 }} />
-                        <Typography sx={{ color: "rgba(255, 255, 255, 0.6)", fontSize: "0.78rem" }}>
+                        <Typography sx={{ color: "#64748B", fontSize: "0.78rem" }}>
                           100% authentic curated designs
                         </Typography>
                       </Stack>
                       <Stack direction="row" alignItems="center" spacing={1.2}>
                         <LocalShippingOutlinedIcon sx={{ color: "#00C896", fontSize: 18 }} />
-                        <Typography sx={{ color: "rgba(255, 255, 255, 0.6)", fontSize: "0.78rem" }}>
+                        <Typography sx={{ color: "#64748B", fontSize: "0.78rem" }}>
                           Fast delivery across Kenya & East Africa
                         </Typography>
                       </Stack>

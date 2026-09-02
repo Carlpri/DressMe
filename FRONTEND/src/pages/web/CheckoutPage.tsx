@@ -7,11 +7,9 @@ import {
   Stack,
   Typography,
   Card,
-  CardContent,
   Button,
   Radio,
   RadioGroup,
-  FormControlLabel,
   Alert,
   Divider,
   Chip,
@@ -22,7 +20,6 @@ import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import StorefrontIcon from "@mui/icons-material/Storefront";
 import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
 import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
-import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 import NotificationsActiveOutlinedIcon from "@mui/icons-material/NotificationsActiveOutlined";
 import ShieldOutlinedIcon from "@mui/icons-material/ShieldOutlined";
@@ -176,7 +173,7 @@ export function CheckoutPage() {
 
   if (cartLoading || addressesLoading) {
     return (
-      <Box sx={{ minHeight: "100vh", bgcolor: "#07090E", py: { xs: 4, sm: 6, md: 8 } }}>
+      <Box sx={{ minHeight: "100vh", bgcolor: "#F8FAFC", py: { xs: 4, sm: 6, md: 8 } }}>
         <Container maxWidth="xl">
           <Stack spacing={4}>
             <LoadingSkeleton height={60} />
@@ -196,21 +193,22 @@ export function CheckoutPage() {
 
   if (items.length === 0) {
     return (
-      <Box sx={{ minHeight: "100vh", bgcolor: "#07090E", py: { xs: 6, md: 10 } }}>
+      <Box sx={{ minHeight: "100vh", bgcolor: "#F8FAFC", py: { xs: 6, md: 10 } }}>
         <Container maxWidth="md">
           <Card
             sx={{
               p: 5,
               textAlign: "center",
-              bgcolor: "#0B0E14",
-              border: "1px solid rgba(255, 255, 255, 0.1)",
+              bgcolor: "#FFFFFF",
+              border: "1px solid #E2E8F0",
               borderRadius: "24px",
+              boxShadow: "0 2px 10px rgba(0,0,0,0.05)",
             }}
           >
-            <Typography variant="h4" sx={{ color: "#FFF", fontWeight: 800, mb: 2 }}>
+            <Typography variant="h4" sx={{ color: "#0F172A", fontWeight: 800, mb: 2 }}>
               Your shopping bag is empty
             </Typography>
-            <Typography sx={{ color: "rgba(255, 255, 255, 0.6)", mb: 4 }}>
+            <Typography sx={{ color: "#64748B", mb: 4 }}>
               Add some items to your bag before proceeding to checkout.
             </Typography>
             <Button
@@ -235,7 +233,7 @@ export function CheckoutPage() {
   }
 
   return (
-    <Box sx={{ minHeight: "100vh", bgcolor: "#07090E", py: { xs: 4, sm: 6, md: 8 } }}>
+    <Box sx={{ minHeight: "100vh", bgcolor: "#F8FAFC", py: { xs: 4, sm: 6, md: 8 } }}>
       <Container maxWidth="xl">
         <Stack spacing={4}>
           {/* Header */}
@@ -252,10 +250,10 @@ export function CheckoutPage() {
             >
               Instant WhatsApp Checkout
             </Typography>
-            <Typography variant="h3" sx={{ fontWeight: 800, color: "#FFF", letterSpacing: "-0.02em" }}>
+            <Typography variant="h3" sx={{ fontWeight: 800, color: "#0F172A", letterSpacing: "-0.02em" }}>
               Checkout & Order Confirmation
             </Typography>
-            <Typography sx={{ color: "rgba(255, 255, 255, 0.55)", mt: 0.5 }}>
+            <Typography sx={{ color: "#64748B", mt: 0.5, fontSize: "0.95rem" }}>
               Confirm your delivery address and send your order directly on WhatsApp. Admin is notified automatically.
             </Typography>
           </Box>
@@ -265,7 +263,7 @@ export function CheckoutPage() {
             <Alert
               severity="error"
               onClose={() => setError(null)}
-              sx={{ borderRadius: "14px", bgcolor: "rgba(239, 68, 68, 0.15)", color: "#FFF" }}
+              sx={{ borderRadius: "14px" }}
             >
               {error}
             </Alert>
@@ -277,7 +275,7 @@ export function CheckoutPage() {
               p: 2.5,
               borderRadius: "16px",
               bgcolor: "rgba(0, 200, 150, 0.08)",
-              border: "1px solid rgba(0, 200, 150, 0.25)",
+              border: "1px solid rgba(0, 200, 150, 0.3)",
               display: "flex",
               flexDirection: { xs: "column", sm: "row" },
               alignItems: { xs: "flex-start", sm: "center" },
@@ -301,10 +299,10 @@ export function CheckoutPage() {
                 <NotificationsActiveOutlinedIcon sx={{ fontSize: 22 }} />
               </Box>
               <Box>
-                <Typography sx={{ color: "#FFF", fontWeight: 700, fontSize: "0.92rem" }}>
+                <Typography sx={{ color: "#0F172A", fontWeight: 700, fontSize: "0.92rem" }}>
                   Real-Time Admin WhatsApp Notification
                 </Typography>
-                <Typography sx={{ color: "rgba(255, 255, 255, 0.6)", fontSize: "0.8rem" }}>
+                <Typography sx={{ color: "#64748B", fontSize: "0.8rem" }}>
                   The central DressMe Admin ({adminWhatsApp}) receives instant WhatsApp alerts when you proceed with this order.
                 </Typography>
               </Box>
@@ -316,8 +314,8 @@ export function CheckoutPage() {
               startIcon={<WhatsAppIcon sx={{ color: "#25D366 !important" }} />}
               onClick={handleNotifyAdmin}
               sx={{
-                color: "#FFF",
-                borderColor: "rgba(37, 211, 102, 0.4)",
+                color: "#0F172A",
+                borderColor: "#25D366",
                 bgcolor: "rgba(37, 211, 102, 0.08)",
                 borderRadius: "10px",
                 fontWeight: 700,
@@ -328,7 +326,7 @@ export function CheckoutPage() {
                 textTransform: "none",
                 "&:hover": {
                   bgcolor: "rgba(37, 211, 102, 0.18)",
-                  borderColor: "#25D366",
+                  borderColor: "#1DA851",
                 },
               }}
             >
@@ -338,22 +336,23 @@ export function CheckoutPage() {
 
           {/* Main Grid */}
           <Grid container spacing={{ xs: 3, md: 4 }}>
-            {/* Left Column: Address & Vendor Order Cards */}
+            {/* Left Column: Address & Vendor Order Cards (Light Mode) */}
             <Grid size={{ xs: 12, md: 8 }}>
               <Stack spacing={3}>
                 {/* ── 1. Delivery Address Card ──────────────────────────────── */}
                 <Card
                   sx={{
-                    bgcolor: "#0B0E14",
+                    bgcolor: "#FFFFFF",
                     borderRadius: "20px",
-                    border: "1px solid rgba(255, 255, 255, 0.08)",
+                    border: "1px solid #E2E8F0",
+                    boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
                     p: { xs: 2.5, sm: 3 },
                   }}
                 >
                   <Stack spacing={2.5}>
                     <Stack direction="row" spacing={1.5} alignItems="center">
                       <LocationOnOutlinedIcon sx={{ color: "#00C896" }} />
-                      <Typography variant="h6" sx={{ color: "#FFF", fontWeight: 800 }}>
+                      <Typography variant="h6" sx={{ color: "#0F172A", fontWeight: 800 }}>
                         1. Select Delivery Address
                       </Typography>
                     </Stack>
@@ -371,7 +370,7 @@ export function CheckoutPage() {
                             Add Address
                           </Button>
                         }
-                        sx={{ bgcolor: "rgba(0, 200, 150, 0.1)", color: "#FFF", borderRadius: "12px" }}
+                        sx={{ borderRadius: "12px" }}
                       >
                         You haven't saved any delivery address yet. Please add one to continue.
                       </Alert>
@@ -391,19 +390,19 @@ export function CheckoutPage() {
                                   p: 2,
                                   borderRadius: "14px",
                                   bgcolor: isSelected
-                                    ? "rgba(0, 200, 150, 0.08)"
-                                    : "rgba(255, 255, 255, 0.02)",
+                                    ? "rgba(0, 200, 150, 0.06)"
+                                    : "#F8FAFC",
                                   border: "1px solid",
                                   borderColor: isSelected
                                     ? "#00C896"
-                                    : "rgba(255, 255, 255, 0.08)",
+                                    : "#E2E8F0",
                                   cursor: "pointer",
                                   transition: "all 0.2s ease",
                                   display: "flex",
                                   alignItems: "flex-start",
                                   gap: 1.5,
                                   "&:hover": {
-                                    borderColor: "rgba(0, 200, 150, 0.4)",
+                                    borderColor: "#00C896",
                                   },
                                 }}
                               >
@@ -413,13 +412,12 @@ export function CheckoutPage() {
                                   sx={{
                                     p: 0,
                                     mt: 0.3,
-                                    color: "rgba(255,255,255,0.3)",
                                     "&.Mui-checked": { color: "#00C896" },
                                   }}
                                 />
                                 <Box sx={{ flex: 1 }}>
                                   <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
-                                    <Typography sx={{ color: "#FFF", fontWeight: 700, fontSize: "0.95rem" }}>
+                                    <Typography sx={{ color: "#0F172A", fontWeight: 700, fontSize: "0.95rem" }}>
                                       {address.label || "Home / Office"}
                                     </Typography>
                                     {address.isDefault && (
@@ -436,10 +434,10 @@ export function CheckoutPage() {
                                       />
                                     )}
                                   </Stack>
-                                  <Typography sx={{ color: "rgba(255,255,255,0.7)", fontSize: "0.85rem" }}>
+                                  <Typography sx={{ color: "#334155", fontSize: "0.85rem" }}>
                                     {address.fullName} · {address.phone}
                                   </Typography>
-                                  <Typography sx={{ color: "rgba(255,255,255,0.45)", fontSize: "0.82rem" }}>
+                                  <Typography sx={{ color: "#64748B", fontSize: "0.82rem" }}>
                                     {[address.street, address.building, address.area, address.city, address.county]
                                       .filter(Boolean)
                                       .join(", ")}
@@ -457,13 +455,14 @@ export function CheckoutPage() {
                 {/* ── 2. Order Notes ───────────────────────────────────────── */}
                 <Card
                   sx={{
-                    bgcolor: "#0B0E14",
+                    bgcolor: "#FFFFFF",
                     borderRadius: "20px",
-                    border: "1px solid rgba(255, 255, 255, 0.08)",
+                    border: "1px solid #E2E8F0",
+                    boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
                     p: { xs: 2.5, sm: 3 },
                   }}
                 >
-                  <Typography variant="h6" sx={{ color: "#FFF", fontWeight: 800, mb: 1.5 }}>
+                  <Typography variant="h6" sx={{ color: "#0F172A", fontWeight: 800, mb: 1.5 }}>
                     2. Order Notes & Customization (Optional)
                   </Typography>
                   <TextField
@@ -475,11 +474,10 @@ export function CheckoutPage() {
                     onChange={(e) => setOrderNotes(e.target.value)}
                     sx={{
                       "& .MuiOutlinedInput-root": {
-                        bgcolor: "rgba(255, 255, 255, 0.04)",
+                        bgcolor: "#F8FAFC",
                         borderRadius: "14px",
-                        color: "#FFF",
-                        "& fieldset": { borderColor: "rgba(255, 255, 255, 0.1)" },
-                        "&:hover fieldset": { borderColor: "rgba(255, 255, 255, 0.25)" },
+                        "& fieldset": { borderColor: "#CBD5E1" },
+                        "&:hover fieldset": { borderColor: "#94A3B8" },
                         "&.Mui-focused fieldset": { borderColor: "#00C896" },
                       },
                     }}
@@ -487,7 +485,7 @@ export function CheckoutPage() {
                 </Card>
 
                 {/* ── 3. Vendor Orders breakdown ──────────────────────────── */}
-                <Typography variant="h6" sx={{ color: "#FFF", fontWeight: 800, pt: 1 }}>
+                <Typography variant="h6" sx={{ color: "#0F172A", fontWeight: 800, pt: 1 }}>
                   3. Store Orders ({vendorGroups.length} {vendorGroups.length === 1 ? "Store" : "Stores"})
                 </Typography>
 
@@ -495,9 +493,10 @@ export function CheckoutPage() {
                   <Card
                     key={group.vendorId}
                     sx={{
-                      bgcolor: "#0B0E14",
+                      bgcolor: "#FFFFFF",
                       borderRadius: "20px",
-                      border: "1px solid rgba(255, 255, 255, 0.08)",
+                      border: "1px solid #E2E8F0",
+                      boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
                       p: { xs: 2.5, sm: 3 },
                     }}
                   >
@@ -519,10 +518,10 @@ export function CheckoutPage() {
                             <StorefrontIcon sx={{ fontSize: 20 }} />
                           </Box>
                           <Box>
-                            <Typography sx={{ color: "#FFF", fontWeight: 800, fontSize: "1.05rem" }}>
+                            <Typography sx={{ color: "#0F172A", fontWeight: 800, fontSize: "1.05rem" }}>
                               {group.businessName}
                             </Typography>
-                            <Typography sx={{ color: "rgba(255, 255, 255, 0.5)", fontSize: "0.78rem" }}>
+                            <Typography sx={{ color: "#64748B", fontSize: "0.78rem" }}>
                               {group.items.length} {group.items.length === 1 ? "item" : "items"} · Subtotal:{" "}
                               <strong style={{ color: "#00C896" }}>{formatCurrency(group.subtotal)}</strong>
                             </Typography>
@@ -534,7 +533,7 @@ export function CheckoutPage() {
                           size="small"
                           sx={{
                             bgcolor: "rgba(37, 211, 102, 0.12)",
-                            color: "#25D366",
+                            color: "#15803D",
                             fontWeight: 700,
                             fontSize: "0.7rem",
                             borderRadius: "8px",
@@ -542,7 +541,7 @@ export function CheckoutPage() {
                         />
                       </Stack>
 
-                      <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.06)" }} />
+                      <Divider sx={{ borderColor: "#F1F5F9" }} />
 
                       {/* Items */}
                       <Stack spacing={1.5}>
@@ -567,7 +566,7 @@ export function CheckoutPage() {
                                     height: 52,
                                     borderRadius: "10px",
                                     overflow: "hidden",
-                                    bgcolor: "#0E131C",
+                                    bgcolor: "#F1F5F9",
                                     flexShrink: 0,
                                   }}
                                 >
@@ -580,14 +579,14 @@ export function CheckoutPage() {
                                     />
                                   ) : (
                                     <Box sx={{ width: "100%", height: "100%", display: "grid", placeItems: "center" }}>
-                                      <Typography sx={{ color: "rgba(255,255,255,0.2)", fontSize: "0.7rem" }}>DM</Typography>
+                                      <Typography sx={{ color: "#94A3B8", fontSize: "0.7rem" }}>DM</Typography>
                                     </Box>
                                   )}
                                 </Box>
                                 <Box sx={{ minWidth: 0 }}>
                                   <Typography
                                     sx={{
-                                      color: "#FFF",
+                                      color: "#0F172A",
                                       fontWeight: 600,
                                       fontSize: "0.9rem",
                                       overflow: "hidden",
@@ -597,13 +596,13 @@ export function CheckoutPage() {
                                   >
                                     {item.product.name}
                                   </Typography>
-                                  <Typography sx={{ color: "rgba(255, 255, 255, 0.45)", fontSize: "0.75rem" }}>
+                                  <Typography sx={{ color: "#64748B", fontSize: "0.75rem" }}>
                                     {[item.variant?.sizeValue, item.variant?.colorValue].filter(Boolean).join(" · ") || "Standard"} · Qty: {item.quantity}
                                   </Typography>
                                 </Box>
                               </Stack>
 
-                              <Typography sx={{ color: "#FFF", fontWeight: 700, fontSize: "0.95rem" }}>
+                              <Typography sx={{ color: "#0F172A", fontWeight: 700, fontSize: "0.95rem" }}>
                                 {formatCurrency(price * item.quantity)}
                               </Typography>
                             </Stack>
@@ -625,7 +624,7 @@ export function CheckoutPage() {
                           fontSize: "0.85rem",
                           textTransform: "none",
                           bgcolor: "#25D366",
-                          color: "#07130F",
+                          color: "#FFFFFF",
                           boxShadow: "0 4px 16px rgba(37, 211, 102, 0.35)",
                           "&:hover": {
                             bgcolor: "#20BA5A",
@@ -641,42 +640,42 @@ export function CheckoutPage() {
               </Stack>
             </Grid>
 
-            {/* Right Column: Order Summary & Unified Admin Checkout Deck */}
+            {/* Right Column: Order Summary & Unified Admin Checkout Deck (Light Mode) */}
             <Grid size={{ xs: 12, md: 4 }}>
               <Box
                 sx={{
                   p: { xs: 2.5, sm: 3.5 },
-                  bgcolor: "#0B0E14",
+                  bgcolor: "#FFFFFF",
                   borderRadius: "24px",
-                  border: "1px solid rgba(255, 255, 255, 0.1)",
-                  boxShadow: "0 16px 40px -10px rgba(0, 0, 0, 0.7)",
+                  border: "1px solid #E2E8F0",
+                  boxShadow: "0 4px 20px -4px rgba(0, 0, 0, 0.08)",
                   position: { md: "sticky" },
                   top: { md: 100 },
                 }}
               >
                 <Stack spacing={3}>
-                  <Typography variant="h5" sx={{ fontWeight: 800, color: "#FFF", letterSpacing: "-0.01em" }}>
+                  <Typography variant="h5" sx={{ fontWeight: 800, color: "#0F172A", letterSpacing: "-0.01em" }}>
                     Order Summary
                   </Typography>
 
                   {/* Financial Breakdown */}
                   <Stack spacing={1.5}>
                     <Stack direction="row" justifyContent="space-between">
-                      <Typography sx={{ color: "rgba(255, 255, 255, 0.6)", fontSize: "0.92rem" }}>
+                      <Typography sx={{ color: "#64748B", fontSize: "0.92rem" }}>
                         Subtotal ({items.length} {items.length === 1 ? "item" : "items"})
                       </Typography>
-                      <Typography sx={{ color: "#FFF", fontWeight: 700, fontSize: "0.95rem" }}>
+                      <Typography sx={{ color: "#0F172A", fontWeight: 700, fontSize: "0.95rem" }}>
                         {formatCurrency(subtotal)}
                       </Typography>
                     </Stack>
 
                     <Stack direction="row" justifyContent="space-between" alignItems="center">
-                      <Typography sx={{ color: "rgba(255, 255, 255, 0.6)", fontSize: "0.92rem" }}>
+                      <Typography sx={{ color: "#64748B", fontSize: "0.92rem" }}>
                         Estimated Shipping
                       </Typography>
                       <Typography
                         sx={{
-                          color: isFreeShipping ? "#00C896" : "#FFF",
+                          color: isFreeShipping ? "#00C896" : "#0F172A",
                           fontWeight: 700,
                           fontSize: "0.95rem",
                         }}
@@ -685,10 +684,10 @@ export function CheckoutPage() {
                       </Typography>
                     </Stack>
 
-                    <Divider sx={{ borderColor: "rgba(255, 255, 255, 0.08)", my: 1 }} />
+                    <Divider sx={{ borderColor: "#E2E8F0", my: 1 }} />
 
                     <Stack direction="row" justifyContent="space-between" alignItems="baseline">
-                      <Typography sx={{ color: "#FFF", fontWeight: 800, fontSize: "1.1rem" }}>
+                      <Typography sx={{ color: "#0F172A", fontWeight: 800, fontSize: "1.1rem" }}>
                         Total Amount
                       </Typography>
                       <Typography
@@ -720,11 +719,11 @@ export function CheckoutPage() {
                         textTransform: "none",
                         bgcolor: "#00C896",
                         color: "#07130F",
-                        boxShadow: "0 6px 24px rgba(0, 200, 150, 0.4)",
+                        boxShadow: "0 6px 24px rgba(0, 200, 150, 0.35)",
                         transition: "all 0.25s ease",
                         "&:hover": {
                           bgcolor: "#00E0A7",
-                          boxShadow: "0 8px 30px rgba(0, 200, 150, 0.6)",
+                          boxShadow: "0 8px 30px rgba(0, 200, 150, 0.5)",
                           transform: "translateY(-2px)",
                         },
                       }}
@@ -742,13 +741,13 @@ export function CheckoutPage() {
                         py: 1,
                         fontWeight: 700,
                         fontSize: "0.82rem",
-                        color: "#FFF",
-                        borderColor: "rgba(255, 255, 255, 0.15)",
-                        bgcolor: "rgba(255, 255, 255, 0.03)",
+                        color: "#0F172A",
+                        borderColor: "#CBD5E1",
+                        bgcolor: "#FFFFFF",
                         textTransform: "none",
                         "&:hover": {
-                          bgcolor: "rgba(255, 255, 255, 0.08)",
-                          borderColor: "rgba(255, 255, 255, 0.3)",
+                          bgcolor: "#F1F5F9",
+                          borderColor: "#94A3B8",
                         },
                       }}
                     >
@@ -761,14 +760,14 @@ export function CheckoutPage() {
                       startIcon={<ArrowBackRoundedIcon />}
                       onClick={() => navigate(ROUTES.customerCart)}
                       sx={{
-                        color: "rgba(255, 255, 255, 0.6)",
+                        color: "#64748B",
                         fontWeight: 700,
                         fontSize: "0.82rem",
                         textTransform: "none",
                         borderRadius: "12px",
                         "&:hover": {
-                          color: "#FFF",
-                          bgcolor: "rgba(255, 255, 255, 0.05)",
+                          color: "#0F172A",
+                          bgcolor: "#F1F5F9",
                         },
                       }}
                     >
@@ -777,16 +776,16 @@ export function CheckoutPage() {
                   </Stack>
 
                   {/* Trust & Safety Highlights */}
-                  <Stack spacing={1.2} sx={{ pt: 1, borderTop: "1px solid rgba(255, 255, 255, 0.06)" }}>
+                  <Stack spacing={1.2} sx={{ pt: 1, borderTop: "1px solid #E2E8F0" }}>
                     <Stack direction="row" alignItems="center" spacing={1.2}>
                       <ShieldOutlinedIcon sx={{ color: "#00C896", fontSize: 18 }} />
-                      <Typography sx={{ color: "rgba(255, 255, 255, 0.6)", fontSize: "0.78rem" }}>
+                      <Typography sx={{ color: "#64748B", fontSize: "0.78rem" }}>
                         Orders verified by DressMe Admin Team
                       </Typography>
                     </Stack>
                     <Stack direction="row" alignItems="center" spacing={1.2}>
                       <WhatsAppIcon sx={{ color: "#25D366", fontSize: 18 }} />
-                      <Typography sx={{ color: "rgba(255, 255, 255, 0.6)", fontSize: "0.78rem" }}>
+                      <Typography sx={{ color: "#64748B", fontSize: "0.78rem" }}>
                         Instant WhatsApp confirmation with store owners
                       </Typography>
                     </Stack>

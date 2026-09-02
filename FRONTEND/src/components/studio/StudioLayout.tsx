@@ -1,5 +1,6 @@
 import { Box } from "@mui/material";
 import { Outlet } from "react-router-dom";
+import { ScrollToTop } from "../shared/ScrollToTop";
 
 export function StudioLayout() {
   return (
@@ -11,6 +12,7 @@ export function StudioLayout() {
         bgcolor: "#F8FAFC",
       }}
     >
+      <ScrollToTop />
       <Box component="main" sx={{ flexGrow: 1 }}>
         <Outlet />
       </Box>

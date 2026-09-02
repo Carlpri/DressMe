@@ -20,7 +20,7 @@ export function WishlistPage() {
   const { data: favorites, isLoading, error } = useFavorites();
 
   return (
-    <Box sx={{ minHeight: "100vh", bgcolor: "#07090E", py: { xs: 4, sm: 6, md: 8 } }}>
+    <Box sx={{ minHeight: "100vh", bgcolor: "#F8FAFC", py: { xs: 4, sm: 6, md: 8 } }}>
       <Container maxWidth="xl">
         <Stack spacing={4}>
           {/* Header */}
@@ -48,12 +48,12 @@ export function WishlistPage() {
               </Typography>
               <Typography
                 variant="h3"
-                sx={{ fontWeight: 800, color: "#FFF", letterSpacing: "-0.02em" }}
+                sx={{ fontWeight: 800, color: "#0F172A", letterSpacing: "-0.02em" }}
               >
                 Wishlist
               </Typography>
               {!isLoading && favorites && favorites.length > 0 && (
-                <Typography sx={{ color: "rgba(255, 255, 255, 0.5)", mt: 0.5 }}>
+                <Typography sx={{ color: "#64748B", mt: 0.5, fontSize: "0.95rem" }}>
                   {favorites.length} {favorites.length === 1 ? "item" : "items"} saved in your collection
                 </Typography>
               )}
@@ -70,14 +70,15 @@ export function WishlistPage() {
                   py: 1,
                   px: 2.5,
                   fontWeight: 700,
-                  fontSize: "0.82rem",
+                  fontSize: "0.85rem",
                   textTransform: "none",
-                  color: "#FFF",
-                  borderColor: "rgba(255, 255, 255, 0.15)",
-                  bgcolor: "rgba(255, 255, 255, 0.03)",
+                  color: "#0F172A",
+                  borderColor: "#CBD5E1",
+                  bgcolor: "#FFFFFF",
+                  boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
                   "&:hover": {
-                    bgcolor: "rgba(255, 255, 255, 0.1)",
-                    borderColor: "rgba(255, 255, 255, 0.35)",
+                    bgcolor: "#F1F5F9",
+                    borderColor: "#94A3B8",
                   },
                 }}
               >
@@ -100,20 +101,21 @@ export function WishlistPage() {
                   Retry
                 </Button>
               }
-              sx={{ borderRadius: "14px", bgcolor: "rgba(239, 68, 68, 0.15)", color: "#FFF" }}
+              sx={{ borderRadius: "14px" }}
             >
               Failed to load wishlist
             </Alert>
           ) : !favorites || favorites.length === 0 ? (
-            /* Empty State */
+            /* Empty State (Light Mode) */
             <Box
               sx={{
                 textAlign: "center",
                 py: { xs: 8, md: 12 },
                 px: 3,
                 borderRadius: "24px",
-                bgcolor: "#0B0E14",
-                border: "1px dashed rgba(255, 255, 255, 0.12)",
+                bgcolor: "#FFFFFF",
+                border: "1px dashed #CBD5E1",
+                boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
@@ -131,17 +133,17 @@ export function WishlistPage() {
                   borderRadius: "20px",
                   bgcolor: "rgba(0, 200, 150, 0.1)",
                   color: "#00C896",
-                  border: "1px solid rgba(0, 200, 150, 0.2)",
+                  border: "1px solid rgba(0, 200, 150, 0.25)",
                   mb: 2.5,
                 }}
               >
                 <FavoriteBorderRoundedIcon sx={{ fontSize: 38 }} />
               </Box>
-              <Typography variant="h5" sx={{ fontWeight: 800, color: "#FFF", mb: 1 }}>
+              <Typography variant="h5" sx={{ fontWeight: 800, color: "#0F172A", mb: 1 }}>
                 Your wishlist is empty
               </Typography>
               <Typography
-                sx={{ color: "rgba(255, 255, 255, 0.5)", maxWidth: 380, mb: 4, fontSize: "0.95rem" }}
+                sx={{ color: "#64748B", maxWidth: 380, mb: 4, fontSize: "0.95rem" }}
               >
                 Explore the latest collections and save the looks and pieces you love.
               </Typography>
@@ -162,10 +164,10 @@ export function WishlistPage() {
                     px: 3,
                     py: 1.1,
                     textTransform: "none",
-                    boxShadow: "0 4px 16px rgba(0, 200, 150, 0.35)",
+                    boxShadow: "0 4px 16px rgba(0, 200, 150, 0.3)",
                     "&:hover": {
                       bgcolor: "#00E0A7",
-                      boxShadow: "0 6px 22px rgba(0, 200, 150, 0.5)",
+                      boxShadow: "0 6px 22px rgba(0, 200, 150, 0.45)",
                     },
                   }}
                 >
@@ -177,16 +179,17 @@ export function WishlistPage() {
                   variant="outlined"
                   startIcon={<GridViewRoundedIcon />}
                   sx={{
-                    color: "#FFF",
-                    borderColor: "rgba(255, 255, 255, 0.18)",
+                    color: "#0F172A",
+                    borderColor: "#CBD5E1",
+                    bgcolor: "#FFFFFF",
                     fontWeight: 700,
                     borderRadius: "12px",
                     px: 3,
                     py: 1.1,
                     textTransform: "none",
                     "&:hover": {
-                      bgcolor: "rgba(255, 255, 255, 0.08)",
-                      borderColor: "rgba(255, 255, 255, 0.35)",
+                      bgcolor: "#F1F5F9",
+                      borderColor: "#94A3B8",
                     },
                   }}
                 >

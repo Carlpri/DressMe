@@ -32,6 +32,7 @@ import CodeIcon from "@mui/icons-material/Code";
 import StorefrontIcon from "@mui/icons-material/Storefront";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { useAuth } from "../../hooks/useAuth";
+import { ScrollToTop } from "../shared/ScrollToTop";
 
 const DRAWER_WIDTH = 260;
 
@@ -183,6 +184,7 @@ export function AdminLayout() {
 
   return (
     <Box sx={{ display: "flex", minHeight: "100vh", bgcolor: "#F8FAFC" }}>
+      <ScrollToTop />
       {/* Top Mobile Bar */}
       <AppBar
         position="fixed"
