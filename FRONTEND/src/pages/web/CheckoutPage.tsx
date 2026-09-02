@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Box,
@@ -14,15 +14,12 @@ import {
   Divider,
   Chip,
   TextField,
-  Snackbar,
 } from "@mui/material";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
-import StorefrontIcon from "@mui/icons-material/Storefront";
 import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
-import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
-import NotificationsActiveOutlinedIcon from "@mui/icons-material/NotificationsActiveOutlined";
 import ShieldOutlinedIcon from "@mui/icons-material/ShieldOutlined";
+import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined";
 import { useCart } from "../../hooks/useCart";
 import { useAddresses } from "../../hooks/useAddresses";
 import { useAuth } from "../../hooks/useAuth";
@@ -31,46 +28,9 @@ import { ROUTES } from "../../constants/routes";
 import { useSiteSettingsContext } from "../../contexts/SiteSettingsContext";
 import { useFormatCurrency } from "../../utils/currency";
 import {
-  buildVendorOrderMessage,
   buildAdminCheckoutNotificationMessage,
   buildWhatsAppUrl,
 } from "../../utils/whatsapp";
-import type { CartItem } from "../../hooks/useCart";
-
-interface VendorCheckoutGroup {
-  vendorId: string;
-  businessName: string;
-  phone: string;
-  items: CartItem[];
-  subtotal: number;
-}
-
-function groupItemsByVendor(items: CartItem[]): VendorCheckoutGroup[] {
-  const groups = new Map<string, VendorCheckoutGroup>();
-
-  for (const item of items) {
-    const vendor = item.product.vendor;
-    if (!vendor) continue;
-
-    const existing = groups.get(vendor.id);
-    const lineTotal = (item.variant?.price ?? item.product.price) * item.quantity;
-
-    if (existing) {
-      existing.items.push(item);
-      existing.subtotal += lineTotal;
-    } else {
-      groups.set(vendor.id, {
-        vendorId: vendor.id,
-        businessName: vendor.businessName,
-        phone: vendor.whatsappNumber || "",
-        items: [item],
-        subtotal: lineTotal,
-      });
-    }
-  }
-
-  return Array.from(groups.values());
-}
 
 export function CheckoutPage() {
   const navigate = useNavigate();
@@ -82,12 +42,8 @@ export function CheckoutPage() {
   const [selectedAddressId, setSelectedAddressId] = useState("");
   const [orderNotes, setOrderNotes] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [adminNotified, setAdminNotified] = useState(false);
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const [snackbarMsg, setSnackbarMsg] = useState("");
 
   const items = cart?.items ?? [];
-  const vendorGroups = useMemo(() => groupItemsByVendor(items), [items]);
 
   const subtotal = items.reduce(
     (sum, item) => sum + (item.variant?.price || item.product.price) * item.quantity,
@@ -98,19 +54,31 @@ export function CheckoutPage() {
   const shipping = isFreeShipping ? 0 : defaultShippingFee;
   const total = subtotal + shipping;
 
-  const selectedAddress = addresses?.find((address) => address.id === selectedAddressId);
+  const selectedAddress = addresses?.find((a) => a.id === selectedAddressId);
   const adminWhatsApp = settings?.whatsappNumber || settings?.supportPhone || "254700000000";
 
   /**
-   * Dispatches WhatsApp Checkout Notification to DressMe Admin
+   * The single checkout action — sends a consolidated order to the DressMe admin WhatsApp.
+   * Vendor/store info is included internally in the message for admin fulfilment, but
+   * the customer only sees and interacts with DressMe as the single point of contact.
    */
-  const handleNotifyAdmin = () => {
+  const handleCheckout = () => {
     setError(null);
 
+    if (!selectedAddressId || !selectedAddress) {
+      setError("Please select a delivery address to continue.");
+      return;
+    }
+
+    if (!user?.name) {
+      setError("Your account name is required to place an order.");
+      return;
+    }
+
     const message = buildAdminCheckoutNotificationMessage({
-      customerName: user?.name || "Guest Customer",
-      customerPhone: selectedAddress?.phone || (user as any)?.phone || undefined,
-      customerEmail: user?.email || undefined,
+      customerName: user.name,
+      customerPhone: selectedAddress.phone || (user as any)?.phone || undefined,
+      customerEmail: user.email || undefined,
       items,
       address: selectedAddress as any,
       currency: settings?.currency ?? "KES",
@@ -118,53 +86,11 @@ export function CheckoutPage() {
       subtotal,
       shipping,
       total,
-      vendorGroups: vendorGroups.map((g) => ({
-        businessName: g.businessName,
-        itemsCount: g.items.length,
-        subtotal: g.subtotal,
-      })),
     });
 
     const url = buildWhatsAppUrl(adminWhatsApp, message);
     if (!url) {
-      setError("Admin WhatsApp number is not configured properly in Settings.");
-      return;
-    }
-
-    setAdminNotified(true);
-    setSnackbarMsg("Admin notification generated for WhatsApp!");
-    setSnackbarOpen(true);
-    window.open(url, "_blank", "noopener,noreferrer");
-  };
-
-  /**
-   * Dispatches WhatsApp Order to a specific store/vendor and offers admin notification
-   */
-  const handleWhatsAppCheckout = (group: VendorCheckoutGroup) => {
-    setError(null);
-
-    if (!selectedAddress) {
-      setError("Please select a delivery address before messaging the store.");
-      return;
-    }
-
-    if (!user?.name) {
-      setError("Your account name is required for the order message.");
-      return;
-    }
-
-    const message = buildVendorOrderMessage({
-      businessName: group.businessName,
-      customerName: user.name,
-      items: group.items,
-      address: selectedAddress as any,
-      currency: settings?.currency ?? "KES",
-      notes: orderNotes.trim() || undefined,
-    });
-
-    const url = buildWhatsAppUrl(group.phone || adminWhatsApp, message);
-    if (!url) {
-      setError(`${group.businessName} does not have a valid WhatsApp number. Please contact admin.`);
+      setError("Checkout is temporarily unavailable. Please contact support.");
       return;
     }
 
@@ -179,10 +105,10 @@ export function CheckoutPage() {
             <LoadingSkeleton height={60} />
             <Grid container spacing={4}>
               <Grid size={{ xs: 12, md: 8 }}>
-                <LoadingSkeleton height={300} />
+                <LoadingSkeleton height={320} />
               </Grid>
               <Grid size={{ xs: 12, md: 4 }}>
-                <LoadingSkeleton height={350} />
+                <LoadingSkeleton height={380} />
               </Grid>
             </Grid>
           </Stack>
@@ -221,6 +147,7 @@ export function CheckoutPage() {
                 borderRadius: "12px",
                 px: 4,
                 py: 1.2,
+                textTransform: "none",
                 "&:hover": { bgcolor: "#00E0A7" },
               }}
             >
@@ -236,110 +163,45 @@ export function CheckoutPage() {
     <Box sx={{ minHeight: "100vh", bgcolor: "#F8FAFC", py: { xs: 4, sm: 6, md: 8 } }}>
       <Container maxWidth="xl">
         <Stack spacing={4}>
-          {/* Header */}
+          {/* ── Page Header ──────────────────────────────────────────── */}
           <Box>
-            <Typography
-              variant="overline"
+            <Button
+              startIcon={<ArrowBackRoundedIcon />}
+              onClick={() => navigate(ROUTES.customerCart)}
               sx={{
-                color: "#00C896",
-                fontWeight: 800,
-                letterSpacing: "0.15em",
-                textTransform: "uppercase",
-                fontSize: "0.75rem",
+                color: "#64748B",
+                fontWeight: 600,
+                textTransform: "none",
+                px: 0,
+                mb: 2,
+                "&:hover": { color: "#0F172A", bgcolor: "transparent" },
               }}
             >
-              Instant WhatsApp Checkout
-            </Typography>
+              Back to Bag
+            </Button>
             <Typography variant="h3" sx={{ fontWeight: 800, color: "#0F172A", letterSpacing: "-0.02em" }}>
-              Checkout & Order Confirmation
+              Checkout
             </Typography>
             <Typography sx={{ color: "#64748B", mt: 0.5, fontSize: "0.95rem" }}>
-              Confirm your delivery address and send your order directly on WhatsApp. Admin is notified automatically.
+              Confirm your delivery details and place your order instantly.
             </Typography>
           </Box>
 
-          {/* Error Banner */}
+          {/* ── Error Banner ─────────────────────────────────────────── */}
           {error && (
-            <Alert
-              severity="error"
-              onClose={() => setError(null)}
-              sx={{ borderRadius: "14px" }}
-            >
+            <Alert severity="error" onClose={() => setError(null)} sx={{ borderRadius: "14px" }}>
               {error}
             </Alert>
           )}
 
-          {/* Admin Real-Time Notification Notification Banner */}
-          <Box
-            sx={{
-              p: 2.5,
-              borderRadius: "16px",
-              bgcolor: "rgba(0, 200, 150, 0.08)",
-              border: "1px solid rgba(0, 200, 150, 0.3)",
-              display: "flex",
-              flexDirection: { xs: "column", sm: "row" },
-              alignItems: { xs: "flex-start", sm: "center" },
-              justifyContent: "space-between",
-              gap: 2,
-            }}
-          >
-            <Stack direction="row" spacing={1.5} alignItems="center">
-              <Box
-                sx={{
-                  width: 42,
-                  height: 42,
-                  borderRadius: "12px",
-                  bgcolor: "rgba(0, 200, 150, 0.15)",
-                  display: "grid",
-                  placeItems: "center",
-                  color: "#00C896",
-                  flexShrink: 0,
-                }}
-              >
-                <NotificationsActiveOutlinedIcon sx={{ fontSize: 22 }} />
-              </Box>
-              <Box>
-                <Typography sx={{ color: "#0F172A", fontWeight: 700, fontSize: "0.92rem" }}>
-                  Real-Time Admin WhatsApp Notification
-                </Typography>
-                <Typography sx={{ color: "#64748B", fontSize: "0.8rem" }}>
-                  The central DressMe Admin ({adminWhatsApp}) receives instant WhatsApp alerts when you proceed with this order.
-                </Typography>
-              </Box>
-            </Stack>
-
-            <Button
-              variant="outlined"
-              size="small"
-              startIcon={<WhatsAppIcon sx={{ color: "#25D366 !important" }} />}
-              onClick={handleNotifyAdmin}
-              sx={{
-                color: "#0F172A",
-                borderColor: "#25D366",
-                bgcolor: "rgba(37, 211, 102, 0.08)",
-                borderRadius: "10px",
-                fontWeight: 700,
-                fontSize: "0.78rem",
-                px: 2,
-                py: 0.8,
-                flexShrink: 0,
-                textTransform: "none",
-                "&:hover": {
-                  bgcolor: "rgba(37, 211, 102, 0.18)",
-                  borderColor: "#1DA851",
-                },
-              }}
-            >
-              {adminNotified ? "Re-send Alert to Admin" : "Send WhatsApp Alert to Admin"}
-            </Button>
-          </Box>
-
-          {/* Main Grid */}
+          {/* ── Main Grid ────────────────────────────────────────────── */}
           <Grid container spacing={{ xs: 3, md: 4 }}>
-            {/* Left Column: Address & Vendor Order Cards (Light Mode) */}
+
+            {/* ── Left: Delivery + Order Notes + Items preview ── */}
             <Grid size={{ xs: 12, md: 8 }}>
               <Stack spacing={3}>
-                {/* ── 1. Delivery Address Card ──────────────────────────────── */}
+
+                {/* 1. Delivery Address */}
                 <Card
                   sx={{
                     bgcolor: "#FFFFFF",
@@ -353,7 +215,7 @@ export function CheckoutPage() {
                     <Stack direction="row" spacing={1.5} alignItems="center">
                       <LocationOnOutlinedIcon sx={{ color: "#00C896" }} />
                       <Typography variant="h6" sx={{ color: "#0F172A", fontWeight: 800 }}>
-                        1. Select Delivery Address
+                        Delivery Address
                       </Typography>
                     </Stack>
 
@@ -365,14 +227,14 @@ export function CheckoutPage() {
                             variant="outlined"
                             size="small"
                             onClick={() => navigate(ROUTES.customerAddresses)}
-                            sx={{ color: "#00C896", borderColor: "#00C896" }}
+                            sx={{ color: "#00C896", borderColor: "#00C896", textTransform: "none" }}
                           >
                             Add Address
                           </Button>
                         }
                         sx={{ borderRadius: "12px" }}
                       >
-                        You haven't saved any delivery address yet. Please add one to continue.
+                        No delivery address saved. Please add one to continue.
                       </Alert>
                     ) : (
                       <RadioGroup
@@ -389,31 +251,21 @@ export function CheckoutPage() {
                                 sx={{
                                   p: 2,
                                   borderRadius: "14px",
-                                  bgcolor: isSelected
-                                    ? "rgba(0, 200, 150, 0.06)"
-                                    : "#F8FAFC",
+                                  bgcolor: isSelected ? "rgba(0, 200, 150, 0.06)" : "#F8FAFC",
                                   border: "1px solid",
-                                  borderColor: isSelected
-                                    ? "#00C896"
-                                    : "#E2E8F0",
+                                  borderColor: isSelected ? "#00C896" : "#E2E8F0",
                                   cursor: "pointer",
                                   transition: "all 0.2s ease",
                                   display: "flex",
                                   alignItems: "flex-start",
                                   gap: 1.5,
-                                  "&:hover": {
-                                    borderColor: "#00C896",
-                                  },
+                                  "&:hover": { borderColor: "#00C896" },
                                 }}
                               >
                                 <Radio
                                   checked={isSelected}
                                   value={address.id}
-                                  sx={{
-                                    p: 0,
-                                    mt: 0.3,
-                                    "&.Mui-checked": { color: "#00C896" },
-                                  }}
+                                  sx={{ p: 0, mt: 0.3, "&.Mui-checked": { color: "#00C896" } }}
                                 />
                                 <Box sx={{ flex: 1 }}>
                                   <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 0.5 }}>
@@ -452,7 +304,7 @@ export function CheckoutPage() {
                   </Stack>
                 </Card>
 
-                {/* ── 2. Order Notes ───────────────────────────────────────── */}
+                {/* 2. Order Notes */}
                 <Card
                   sx={{
                     bgcolor: "#FFFFFF",
@@ -463,11 +315,14 @@ export function CheckoutPage() {
                   }}
                 >
                   <Typography variant="h6" sx={{ color: "#0F172A", fontWeight: 800, mb: 1.5 }}>
-                    2. Order Notes & Customization (Optional)
+                    Order Notes
+                    <Typography component="span" sx={{ color: "#94A3B8", fontWeight: 400, fontSize: "0.85rem", ml: 1 }}>
+                      (optional)
+                    </Typography>
                   </Typography>
                   <TextField
                     fullWidth
-                    placeholder="Specific delivery instructions, preferred delivery time, sizing notes, or gift requests..."
+                    placeholder="Delivery instructions, preferred time, sizing notes, gift message..."
                     multiline
                     minRows={2}
                     value={orderNotes}
@@ -484,163 +339,96 @@ export function CheckoutPage() {
                   />
                 </Card>
 
-                {/* ── 3. Vendor Orders breakdown ──────────────────────────── */}
-                <Typography variant="h6" sx={{ color: "#0F172A", fontWeight: 800, pt: 1 }}>
-                  3. Store Orders ({vendorGroups.length} {vendorGroups.length === 1 ? "Store" : "Stores"})
-                </Typography>
+                {/* 3. Items in your order */}
+                <Card
+                  sx={{
+                    bgcolor: "#FFFFFF",
+                    borderRadius: "20px",
+                    border: "1px solid #E2E8F0",
+                    boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
+                    p: { xs: 2.5, sm: 3 },
+                  }}
+                >
+                  <Typography variant="h6" sx={{ color: "#0F172A", fontWeight: 800, mb: 2 }}>
+                    Order Items
+                    <Typography component="span" sx={{ color: "#64748B", fontWeight: 500, fontSize: "0.85rem", ml: 1 }}>
+                      ({items.length} {items.length === 1 ? "item" : "items"})
+                    </Typography>
+                  </Typography>
 
-                {vendorGroups.map((group) => (
-                  <Card
-                    key={group.vendorId}
-                    sx={{
-                      bgcolor: "#FFFFFF",
-                      borderRadius: "20px",
-                      border: "1px solid #E2E8F0",
-                      boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
-                      p: { xs: 2.5, sm: 3 },
-                    }}
-                  >
-                    <Stack spacing={2.5}>
-                      {/* Store Header */}
-                      <Stack direction="row" justifyContent="space-between" alignItems="center">
-                        <Stack direction="row" spacing={1.5} alignItems="center">
-                          <Box
-                            sx={{
-                              width: 38,
-                              height: 38,
-                              borderRadius: "10px",
-                              bgcolor: "rgba(0, 200, 150, 0.12)",
-                              color: "#00C896",
-                              display: "grid",
-                              placeItems: "center",
-                            }}
-                          >
-                            <StorefrontIcon sx={{ fontSize: 20 }} />
-                          </Box>
-                          <Box>
-                            <Typography sx={{ color: "#0F172A", fontWeight: 800, fontSize: "1.05rem" }}>
-                              {group.businessName}
-                            </Typography>
-                            <Typography sx={{ color: "#64748B", fontSize: "0.78rem" }}>
-                              {group.items.length} {group.items.length === 1 ? "item" : "items"} · Subtotal:{" "}
-                              <strong style={{ color: "#00C896" }}>{formatCurrency(group.subtotal)}</strong>
-                            </Typography>
-                          </Box>
-                        </Stack>
+                  <Stack spacing={1.5} divider={<Divider sx={{ borderColor: "#F1F5F9" }} />}>
+                    {items.map((item) => {
+                      const primaryImage =
+                        (item.product.images ?? []).find((img) => img.isPrimary) ||
+                        item.product.images?.[0];
+                      const price = item.variant?.price || item.product.price;
 
-                        <Chip
-                          label={group.phone ? "Direct Store WhatsApp" : "Admin Coordinated"}
-                          size="small"
-                          sx={{
-                            bgcolor: "rgba(37, 211, 102, 0.12)",
-                            color: "#15803D",
-                            fontWeight: 700,
-                            fontSize: "0.7rem",
-                            borderRadius: "8px",
-                          }}
-                        />
-                      </Stack>
-
-                      <Divider sx={{ borderColor: "#F1F5F9" }} />
-
-                      {/* Items */}
-                      <Stack spacing={1.5}>
-                        {group.items.map((item) => {
-                          const primaryImage =
-                            (item.product.images ?? []).find((img) => img.isPrimary) ||
-                            item.product.images?.[0];
-                          const price = item.variant?.price || item.product.price;
-
-                          return (
-                            <Stack
-                              key={item.id}
-                              direction="row"
-                              spacing={2}
-                              alignItems="center"
-                              justifyContent="space-between"
+                      return (
+                        <Stack
+                          key={item.id}
+                          direction="row"
+                          spacing={2}
+                          alignItems="center"
+                          justifyContent="space-between"
+                        >
+                          <Stack direction="row" spacing={2} alignItems="center" sx={{ minWidth: 0, flex: 1 }}>
+                            <Box
+                              sx={{
+                                width: 60,
+                                height: 60,
+                                borderRadius: "12px",
+                                overflow: "hidden",
+                                bgcolor: "#F1F5F9",
+                                flexShrink: 0,
+                              }}
                             >
-                              <Stack direction="row" spacing={2} alignItems="center" sx={{ minWidth: 0, flex: 1 }}>
+                              {primaryImage ? (
                                 <Box
-                                  sx={{
-                                    width: 52,
-                                    height: 52,
-                                    borderRadius: "10px",
-                                    overflow: "hidden",
-                                    bgcolor: "#F1F5F9",
-                                    flexShrink: 0,
-                                  }}
-                                >
-                                  {primaryImage ? (
-                                    <Box
-                                      component="img"
-                                      src={primaryImage.imageUrl}
-                                      alt={item.product.name}
-                                      sx={{ width: "100%", height: "100%", objectFit: "cover" }}
-                                    />
-                                  ) : (
-                                    <Box sx={{ width: "100%", height: "100%", display: "grid", placeItems: "center" }}>
-                                      <Typography sx={{ color: "#94A3B8", fontSize: "0.7rem" }}>DM</Typography>
-                                    </Box>
-                                  )}
+                                  component="img"
+                                  src={primaryImage.imageUrl}
+                                  alt={item.product.name}
+                                  sx={{ width: "100%", height: "100%", objectFit: "cover" }}
+                                />
+                              ) : (
+                                <Box sx={{ width: "100%", height: "100%", display: "grid", placeItems: "center" }}>
+                                  <Typography sx={{ color: "#94A3B8", fontSize: "0.7rem", fontWeight: 700 }}>DM</Typography>
                                 </Box>
-                                <Box sx={{ minWidth: 0 }}>
-                                  <Typography
-                                    sx={{
-                                      color: "#0F172A",
-                                      fontWeight: 600,
-                                      fontSize: "0.9rem",
-                                      overflow: "hidden",
-                                      textOverflow: "ellipsis",
-                                      whiteSpace: "nowrap",
-                                    }}
-                                  >
-                                    {item.product.name}
-                                  </Typography>
-                                  <Typography sx={{ color: "#64748B", fontSize: "0.75rem" }}>
-                                    {[item.variant?.sizeValue, item.variant?.colorValue].filter(Boolean).join(" · ") || "Standard"} · Qty: {item.quantity}
-                                  </Typography>
-                                </Box>
-                              </Stack>
-
-                              <Typography sx={{ color: "#0F172A", fontWeight: 700, fontSize: "0.95rem" }}>
-                                {formatCurrency(price * item.quantity)}
+                              )}
+                            </Box>
+                            <Box sx={{ minWidth: 0 }}>
+                              <Typography
+                                sx={{
+                                  color: "#0F172A",
+                                  fontWeight: 600,
+                                  fontSize: "0.9rem",
+                                  overflow: "hidden",
+                                  textOverflow: "ellipsis",
+                                  whiteSpace: "nowrap",
+                                }}
+                              >
+                                {item.product.name}
                               </Typography>
-                            </Stack>
-                          );
-                        })}
-                      </Stack>
+                              <Typography sx={{ color: "#64748B", fontSize: "0.75rem" }}>
+                                {[item.variant?.sizeValue, item.variant?.colorValue]
+                                  .filter(Boolean)
+                                  .join(" · ") || "Standard"}{" "}
+                                · Qty: {item.quantity}
+                              </Typography>
+                            </Box>
+                          </Stack>
 
-                      {/* Store WhatsApp Button */}
-                      <Button
-                        variant="contained"
-                        size="medium"
-                        startIcon={<WhatsAppIcon />}
-                        onClick={() => handleWhatsAppCheckout(group)}
-                        disabled={!selectedAddressId}
-                        sx={{
-                          borderRadius: "12px",
-                          py: 1.1,
-                          fontWeight: 800,
-                          fontSize: "0.85rem",
-                          textTransform: "none",
-                          bgcolor: "#25D366",
-                          color: "#FFFFFF",
-                          boxShadow: "0 4px 16px rgba(37, 211, 102, 0.35)",
-                          "&:hover": {
-                            bgcolor: "#20BA5A",
-                            boxShadow: "0 6px 22px rgba(37, 211, 102, 0.5)",
-                          },
-                        }}
-                      >
-                        Send Order to {group.businessName} on WhatsApp
-                      </Button>
-                    </Stack>
-                  </Card>
-                ))}
+                          <Typography sx={{ color: "#0F172A", fontWeight: 700, fontSize: "0.95rem", flexShrink: 0 }}>
+                            {formatCurrency(price * item.quantity)}
+                          </Typography>
+                        </Stack>
+                      );
+                    })}
+                  </Stack>
+                </Card>
               </Stack>
             </Grid>
 
-            {/* Right Column: Order Summary & Unified Admin Checkout Deck (Light Mode) */}
+            {/* ── Right: Order Summary + Single Checkout Button ── */}
             <Grid size={{ xs: 12, md: 4 }}>
               <Box
                 sx={{
@@ -648,7 +436,7 @@ export function CheckoutPage() {
                   bgcolor: "#FFFFFF",
                   borderRadius: "24px",
                   border: "1px solid #E2E8F0",
-                  boxShadow: "0 4px 20px -4px rgba(0, 0, 0, 0.08)",
+                  boxShadow: "0 4px 20px -4px rgba(0,0,0,0.08)",
                   position: { md: "sticky" },
                   top: { md: 100 },
                 }}
@@ -684,17 +472,33 @@ export function CheckoutPage() {
                       </Typography>
                     </Stack>
 
-                    <Divider sx={{ borderColor: "#E2E8F0", my: 1 }} />
+                    {isFreeShipping && (
+                      <Typography
+                        sx={{
+                          fontSize: "0.75rem",
+                          color: "#00C896",
+                          bgcolor: "rgba(0,200,150,0.08)",
+                          borderRadius: "8px",
+                          px: 1.5,
+                          py: 0.5,
+                          fontWeight: 600,
+                        }}
+                      >
+                        🎉 You qualify for free shipping!
+                      </Typography>
+                    )}
+
+                    <Divider sx={{ borderColor: "#E2E8F0", my: 0.5 }} />
 
                     <Stack direction="row" justifyContent="space-between" alignItems="baseline">
                       <Typography sx={{ color: "#0F172A", fontWeight: 800, fontSize: "1.1rem" }}>
-                        Total Amount
+                        Total
                       </Typography>
                       <Typography
                         sx={{
                           color: "#00C896",
                           fontWeight: 900,
-                          fontSize: "1.5rem",
+                          fontSize: "1.6rem",
                           letterSpacing: "-0.02em",
                         }}
                       >
@@ -703,90 +507,66 @@ export function CheckoutPage() {
                     </Stack>
                   </Stack>
 
-                  {/* Unified Admin WhatsApp Checkout Action */}
-                  <Stack spacing={1.5}>
-                    <Button
-                      variant="contained"
-                      fullWidth
-                      startIcon={<WhatsAppIcon />}
-                      onClick={handleNotifyAdmin}
-                      sx={{
-                        borderRadius: "14px",
-                        py: 1.4,
-                        fontWeight: 900,
-                        fontSize: "0.92rem",
-                        letterSpacing: "0.02em",
-                        textTransform: "none",
-                        bgcolor: "#00C896",
-                        color: "#07130F",
-                        boxShadow: "0 6px 24px rgba(0, 200, 150, 0.35)",
-                        transition: "all 0.25s ease",
-                        "&:hover": {
-                          bgcolor: "#00E0A7",
-                          boxShadow: "0 8px 30px rgba(0, 200, 150, 0.5)",
-                          transform: "translateY(-2px)",
-                        },
-                      }}
-                    >
-                      Notify Admin on WhatsApp
-                    </Button>
+                  {/* ── THE SINGLE CHECKOUT BUTTON ─────────────── */}
+                  <Button
+                    id="checkout-whatsapp-btn"
+                    variant="contained"
+                    fullWidth
+                    size="large"
+                    startIcon={<WhatsAppIcon sx={{ fontSize: "1.3rem !important" }} />}
+                    onClick={handleCheckout}
+                    disabled={!selectedAddressId}
+                    sx={{
+                      borderRadius: "16px",
+                      py: 1.7,
+                      fontWeight: 900,
+                      fontSize: "1rem",
+                      letterSpacing: "0.01em",
+                      textTransform: "none",
+                      bgcolor: "#25D366",
+                      color: "#FFFFFF",
+                      boxShadow: "0 6px 24px rgba(37, 211, 102, 0.4)",
+                      transition: "all 0.25s ease",
+                      "&:hover": {
+                        bgcolor: "#1DAA54",
+                        boxShadow: "0 8px 32px rgba(37, 211, 102, 0.55)",
+                        transform: "translateY(-2px)",
+                      },
+                      "&:disabled": {
+                        bgcolor: "#CBD5E1",
+                        color: "#94A3B8",
+                        boxShadow: "none",
+                        transform: "none",
+                      },
+                    }}
+                  >
+                    Place Order via WhatsApp
+                  </Button>
 
-                    <Button
-                      variant="outlined"
-                      fullWidth
-                      startIcon={<AdminPanelSettingsOutlinedIcon />}
-                      onClick={handleNotifyAdmin}
-                      sx={{
-                        borderRadius: "12px",
-                        py: 1,
-                        fontWeight: 700,
-                        fontSize: "0.82rem",
-                        color: "#0F172A",
-                        borderColor: "#CBD5E1",
-                        bgcolor: "#FFFFFF",
-                        textTransform: "none",
-                        "&:hover": {
-                          bgcolor: "#F1F5F9",
-                          borderColor: "#94A3B8",
-                        },
-                      }}
-                    >
-                      Coordinate Full Order with Admin
-                    </Button>
+                  {!selectedAddressId && (
+                    <Typography sx={{ fontSize: "0.78rem", color: "#94A3B8", textAlign: "center", mt: -1 }}>
+                      Select a delivery address to continue
+                    </Typography>
+                  )}
 
-                    <Button
-                      variant="text"
-                      fullWidth
-                      startIcon={<ArrowBackRoundedIcon />}
-                      onClick={() => navigate(ROUTES.customerCart)}
-                      sx={{
-                        color: "#64748B",
-                        fontWeight: 700,
-                        fontSize: "0.82rem",
-                        textTransform: "none",
-                        borderRadius: "12px",
-                        "&:hover": {
-                          color: "#0F172A",
-                          bgcolor: "#F1F5F9",
-                        },
-                      }}
-                    >
-                      Back to Shopping Bag
-                    </Button>
-                  </Stack>
-
-                  {/* Trust & Safety Highlights */}
-                  <Stack spacing={1.2} sx={{ pt: 1, borderTop: "1px solid #E2E8F0" }}>
+                  {/* Trust Signals */}
+                  <Stack spacing={1} sx={{ pt: 0.5, borderTop: "1px solid #E2E8F0" }}>
                     <Stack direction="row" alignItems="center" spacing={1.2}>
-                      <ShieldOutlinedIcon sx={{ color: "#00C896", fontSize: 18 }} />
+                      <ShieldOutlinedIcon sx={{ color: "#00C896", fontSize: 17 }} />
                       <Typography sx={{ color: "#64748B", fontSize: "0.78rem" }}>
-                        Orders verified by DressMe Admin Team
+                        Secure, managed by DressMe
                       </Typography>
                     </Stack>
                     <Stack direction="row" alignItems="center" spacing={1.2}>
-                      <WhatsAppIcon sx={{ color: "#25D366", fontSize: 18 }} />
+                      <LocalShippingOutlinedIcon sx={{ color: "#00C896", fontSize: 17 }} />
                       <Typography sx={{ color: "#64748B", fontSize: "0.78rem" }}>
-                        Instant WhatsApp confirmation with store owners
+                        Free delivery on orders over {formatCurrency(5000)}
+                      </Typography>
+                    </Stack>
+                    <Stack direction="row" alignItems="center" spacing={1.2}>
+                      <WhatsAppIcon sx={{ color: "#25D366", fontSize: 17 }} />
+                      <Typography sx={{ color: "#64748B", fontSize: "0.78rem" }}>
+                        Order confirmed instantly on WhatsApp
                       </Typography>
                     </Stack>
                   </Stack>
@@ -796,27 +576,6 @@ export function CheckoutPage() {
           </Grid>
         </Stack>
       </Container>
-
-      {/* Snackbar Feedback */}
-      <Snackbar
-        open={snackbarOpen}
-        autoHideDuration={4000}
-        onClose={() => setSnackbarOpen(false)}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      >
-        <Alert
-          severity="success"
-          onClose={() => setSnackbarOpen(false)}
-          sx={{
-            bgcolor: "#00C896",
-            color: "#07130F",
-            fontWeight: 700,
-            boxShadow: "0 8px 30px rgba(0,200,150,0.4)",
-          }}
-        >
-          {snackbarMsg}
-        </Alert>
-      </Snackbar>
     </Box>
   );
 }
