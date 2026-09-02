@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Box,
@@ -29,10 +29,11 @@ interface ProductCardProps {
 
 // How many px of the hover panel peek above the card bottom when NOT hovered.
 // This is exactly what is always visible: price + size row.
-const PEEK_HEIGHT = 48; // px  (price row ~28px + 20px padding)
+const PEEK_HEIGHT = 48; // px (price row ~28px + 20px padding)
 
 export function ProductCard({ product }: ProductCardProps) {
   const navigate = useNavigate();
+  const cardRef = useRef<HTMLDivElement>(null);
   const { data: favorites } = useFavorites();
   const isFavorited = favorites ? favorites.some((f) => f.id === product.id) : false;
 
@@ -47,6 +48,28 @@ export function ProductCard({ product }: ProductCardProps) {
   const addToCart = useAddToCart();
   const addToFavorites = useAddToFavorites();
   const removeFromFavorites = useRemoveFromFavorites();
+
+  const isTouchDevice =
+    typeof window !== "undefined" &&
+    ("ontouchstart" in window || navigator.maxTouchPoints > 0);
+
+  // Close card when user clicks or touches outside
+  useEffect(() => {
+    if (!isHovered) return;
+
+    const handleOutsideInteraction = (e: MouseEvent | TouchEvent) => {
+      if (cardRef.current && !cardRef.current.contains(e.target as Node)) {
+        setIsHovered(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleOutsideInteraction);
+    document.addEventListener("touchstart", handleOutsideInteraction);
+    return () => {
+      document.removeEventListener("mousedown", handleOutsideInteraction);
+      document.removeEventListener("touchstart", handleOutsideInteraction);
+    };
+  }, [isHovered]);
 
   const images =
     product.images && product.images.length > 0
@@ -96,16 +119,38 @@ export function ProductCard({ product }: ProductCardProps) {
     e.stopPropagation();
     if (isFavorited) {
       removeFromFavorites.mutate(product.id, {
-        onSuccess: () => { setFavoriteMessage("Removed from wishlist!"); setShowFavoriteSuccess(true); },
+        onSuccess: () => {
+          setFavoriteMessage("Removed from wishlist!");
+          setShowFavoriteSuccess(true);
+        },
       });
     } else {
       addToFavorites.mutate(product.id, {
-        onSuccess: () => { setFavoriteMessage("Added to wishlist!"); setShowFavoriteSuccess(true); },
+        onSuccess: () => {
+          setFavoriteMessage("Added to wishlist!");
+          setShowFavoriteSuccess(true);
+        },
       });
     }
   };
 
-  const handleCardClick = () => navigate(`/products/${product.slug}`);
+  // Card click / tap behavior:
+  // On touchscreen, 1st tap reveals details if closed. 2nd tap (or desktop click) navigates.
+  const handleCardClick = (e: React.MouseEvent) => {
+    if (isTouchDevice && !isHovered) {
+      e.preventDefault();
+      setIsHovered(true);
+      return;
+    }
+    navigate(`/products/${product.slug}`);
+  };
+
+  // Touch / Hold event handlers
+  const handleTouchStart = () => {
+    if (!isHovered) {
+      setIsHovered(true);
+    }
+  };
 
   // Sizes
   const sizeMap = new Map<string, { id: string; inStock: boolean }>();
@@ -129,20 +174,30 @@ export function ProductCard({ product }: ProductCardProps) {
     }
   }
   const visibleColors = [...colorMap.entries()].slice(0, 4);
-  const isValidCssColor = (c: string) => { const s = new Option().style; s.color = c.toLowerCase(); return s.color !== ""; };
-  const useSwatches = visibleColors.length > 0 && visibleColors.every(([label]) => isValidCssColor(label));
+  const isValidCssColor = (c: string) => {
+    const s = new Option().style;
+    s.color = c.toLowerCase();
+    return s.color !== "";
+  };
+  const useSwatches =
+    visibleColors.length > 0 && visibleColors.every(([label]) => isValidCssColor(label));
 
   return (
     <>
-      {/* ════════════════════ PINTEREST HOVER-REVEAL CARD ════════════════════ */}
+      {/* ════════════════════ PINTEREST HOVER/TOUCH-REVEAL CARD ════════════════════ */}
       <Box
+        ref={cardRef}
         onClick={handleCardClick}
+        onTouchStart={handleTouchStart}
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         role="article"
         tabIndex={0}
         onKeyDown={(e) => {
-          if (e.key === "Enter" || e.key === " ") { e.preventDefault(); handleCardClick(); }
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            handleCardClick(e as unknown as React.MouseEvent);
+          }
         }}
         sx={{
           position: "relative",
@@ -153,7 +208,8 @@ export function ProductCard({ product }: ProductCardProps) {
           overflow: "hidden",
           cursor: "pointer",
           bgcolor: "#0B0E14",
-          border: "1px solid rgba(255, 255, 255, 0.07)",
+          border: "1px solid",
+          borderColor: isHovered ? "rgba(0, 200, 150, 0.45)" : "rgba(255, 255, 255, 0.07)",
           boxShadow: isHovered
             ? "0 22px 44px -8px rgba(0,0,0,0.8), 0 0 0 1px rgba(0,200,150,0.28)"
             : "0 4px 16px -2px rgba(0,0,0,0.5)",
@@ -161,6 +217,7 @@ export function ProductCard({ product }: ProductCardProps) {
           transition: "all 0.38s cubic-bezier(0.16, 1, 0.3, 1)",
           outline: "none",
           breakInside: "avoid",
+          WebkitTapHighlightColor: "transparent",
           "&:focus-visible": { boxShadow: "0 0 0 3px #00C896" },
         }}
       >
@@ -206,7 +263,7 @@ export function ProductCard({ product }: ProductCardProps) {
             </Box>
           )}
 
-          {/* Permanent bottom gradient — makes the peek area legible */}
+          {/* Permanent bottom gradient — keeps the peek area clean & legible */}
           <Box
             sx={{
               position: "absolute",
@@ -221,7 +278,7 @@ export function ProductCard({ product }: ProductCardProps) {
           />
         </Box>
 
-        {/* ── TOP-LEFT BADGES (hover reveal) ─────────────────────────────── */}
+        {/* ── TOP-LEFT BADGES (hover / touch reveal) ─────────────────────── */}
         <Stack
           direction="column"
           spacing={0.4}
@@ -237,23 +294,79 @@ export function ProductCard({ product }: ProductCardProps) {
           }}
         >
           {isOutOfStock && (
-            <Chip label="Sold Out" size="small" sx={{ bgcolor: "rgba(220,38,38,0.9)", color: "#FFF", fontWeight: 800, fontSize: "0.58rem", height: 20, px: 0.3, backdropFilter: "blur(8px)" }} />
+            <Chip
+              label="Sold Out"
+              size="small"
+              sx={{
+                bgcolor: "rgba(220,38,38,0.9)",
+                color: "#FFF",
+                fontWeight: 800,
+                fontSize: "0.58rem",
+                height: 20,
+                px: 0.3,
+                backdropFilter: "blur(8px)",
+              }}
+            />
           )}
           {!isOutOfStock && discountPercent > 0 && (
-            <Chip label={`-${discountPercent}%`} size="small" sx={{ bgcolor: "rgba(220,38,38,0.9)", color: "#FFF", fontWeight: 800, fontSize: "0.58rem", height: 20, px: 0.3, backdropFilter: "blur(8px)" }} />
+            <Chip
+              label={`-${discountPercent}%`}
+              size="small"
+              sx={{
+                bgcolor: "rgba(220,38,38,0.9)",
+                color: "#FFF",
+                fontWeight: 800,
+                fontSize: "0.58rem",
+                height: 20,
+                px: 0.3,
+                backdropFilter: "blur(8px)",
+              }}
+            />
           )}
           {product.isNewArrival && (
-            <Chip label="NEW" size="small" sx={{ bgcolor: "rgba(0,200,150,0.92)", color: "#07130F", fontWeight: 800, fontSize: "0.58rem", height: 20, px: 0.3 }} />
+            <Chip
+              label="NEW"
+              size="small"
+              sx={{
+                bgcolor: "rgba(0,200,150,0.92)",
+                color: "#07130F",
+                fontWeight: 800,
+                fontSize: "0.58rem",
+                height: 20,
+                px: 0.3,
+              }}
+            />
           )}
           {product.isTrending && (
-            <Chip label="HOT" size="small" sx={{ bgcolor: "rgba(245,158,11,0.92)", color: "#180E02", fontWeight: 800, fontSize: "0.58rem", height: 20, px: 0.3 }} />
+            <Chip
+              label="HOT"
+              size="small"
+              sx={{
+                bgcolor: "rgba(245,158,11,0.92)",
+                color: "#180E02",
+                fontWeight: 800,
+                fontSize: "0.58rem",
+                height: 20,
+                px: 0.3,
+              }}
+            />
           )}
           {isLowStock && (
-            <Chip label={`${totalStock} left`} size="small" sx={{ bgcolor: "rgba(234,88,12,0.9)", color: "#FFF", fontWeight: 700, fontSize: "0.55rem", height: 20 }} />
+            <Chip
+              label={`${totalStock} left`}
+              size="small"
+              sx={{
+                bgcolor: "rgba(234,88,12,0.9)",
+                color: "#FFF",
+                fontWeight: 700,
+                fontSize: "0.55rem",
+                height: 20,
+              }}
+            />
           )}
         </Stack>
 
-        {/* ── TOP-RIGHT: WISHLIST + IMAGE COUNTER (hover reveal) ─────────── */}
+        {/* ── TOP-RIGHT: WISHLIST + IMAGE COUNTER (hover / touch reveal) ─── */}
         <Stack
           direction="column"
           spacing={0.6}
@@ -284,12 +397,17 @@ export function ProductCard({ product }: ProductCardProps) {
               width: { xs: 30, sm: 34 },
               height: { xs: 30, sm: 34 },
               transition: "all 0.2s ease",
-              "&:hover": { bgcolor: isFavorited ? "rgba(0,200,150,0.35)" : "rgba(255,255,255,0.18)", transform: "scale(1.1)" },
+              "&:hover": {
+                bgcolor: isFavorited ? "rgba(0,200,150,0.35)" : "rgba(255,255,255,0.18)",
+                transform: "scale(1.1)",
+              },
             }}
           >
-            {isFavorited
-              ? <FavoriteIcon sx={{ fontSize: { xs: 15, sm: 17 }, color: "#00C896" }} />
-              : <FavoriteBorderIcon sx={{ fontSize: { xs: 15, sm: 17 } }} />}
+            {isFavorited ? (
+              <FavoriteIcon sx={{ fontSize: { xs: 15, sm: 17 }, color: "#00C896" }} />
+            ) : (
+              <FavoriteBorderIcon sx={{ fontSize: { xs: 15, sm: 17 } }} />
+            )}
           </IconButton>
 
           {images.length > 1 && (
@@ -311,7 +429,7 @@ export function ProductCard({ product }: ProductCardProps) {
           )}
         </Stack>
 
-        {/* ── PREV/NEXT ARROWS (hover reveal) ────────────────────────────── */}
+        {/* ── PREV/NEXT ARROWS (hover / touch reveal) ────────────────────── */}
         {images.length > 1 && (
           <>
             {[
@@ -335,7 +453,9 @@ export function ProductCard({ product }: ProductCardProps) {
                   width: { xs: 26, sm: 30 },
                   height: { xs: 26, sm: 30 },
                   opacity: isHovered ? 1 : 0,
-                  transform: isHovered ? "translateY(-50%) translateX(0)" : `translateY(-50%) translateX(${side === "left" ? "-5px" : "5px"})`,
+                  transform: isHovered
+                    ? "translateY(-50%) translateX(0)"
+                    : `translateY(-50%) translateX(${side === "left" ? "-5px" : "5px"})`,
                   transition: "all 0.28s ease",
                   "&:hover": { bgcolor: "#00C896", color: "#0B131E" },
                 }}
@@ -349,8 +469,8 @@ export function ProductCard({ product }: ProductCardProps) {
         {/* ══════════════════════════════════════════════════════════════════
             SLIDING PANEL — bottom of card
             • At rest:  translateY(calc(100% - PEEK_HEIGHT))
-              → only the last PEEK_HEIGHT px show → price + sizes
-            • On hover: translateY(0) → full panel revealed
+              → ONLY the last PEEK_HEIGHT px show → PRICE + SIZE (ALWAYS VISIBLE)
+            • On hover/touch: translateY(0) → full details revealed
         ══════════════════════════════════════════════════════════════════ */}
         <Box
           sx={{
@@ -359,22 +479,21 @@ export function ProductCard({ product }: ProductCardProps) {
             right: 0,
             bottom: 0,
             zIndex: 5,
-            // Slide: peek by default, full reveal on hover
+            // Slide: peek by default, full reveal on hover or touch
             transform: isHovered
               ? "translateY(0)"
               : `translateY(calc(100% - ${PEEK_HEIGHT}px))`,
             transition: "transform 0.38s cubic-bezier(0.16, 1, 0.3, 1)",
-            background: "rgba(8, 11, 18, 0.75)",
+            background: "rgba(8, 11, 18, 0.8)",
             backdropFilter: "blur(20px) saturate(180%)",
             WebkitBackdropFilter: "blur(20px) saturate(180%)",
             borderTop: "1px solid rgba(255,255,255,0.09)",
-            // Inner layout
             display: "flex",
             flexDirection: "column",
             gap: 0,
           }}
         >
-          {/* ── HIDDEN SECTION (revealed on hover) ── */}
+          {/* ── HIDDEN SECTION (revealed on hover / touch) ── */}
           <Box
             sx={{
               px: { xs: 1.25, sm: 1.5 },
@@ -409,14 +528,29 @@ export function ProductCard({ product }: ProductCardProps) {
               {product.averageRating > 0 ? (
                 <Stack direction="row" alignItems="center" spacing={0.25} sx={{ flexShrink: 0 }}>
                   <StarIcon sx={{ fontSize: { xs: 10, sm: 11 }, color: "#FBBF24" }} />
-                  <Typography sx={{ fontSize: { xs: "0.6rem", sm: "0.65rem" }, fontWeight: 700, color: "rgba(255,255,255,0.85)" }}>
+                  <Typography
+                    sx={{
+                      fontSize: { xs: "0.6rem", sm: "0.65rem" },
+                      fontWeight: 700,
+                      color: "rgba(255,255,255,0.85)",
+                    }}
+                  >
                     {product.averageRating.toFixed(1)}
                   </Typography>
                 </Stack>
               ) : product.vendor?.businessName ? (
                 <Stack direction="row" alignItems="center" spacing={0.2} sx={{ flexShrink: 0 }}>
                   <StorefrontIcon sx={{ fontSize: { xs: 9, sm: 10 }, color: "rgba(255,255,255,0.4)" }} />
-                  <Typography sx={{ fontSize: { xs: "0.55rem", sm: "0.6rem" }, color: "rgba(255,255,255,0.4)", maxWidth: 60, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                  <Typography
+                    sx={{
+                      fontSize: { xs: "0.55rem", sm: "0.6rem" },
+                      color: "rgba(255,255,255,0.4)",
+                      maxWidth: 60,
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
                     {product.vendor.businessName}
                   </Typography>
                 </Stack>
@@ -446,9 +580,11 @@ export function ProductCard({ product }: ProductCardProps) {
               fullWidth
               size="small"
               startIcon={
-                addToCart.isPending
-                  ? <CircularProgress size={10} color="inherit" />
-                  : <ShoppingBagOutlinedIcon sx={{ fontSize: "12px !important" }} />
+                addToCart.isPending ? (
+                  <CircularProgress size={10} color="inherit" />
+                ) : (
+                  <ShoppingBagOutlinedIcon sx={{ fontSize: "12px !important" }} />
+                )
               }
               disabled={isOutOfStock || addToCart.isPending}
               onClick={handleAddToCart}
@@ -465,15 +601,24 @@ export function ProductCard({ product }: ProductCardProps) {
                 boxShadow: isOutOfStock ? "none" : "0 3px 12px rgba(0,200,150,0.3)",
                 textTransform: "none",
                 transition: "all 0.22s ease",
-                "&:hover": { bgcolor: "#00E0A7", borderColor: "#00E0A7", color: "#050E0B", boxShadow: "0 5px 18px rgba(0,200,150,0.45)", transform: "translateY(-1px)" },
-                "&.Mui-disabled": { bgcolor: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.18)" },
+                "&:hover": {
+                  bgcolor: "#00E0A7",
+                  borderColor: "#00E0A7",
+                  color: "#050E0B",
+                  boxShadow: "0 5px 18px rgba(0,200,150,0.45)",
+                  transform: "translateY(-1px)",
+                },
+                "&.Mui-disabled": {
+                  bgcolor: "rgba(255,255,255,0.04)",
+                  color: "rgba(255,255,255,0.18)",
+                },
               }}
             >
               {isOutOfStock ? "Sold Out" : "Add to Cart"}
             </Button>
           </Box>
 
-          {/* ── ALWAYS-VISIBLE PEEK ROW: price + sizes ──────────────────── */}
+          {/* ── ALWAYS-VISIBLE PEEK ROW: PRICE + SIZE (ALWAYS VISIBLE) ──── */}
           <Stack
             direction="row"
             alignItems="center"
@@ -533,17 +678,36 @@ export function ProductCard({ product }: ProductCardProps) {
                 : visibleSizes.map(([label, { id, inStock }]) => (
                     <Box
                       key={label}
-                      onClick={(e) => { e.preventDefault(); e.stopPropagation(); if (inStock) setSelectedVariantId(id); }}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (inStock) setSelectedVariantId(id);
+                      }}
                       sx={{
                         px: 0.45,
                         py: 0.15,
                         borderRadius: "3px",
-                        bgcolor: selectedVariantId === id ? "rgba(0,200,150,0.2)" : inStock ? "rgba(255,255,255,0.1)" : "rgba(255,255,255,0.03)",
+                        bgcolor:
+                          selectedVariantId === id
+                            ? "rgba(0,200,150,0.2)"
+                            : inStock
+                            ? "rgba(255,255,255,0.1)"
+                            : "rgba(255,255,255,0.03)",
                         border: "1px solid",
-                        borderColor: selectedVariantId === id ? "#00C896" : inStock ? "rgba(255,255,255,0.2)" : "rgba(255,255,255,0.05)",
+                        borderColor:
+                          selectedVariantId === id
+                            ? "#00C896"
+                            : inStock
+                            ? "rgba(255,255,255,0.2)"
+                            : "rgba(255,255,255,0.05)",
                         fontSize: "0.55rem",
                         fontWeight: 700,
-                        color: selectedVariantId === id ? "#00C896" : inStock ? "rgba(255,255,255,0.85)" : "rgba(255,255,255,0.2)",
+                        color:
+                          selectedVariantId === id
+                            ? "#00C896"
+                            : inStock
+                            ? "rgba(255,255,255,0.85)"
+                            : "rgba(255,255,255,0.2)",
                         textDecoration: inStock ? "none" : "line-through",
                         cursor: inStock ? "pointer" : "default",
                         flexShrink: 0,
@@ -558,14 +722,43 @@ export function ProductCard({ product }: ProductCardProps) {
       </Box>
 
       {/* Feedback Snackbars */}
-      <Snackbar open={showCartSuccess} autoHideDuration={3000} onClose={() => setShowCartSuccess(false)} anchorOrigin={{ vertical: "bottom", horizontal: "center" }}>
-        <Alert severity="success" onClose={() => setShowCartSuccess(false)} sx={{ bgcolor: "#00C896", color: "#07130F", fontWeight: 700, boxShadow: "0 8px 24px rgba(0,200,150,0.4)", "& .MuiAlert-icon": { color: "#07130F" } }}>
+      <Snackbar
+        open={showCartSuccess}
+        autoHideDuration={3000}
+        onClose={() => setShowCartSuccess(false)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          severity="success"
+          onClose={() => setShowCartSuccess(false)}
+          sx={{
+            bgcolor: "#00C896",
+            color: "#07130F",
+            fontWeight: 700,
+            boxShadow: "0 8px 24px rgba(0,200,150,0.4)",
+            "& .MuiAlert-icon": { color: "#07130F" },
+          }}
+        >
           {product.name} added to cart!
         </Alert>
       </Snackbar>
 
-      <Snackbar open={showFavoriteSuccess} autoHideDuration={3000} onClose={() => setShowFavoriteSuccess(false)} anchorOrigin={{ vertical: "bottom", horizontal: "center" }}>
-        <Alert severity="info" onClose={() => setShowFavoriteSuccess(false)} sx={{ bgcolor: "#1E293B", color: "#FFF", fontWeight: 600, border: "1px solid rgba(255,255,255,0.12)" }}>
+      <Snackbar
+        open={showFavoriteSuccess}
+        autoHideDuration={3000}
+        onClose={() => setShowFavoriteSuccess(false)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          severity="info"
+          onClose={() => setShowFavoriteSuccess(false)}
+          sx={{
+            bgcolor: "#1E293B",
+            color: "#FFF",
+            fontWeight: 600,
+            border: "1px solid rgba(255,255,255,0.12)",
+          }}
+        >
           {favoriteMessage}
         </Alert>
       </Snackbar>

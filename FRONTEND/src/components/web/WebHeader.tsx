@@ -2,10 +2,11 @@ import { useState } from "react";
 import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
 import {
   AppBar,
+  Avatar,
   Badge,
   Box,
-  Button,
   Container,
+  Divider,
   Drawer,
   IconButton,
   Link,
@@ -15,298 +16,663 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import MenuIcon from "@mui/icons-material/Menu";
-import CloseIcon from "@mui/icons-material/Close";
-import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import PersonIcon from "@mui/icons-material/Person";
-import LogoutIcon from "@mui/icons-material/Logout";
+
+import MenuRoundedIcon from "@mui/icons-material/MenuRounded";
+import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
+import FavoriteBorderRoundedIcon from "@mui/icons-material/FavoriteBorderRounded";
+import FavoriteRoundedIcon from "@mui/icons-material/FavoriteRounded";
+import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
+import AutoAwesomeRoundedIcon from "@mui/icons-material/AutoAwesomeRounded";
+import GridViewRoundedIcon from "@mui/icons-material/GridViewRounded";
+import StorefrontRoundedIcon from "@mui/icons-material/StorefrontRounded";
+import StyleRoundedIcon from "@mui/icons-material/StyleRounded";
+import PersonRoundedIcon from "@mui/icons-material/PersonRounded";
+import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
+import LoginRoundedIcon from "@mui/icons-material/LoginRounded";
+import PersonAddRoundedIcon from "@mui/icons-material/PersonAddRounded";
+import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
+
 import { ROUTES } from "../../constants/routes";
 import { useAuth } from "../../hooks/useAuth";
 import { useSiteSettingsContext } from "../../contexts/SiteSettingsContext";
 import { useFavorites } from "../../hooks/useFavorites";
 import { useCart } from "../../hooks/useCart";
 
-const NAVIGATION_ITEMS = [
+// ─── Desktop nav items ────────────────────────────────────────────────────────
+const DESKTOP_NAV = [
   { label: "Products", path: ROUTES.customerDashboard },
   { label: "Categories", path: ROUTES.categories },
   { label: "Brands", path: ROUTES.brands },
   { label: "AI Stylist", path: ROUTES.aiStylist },
 ];
 
+// ─── Mobile drawer menu sections ─────────────────────────────────────────────
+const MENU_NAV = [
+  { label: "Products", path: ROUTES.customerDashboard, Icon: GridViewRoundedIcon },
+  { label: "Categories", path: ROUTES.categories, Icon: StyleRoundedIcon },
+  { label: "Brands", path: ROUTES.brands, Icon: StorefrontRoundedIcon },
+];
+
 export function WebHeader() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const { user, isAuthenticated, logout } = useAuth();
   const { settings } = useSiteSettingsContext();
   const { data: favorites } = useFavorites();
   const { data: cart } = useCart();
-  const cartCount = cart?.items?.reduce((sum, item) => sum + item.quantity, 0) || 0;
 
-  const handleDrawerToggle = () => {
-    setMobileOpen(!mobileOpen);
-  };
+  const favCount = favorites?.length || 0;
+  const cartCount = cart?.items?.reduce((s, i) => s + i.quantity, 0) || 0;
+
+  const closeMenu = () => setMenuOpen(false);
 
   const handleLogout = () => {
+    closeMenu();
     logout();
     navigate(ROUTES.webLogin, { replace: true });
   };
 
-  const navigationContent = (
-    <Stack direction={isMobile ? "column" : "row"} spacing={isMobile ? 3 : 4} alignItems="center">
-      {NAVIGATION_ITEMS.map((item) => (
-        <Link
-          key={item.path}
-          component={RouterLink}
-          to={item.path}
-          underline="none"
-          color={location.pathname === item.path ? "primary" : "text.primary"}
-          sx={{
-            fontWeight: location.pathname === item.path ? 600 : 500,
-            fontSize: "0.95rem",
-            transition: "color 0.2s",
-            "&:hover": { color: "primary.main" },
-          }}
-        >
-          {item.label}
-        </Link>
-      ))}
-    </Stack>
-  );
+  // ── Icon button shared styles ──────────────────────────────────────────────
+  const iconBtnSx = {
+    width: 36,
+    height: 36,
+    borderRadius: "10px",
+    color: "rgba(255,255,255,0.85)",
+    bgcolor: "rgba(255,255,255,0.05)",
+    border: "1px solid rgba(255,255,255,0.09)",
+    transition: "all 0.2s ease",
+    "&:hover": {
+      bgcolor: "rgba(255,255,255,0.12)",
+      borderColor: "rgba(255,255,255,0.2)",
+      color: "#fff",
+    },
+  };
 
   return (
-    <AppBar
-      position="sticky"
-      elevation={0}
-      sx={{
-        bgcolor: "background.paper",
-        borderBottom: "1px solid",
-        borderColor: "divider",
-        py: 1,
-      }}
-    >
-      <Container maxWidth="xl">
-        <Toolbar disableGutters sx={{ gap: 2 }}>
-          <Box sx={{ display: "flex", alignItems: "center", flexGrow: 1 }}>
-            <Link
-              component={RouterLink}
-              to={ROUTES.landing}
-              underline="none"
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                gap: 1,
-              }}
-            >
-              {settings?.logoUrl ? (
-                <Box
-                  component="img"
-                  src={settings.logoUrl}
-                  alt={settings?.siteName || "DressMe"}
-                  sx={{
-                    height: { xs: 64, md: 96 },
-                    maxWidth: { xs: 200, md: 300 },
-                    objectFit: "contain",
-                    display: "block",
-                  }}
-                />
-              ) : (
-                <Typography
-                  variant="h5"
-                  sx={{
-                    fontWeight: 700,
-                    color: "primary.main",
-                    fontSize: { xs: "1.5rem", md: "1.75rem" },
-                  }}
-                >
-                  {settings?.siteName || "DressMe"}
-                </Typography>
-              )}
-            </Link>
-          </Box>
+    <>
+      <AppBar
+        position="sticky"
+        elevation={0}
+        sx={{
+          bgcolor: { xs: "rgba(7,9,14,0.96)", md: "background.paper" },
+          backdropFilter: "blur(20px)",
+          WebkitBackdropFilter: "blur(20px)",
+          borderBottom: "1px solid",
+          borderColor: { xs: "rgba(255,255,255,0.07)", md: "divider" },
+          // keep desktop py, tighter on mobile
+          py: { xs: 0.5, md: 1 },
+        }}
+      >
+        <Container maxWidth="xl">
+          <Toolbar disableGutters sx={{ gap: { xs: 1, md: 2 }, minHeight: { xs: 56, md: 64 } }}>
 
-          {!isMobile && (
-            <Box sx={{ display: "flex", alignItems: "center", gap: 4 }}>
-              {navigationContent}
+            {/* ── LOGO ────────────────────────────────────────────────────── */}
+            <Box sx={{ display: "flex", alignItems: "center", flexGrow: 1 }}>
+              <Link
+                component={RouterLink}
+                to={ROUTES.landing}
+                underline="none"
+                sx={{ display: "flex", alignItems: "center" }}
+              >
+                {settings?.logoUrl ? (
+                  <Box
+                    component="img"
+                    src={settings.logoUrl}
+                    alt={settings?.siteName || "DressMe"}
+                    sx={{
+                      height: { xs: 44, md: 96 },
+                      maxWidth: { xs: 160, md: 300 },
+                      objectFit: "contain",
+                      display: "block",
+                    }}
+                  />
+                ) : (
+                  <Typography
+                    variant="h5"
+                    sx={{
+                      fontWeight: 800,
+                      color: "#00C896",
+                      fontSize: { xs: "1.35rem", md: "1.75rem" },
+                      letterSpacing: "-0.02em",
+                    }}
+                  >
+                    {settings?.siteName || "DressMe"}
+                  </Typography>
+                )}
+              </Link>
             </Box>
-          )}
 
-          <Stack direction="row" spacing={2} alignItems="center">
-            {isAuthenticated ? (
-              <>
+            {/* ── DESKTOP NAV (md+) ────────────────────────────────────────── */}
+            {!isMobile && (
+              <Stack direction="row" spacing={4} alignItems="center">
+                {DESKTOP_NAV.map((item) => (
+                  <Link
+                    key={item.path}
+                    component={RouterLink}
+                    to={item.path}
+                    underline="none"
+                    color={location.pathname === item.path ? "primary" : "text.primary"}
+                    sx={{
+                      fontWeight: location.pathname === item.path ? 600 : 500,
+                      fontSize: "0.95rem",
+                      transition: "color 0.2s",
+                      "&:hover": { color: "primary.main" },
+                    }}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </Stack>
+            )}
+
+            {/* ── DESKTOP RIGHT ICONS (md+) ────────────────────────────────── */}
+            {!isMobile && (
+              <Stack direction="row" spacing={1.5} alignItems="center">
+                {isAuthenticated ? (
+                  <>
+                    <IconButton
+                      component={RouterLink}
+                      to={ROUTES.wishlist}
+                      size="small"
+                      sx={{ color: "text.primary" }}
+                      aria-label="Wishlist"
+                    >
+                      <Badge badgeContent={favCount} color="error">
+                        <FavoriteBorderRoundedIcon />
+                      </Badge>
+                    </IconButton>
+                    <IconButton
+                      component={RouterLink}
+                      to={ROUTES.customerCart}
+                      size="small"
+                      sx={{ color: "text.primary" }}
+                      aria-label="Cart"
+                    >
+                      <Badge badgeContent={cartCount} color="primary">
+                        <ShoppingBagOutlinedIcon />
+                      </Badge>
+                    </IconButton>
+                    <IconButton
+                      component={RouterLink}
+                      to={ROUTES.profile}
+                      size="small"
+                      sx={{ color: "text.primary" }}
+                      aria-label="Account"
+                    >
+                      <PersonRoundedIcon />
+                    </IconButton>
+                    <IconButton
+                      onClick={handleLogout}
+                      size="small"
+                      sx={{ color: "text.primary" }}
+                      aria-label="Logout"
+                    >
+                      <LogoutRoundedIcon />
+                    </IconButton>
+                  </>
+                ) : (
+                  <>
+                    <IconButton
+                      component={RouterLink}
+                      to={ROUTES.customerCart}
+                      size="small"
+                      sx={{ color: "text.primary" }}
+                      aria-label="Cart"
+                    >
+                      <Badge badgeContent={cartCount} color="primary">
+                        <ShoppingBagOutlinedIcon />
+                      </Badge>
+                    </IconButton>
+                    <Link
+                      component={RouterLink}
+                      to={ROUTES.webLogin}
+                      underline="none"
+                      sx={{ fontWeight: 600, fontSize: "0.9rem", color: "text.primary", "&:hover": { color: "primary.main" } }}
+                    >
+                      Sign In
+                    </Link>
+                    <Box
+                      component={RouterLink}
+                      to={ROUTES.webRegister}
+                      sx={{
+                        px: 2, py: 0.7,
+                        bgcolor: "#00C896",
+                        color: "#07130F",
+                        fontWeight: 700,
+                        fontSize: "0.85rem",
+                        borderRadius: "10px",
+                        textDecoration: "none",
+                        transition: "all 0.2s ease",
+                        "&:hover": { bgcolor: "#00E0A7" },
+                      }}
+                    >
+                      Sign Up
+                    </Box>
+                  </>
+                )}
+              </Stack>
+            )}
+
+            {/* ════════════════════════════════════════════════════════════════
+                MOBILE RIGHT: Wishlist · Cart · AI Stylist pill · ☰ Menu
+            ════════════════════════════════════════════════════════════════ */}
+            {isMobile && (
+              <Stack direction="row" spacing={0.75} alignItems="center">
+
+                {/* Wishlist */}
                 <IconButton
                   component={RouterLink}
                   to={ROUTES.wishlist}
-                  size="small"
-                  sx={{ color: "text.primary" }}
                   aria-label="Wishlist"
+                  size="small"
+                  sx={iconBtnSx}
                 >
-                  <Badge badgeContent={favorites?.length || 0} color="error">
-                    <FavoriteBorderIcon />
+                  <Badge
+                    badgeContent={favCount}
+                    sx={{
+                      "& .MuiBadge-badge": {
+                        bgcolor: "#EF4444",
+                        color: "#fff",
+                        fontSize: "0.55rem",
+                        minWidth: 14,
+                        height: 14,
+                        top: 1,
+                        right: 1,
+                      },
+                    }}
+                  >
+                    {favCount > 0 ? (
+                      <FavoriteRoundedIcon sx={{ fontSize: 18, color: "#EF4444" }} />
+                    ) : (
+                      <FavoriteBorderRoundedIcon sx={{ fontSize: 18 }} />
+                    )}
                   </Badge>
                 </IconButton>
-                <IconButton
-                  component={RouterLink}
-                  to={ROUTES.customerCart}
-                  size="small"
-                  sx={{ color: "text.primary" }}
-                  aria-label="Shopping Cart"
-                >
-                  <Badge badgeContent={cartCount} color="primary">
-                    <ShoppingCartIcon />
-                  </Badge>
-                </IconButton>
-                <Button
-                  component={RouterLink}
-                  to={ROUTES.profile}
-                  variant="outlined"
-                  size="small"
-                  startIcon={<PersonIcon />}
-                >
-                  {user?.name?.split(" ")[0] || "Account"}
-                </Button>
-                <IconButton
-                  aria-label="Log out"
-                  onClick={handleLogout}
-                  size="small"
-                  sx={{ color: "text.primary" }}
-                >
-                  <LogoutIcon />
-                </IconButton>
-              </>
-            ) : (
-              <>
-                <IconButton
-                  component={RouterLink}
-                  to={ROUTES.customerCart}
-                  size="small"
-                  sx={{ color: "text.primary" }}
-                  aria-label="Shopping Cart"
-                >
-                  <Badge badgeContent={cartCount} color="primary">
-                    <ShoppingCartIcon />
-                  </Badge>
-                </IconButton>
-                <Button
-                  component={RouterLink}
-                  to={ROUTES.webLogin}
-                  variant="text"
-                  size="small"
-                >
-                  Sign In
-                </Button>
-                <Button
-                  component={RouterLink}
-                  to={ROUTES.webRegister}
-                  variant="contained"
-                  size="small"
-                >
-                  Sign Up
-                </Button>
-              </>
-            )}
-            {isMobile && (
-              <IconButton
-                color="inherit"
-                aria-label="open drawer"
-                edge="end"
-                onClick={handleDrawerToggle}
-              >
-                {mobileOpen ? <CloseIcon /> : <MenuIcon />}
-              </IconButton>
-            )}
-          </Stack>
-        </Toolbar>
-      </Container>
 
+                {/* Cart */}
+                <IconButton
+                  component={RouterLink}
+                  to={ROUTES.customerCart}
+                  aria-label="Cart"
+                  size="small"
+                  sx={iconBtnSx}
+                >
+                  <Badge
+                    badgeContent={cartCount}
+                    sx={{
+                      "& .MuiBadge-badge": {
+                        bgcolor: "#00C896",
+                        color: "#07130F",
+                        fontWeight: 800,
+                        fontSize: "0.55rem",
+                        minWidth: 14,
+                        height: 14,
+                        top: 1,
+                        right: 1,
+                      },
+                    }}
+                  >
+                    <ShoppingBagOutlinedIcon sx={{ fontSize: 18 }} />
+                  </Badge>
+                </IconButton>
+
+                {/* AI Stylist pill */}
+                <Box
+                  component={RouterLink}
+                  to={ROUTES.aiStylist}
+                  aria-label="AI Stylist"
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 0.4,
+                    px: 1.2,
+                    height: 32,
+                    borderRadius: "20px",
+                    bgcolor: "rgba(0,200,150,0.12)",
+                    border: "1px solid rgba(0,200,150,0.3)",
+                    color: "#00C896",
+                    textDecoration: "none",
+                    transition: "all 0.2s ease",
+                    "&:hover": {
+                      bgcolor: "rgba(0,200,150,0.22)",
+                      borderColor: "#00C896",
+                    },
+                    "&:active": { transform: "scale(0.95)" },
+                  }}
+                >
+                  <AutoAwesomeRoundedIcon sx={{ fontSize: 13 }} />
+                  <Typography sx={{ fontSize: "0.68rem", fontWeight: 800, letterSpacing: "0.04em", lineHeight: 1 }}>
+                    Stylist
+                  </Typography>
+                </Box>
+
+                {/* Hamburger */}
+                <IconButton
+                  onClick={() => setMenuOpen(true)}
+                  aria-label="Open menu"
+                  size="small"
+                  sx={{
+                    ...iconBtnSx,
+                    bgcolor: menuOpen ? "rgba(0,200,150,0.15)" : "rgba(255,255,255,0.05)",
+                    borderColor: menuOpen ? "rgba(0,200,150,0.35)" : "rgba(255,255,255,0.09)",
+                    color: menuOpen ? "#00C896" : "rgba(255,255,255,0.85)",
+                  }}
+                >
+                  <MenuRoundedIcon sx={{ fontSize: 18 }} />
+                </IconButton>
+              </Stack>
+            )}
+
+          </Toolbar>
+        </Container>
+      </AppBar>
+
+      {/* ══════════════════════════════════════════════════════════════════════
+          MOBILE MENU DRAWER — slides up from bottom
+      ══════════════════════════════════════════════════════════════════════ */}
       <Drawer
-        anchor="right"
-        open={mobileOpen}
-        onClose={handleDrawerToggle}
+        anchor="bottom"
+        open={menuOpen}
+        onClose={closeMenu}
         ModalProps={{ keepMounted: true }}
         sx={{
           display: { xs: "block", md: "none" },
           "& .MuiDrawer-paper": {
-            boxSizing: "border-box",
-            width: 280,
-            pt: 2,
-            background: "rgba(255, 255, 255, 0.7)",
-            backdropFilter: "blur(20px)",
-            WebkitBackdropFilter: "blur(20px)",
-            borderLeft: "1px solid rgba(255, 255, 255, 0.3)",
+            borderRadius: "24px 24px 0 0",
+            bgcolor: "#0B0E14",
+            border: "1px solid rgba(255,255,255,0.1)",
+            borderBottom: "none",
+            backdropFilter: "blur(24px)",
+            WebkitBackdropFilter: "blur(24px)",
+            boxShadow: "0 -20px 60px rgba(0,0,0,0.8)",
+            maxHeight: "82vh",
+            overflowY: "auto",
           },
         }}
       >
-        <Box onClick={handleDrawerToggle} sx={{ p: 3, display: "flex", flexDirection: "column", height: "100%" }}>
-          <Typography variant="h6" sx={{ mb: 3, fontWeight: 700 }}>
-            Menu
-          </Typography>
-          {navigationContent}
-          <Box sx={{ mt: "auto", pt: 3, borderTop: "1px solid", borderColor: "divider" }}>
-            {isAuthenticated ? (
-              <Stack spacing={2}>
-                <Button
+        {/* ── Drag handle + header ─────────────────────────────────────── */}
+        <Box sx={{ px: 2.5, pt: 1.5, pb: 0 }}>
+          {/* Drag pill */}
+          <Box
+            sx={{
+              width: 36,
+              height: 4,
+              borderRadius: 2,
+              bgcolor: "rgba(255,255,255,0.15)",
+              mx: "auto",
+              mb: 2,
+            }}
+          />
+
+          {/* Header row */}
+          <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
+            <Typography
+              sx={{ fontWeight: 800, fontSize: "1.05rem", color: "#FFF", letterSpacing: "-0.01em" }}
+            >
+              Menu
+            </Typography>
+            <IconButton
+              onClick={closeMenu}
+              size="small"
+              sx={{
+                color: "rgba(255,255,255,0.5)",
+                bgcolor: "rgba(255,255,255,0.05)",
+                borderRadius: "10px",
+                width: 32,
+                height: 32,
+                "&:hover": { color: "#fff", bgcolor: "rgba(255,255,255,0.1)" },
+              }}
+            >
+              <CloseRoundedIcon sx={{ fontSize: 16 }} />
+            </IconButton>
+          </Stack>
+        </Box>
+
+        <Box sx={{ px: 2.5, pb: 3 }}>
+
+          {/* ── NAV LINKS ────────────────────────────────────────────────── */}
+          <Stack spacing={0.5} sx={{ mb: 2 }}>
+            {MENU_NAV.map(({ label, path, Icon }) => {
+              const active = location.pathname.startsWith(path);
+              return (
+                <Box
+                  key={path}
                   component={RouterLink}
-                  to={ROUTES.wishlist}
-                  startIcon={<FavoriteBorderIcon />}
-                  fullWidth
-                  sx={{ justifyContent: "flex-start" }}
+                  to={path}
+                  onClick={closeMenu}
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1.5,
+                    px: 1.5,
+                    py: 1.3,
+                    borderRadius: "14px",
+                    bgcolor: active ? "rgba(0,200,150,0.1)" : "transparent",
+                    border: "1px solid",
+                    borderColor: active ? "rgba(0,200,150,0.25)" : "transparent",
+                    textDecoration: "none",
+                    transition: "all 0.18s ease",
+                    "&:hover": {
+                      bgcolor: "rgba(255,255,255,0.05)",
+                      borderColor: "rgba(255,255,255,0.1)",
+                    },
+                  }}
                 >
-                  Wishlist ({favorites?.length || 0})
-                </Button>
-                <Button
-                  component={RouterLink}
-                  to={ROUTES.customerCart}
-                  startIcon={<ShoppingCartIcon />}
-                  fullWidth
-                  sx={{ justifyContent: "flex-start" }}
+                  <Box
+                    sx={{
+                      width: 34,
+                      height: 34,
+                      borderRadius: "10px",
+                      bgcolor: active ? "rgba(0,200,150,0.15)" : "rgba(255,255,255,0.05)",
+                      display: "grid",
+                      placeItems: "center",
+                      flexShrink: 0,
+                    }}
+                  >
+                    <Icon
+                      sx={{ fontSize: 17, color: active ? "#00C896" : "rgba(255,255,255,0.55)" }}
+                    />
+                  </Box>
+                  <Typography
+                    sx={{
+                      flex: 1,
+                      fontWeight: active ? 700 : 500,
+                      fontSize: "0.95rem",
+                      color: active ? "#00C896" : "rgba(255,255,255,0.85)",
+                    }}
+                  >
+                    {label}
+                  </Typography>
+                  <ChevronRightRoundedIcon
+                    sx={{ fontSize: 16, color: active ? "#00C896" : "rgba(255,255,255,0.2)" }}
+                  />
+                </Box>
+              );
+            })}
+          </Stack>
+
+          <Divider sx={{ borderColor: "rgba(255,255,255,0.07)", mb: 2 }} />
+
+          {/* ── USER SECTION ─────────────────────────────────────────────── */}
+          {isAuthenticated ? (
+            <Stack spacing={0.5}>
+              {/* User info row */}
+              <Box
+                component={RouterLink}
+                to={ROUTES.profile}
+                onClick={closeMenu}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1.5,
+                  px: 1.5,
+                  py: 1.3,
+                  borderRadius: "14px",
+                  textDecoration: "none",
+                  transition: "all 0.18s ease",
+                  "&:hover": { bgcolor: "rgba(255,255,255,0.05)" },
+                }}
+              >
+                <Avatar
+                  sx={{
+                    width: 34,
+                    height: 34,
+                    bgcolor: "rgba(0,200,150,0.15)",
+                    border: "1.5px solid rgba(0,200,150,0.35)",
+                    color: "#00C896",
+                    fontSize: "0.8rem",
+                    fontWeight: 800,
+                    flexShrink: 0,
+                  }}
                 >
-                  Cart
-                </Button>
-                <Button
-                  component={RouterLink}
-                  to={ROUTES.profile}
-                  startIcon={<PersonIcon />}
-                  fullWidth
-                  sx={{ justifyContent: "flex-start" }}
+                  {user?.name?.charAt(0)?.toUpperCase() || "U"}
+                </Avatar>
+                <Box sx={{ flex: 1, minWidth: 0 }}>
+                  <Typography
+                    sx={{
+                      fontWeight: 700,
+                      fontSize: "0.9rem",
+                      color: "#FFF",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {user?.name || "My Account"}
+                  </Typography>
+                  <Typography
+                    sx={{
+                      fontSize: "0.72rem",
+                      color: "rgba(255,255,255,0.4)",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {user?.email || "View profile"}
+                  </Typography>
+                </Box>
+                <ChevronRightRoundedIcon sx={{ fontSize: 16, color: "rgba(255,255,255,0.2)" }} />
+              </Box>
+
+              {/* Logout */}
+              <Box
+                onClick={handleLogout}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1.5,
+                  px: 1.5,
+                  py: 1.3,
+                  borderRadius: "14px",
+                  cursor: "pointer",
+                  transition: "all 0.18s ease",
+                  "&:hover": {
+                    bgcolor: "rgba(239,68,68,0.08)",
+                    "& .logout-icon": { color: "#EF4444" },
+                    "& .logout-text": { color: "#EF4444" },
+                  },
+                }}
+              >
+                <Box
+                  sx={{
+                    width: 34,
+                    height: 34,
+                    borderRadius: "10px",
+                    bgcolor: "rgba(255,255,255,0.04)",
+                    display: "grid",
+                    placeItems: "center",
+                    flexShrink: 0,
+                  }}
                 >
-                  {user?.name?.split(" ")[0] || "Account"}
-                </Button>
-                <Button
-                  onClick={handleLogout}
-                  startIcon={<LogoutIcon />}
-                  fullWidth
-                  sx={{ justifyContent: "flex-start" }}
+                  <LogoutRoundedIcon
+                    className="logout-icon"
+                    sx={{ fontSize: 17, color: "rgba(255,255,255,0.4)", transition: "color 0.2s" }}
+                  />
+                </Box>
+                <Typography
+                  className="logout-text"
+                  sx={{
+                    fontWeight: 500,
+                    fontSize: "0.95rem",
+                    color: "rgba(255,255,255,0.5)",
+                    transition: "color 0.2s",
+                  }}
                 >
-                  Logout
-                </Button>
-              </Stack>
-            ) : (
-              <Stack spacing={2}>
-                <Button
-                  component={RouterLink}
-                  to={ROUTES.webLogin}
-                  variant="outlined"
-                  fullWidth
+                  Log out
+                </Typography>
+              </Box>
+            </Stack>
+          ) : (
+            /* Not authenticated — Sign In / Sign Up */
+            <Stack spacing={1}>
+              <Box
+                component={RouterLink}
+                to={ROUTES.webLogin}
+                onClick={closeMenu}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1.5,
+                  px: 1.5,
+                  py: 1.3,
+                  borderRadius: "14px",
+                  textDecoration: "none",
+                  border: "1px solid rgba(255,255,255,0.1)",
+                  transition: "all 0.18s ease",
+                  "&:hover": { bgcolor: "rgba(255,255,255,0.05)" },
+                }}
+              >
+                <Box
+                  sx={{
+                    width: 34,
+                    height: 34,
+                    borderRadius: "10px",
+                    bgcolor: "rgba(255,255,255,0.05)",
+                    display: "grid",
+                    placeItems: "center",
+                  }}
                 >
+                  <LoginRoundedIcon sx={{ fontSize: 17, color: "rgba(255,255,255,0.55)" }} />
+                </Box>
+                <Typography sx={{ fontWeight: 600, fontSize: "0.95rem", color: "rgba(255,255,255,0.85)" }}>
                   Sign In
-                </Button>
-                <Button
-                  component={RouterLink}
-                  to={ROUTES.webRegister}
-                  variant="contained"
-                  fullWidth
-                >
-                  Sign Up
-                </Button>
-              </Stack>
-            )}
-          </Box>
+                </Typography>
+              </Box>
+
+              <Box
+                component={RouterLink}
+                to={ROUTES.webRegister}
+                onClick={closeMenu}
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 1,
+                  px: 1.5,
+                  py: 1.3,
+                  borderRadius: "14px",
+                  textDecoration: "none",
+                  bgcolor: "#00C896",
+                  color: "#07130F",
+                  fontWeight: 800,
+                  fontSize: "0.95rem",
+                  transition: "all 0.2s ease",
+                  "&:hover": { bgcolor: "#00E0A7" },
+                }}
+              >
+                <PersonAddRoundedIcon sx={{ fontSize: 18 }} />
+                <Typography sx={{ fontWeight: 800, fontSize: "0.95rem", color: "inherit" }}>
+                  Create Account
+                </Typography>
+              </Box>
+            </Stack>
+          )}
         </Box>
       </Drawer>
-    </AppBar>
+    </>
   );
 }
