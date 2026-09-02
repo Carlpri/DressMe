@@ -1,48 +1,38 @@
-import { useState } from "react";
 import { Link as RouterLink } from "react-router-dom";
 import {
   Alert,
   Box,
   Button,
   Container,
-  Grid,
-  Skeleton,
-  Snackbar,
   Stack,
   Typography,
 } from "@mui/material";
 import FavoriteBorderRoundedIcon from "@mui/icons-material/FavoriteBorderRounded";
 import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
 import GridViewRoundedIcon from "@mui/icons-material/GridViewRounded";
-import { useFavorites, useRemoveFromFavorites } from "../../hooks/useFavorites";
-import { WishlistItemCard } from "../../components/customer/WishlistItemCard";
+import { useFavorites } from "../../hooks/useFavorites";
+import { ProductCard } from "../../components/shared/ProductCard";
+import { MasonryGrid } from "../../components/shared/MasonryGrid";
+import { LoadingSkeleton } from "../../components/shared/LoadingSkeleton";
 import { ROUTES } from "../../constants/routes";
 
 export function WishlistPage() {
   const { data: favorites, isLoading, error } = useFavorites();
-  const removeFromFavorites = useRemoveFromFavorites();
-  const [removingId, setRemovingId] = useState<string | null>(null);
-  const [showRemoveSuccess, setShowRemoveSuccess] = useState(false);
-
-  const handleRemove = (productId: string) => {
-    setRemovingId(productId);
-    window.setTimeout(() => {
-      removeFromFavorites.mutate(productId, {
-        onSuccess: () => {
-          setShowRemoveSuccess(true);
-          setRemovingId(null);
-        },
-        onError: () => setRemovingId(null),
-      });
-    }, 180);
-  };
 
   return (
     <Box sx={{ minHeight: "100vh", bgcolor: "#07090E", py: { xs: 4, sm: 6, md: 8 } }}>
       <Container maxWidth="xl">
         <Stack spacing={4}>
           {/* Header */}
-          <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, justifyContent: "space-between", alignItems: { xs: "flex-start", sm: "flex-end" }, gap: 2 }}>
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: { xs: "column", sm: "row" },
+              justifyContent: "space-between",
+              alignItems: { xs: "flex-start", sm: "flex-end" },
+              gap: 2,
+            }}
+          >
             <Box>
               <Typography
                 variant="overline"
@@ -56,7 +46,10 @@ export function WishlistPage() {
               >
                 Saved Items
               </Typography>
-              <Typography variant="h3" sx={{ fontWeight: 800, color: "#FFF", letterSpacing: "-0.02em" }}>
+              <Typography
+                variant="h3"
+                sx={{ fontWeight: 800, color: "#FFF", letterSpacing: "-0.02em" }}
+              >
                 Wishlist
               </Typography>
               {!isLoading && favorites && favorites.length > 0 && (
@@ -94,18 +87,11 @@ export function WishlistPage() {
           </Box>
 
           {isLoading ? (
-            <Grid container spacing={3}>
-              {[...Array(4)].map((_, i) => (
-                <Grid size={{ xs: 12, lg: 6 }} key={i}>
-                  <Skeleton
-                    variant="rounded"
-                    animation="wave"
-                    height={240}
-                    sx={{ borderRadius: "22px", bgcolor: "rgba(255, 255, 255, 0.05)" }}
-                  />
-                </Grid>
+            <MasonryGrid columns={{ xs: 2, sm: 2, md: 3, lg: 4 }}>
+              {[...Array(6)].map((_, i) => (
+                <LoadingSkeleton key={i} height={340} />
               ))}
-            </Grid>
+            </MasonryGrid>
           ) : error ? (
             <Alert
               severity="error"
@@ -154,10 +140,16 @@ export function WishlistPage() {
               <Typography variant="h5" sx={{ fontWeight: 800, color: "#FFF", mb: 1 }}>
                 Your wishlist is empty
               </Typography>
-              <Typography sx={{ color: "rgba(255, 255, 255, 0.5)", maxWidth: 380, mb: 4, fontSize: "0.95rem" }}>
+              <Typography
+                sx={{ color: "rgba(255, 255, 255, 0.5)", maxWidth: 380, mb: 4, fontSize: "0.95rem" }}
+              >
                 Explore the latest collections and save the looks and pieces you love.
               </Typography>
-              <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5} sx={{ width: { xs: "100%", sm: "auto" } }}>
+              <Stack
+                direction={{ xs: "column", sm: "row" }}
+                spacing={1.5}
+                sx={{ width: { xs: "100%", sm: "auto" } }}
+              >
                 <Button
                   component={RouterLink}
                   to={ROUTES.customerDashboard}
@@ -203,42 +195,15 @@ export function WishlistPage() {
               </Stack>
             </Box>
           ) : (
-            /* Items Grid */
-            <Grid container spacing={{ xs: 2, sm: 2.5, md: 3 }}>
+            /* Unified Pinterest Masonry Grid matching all other pages */
+            <MasonryGrid columns={{ xs: 2, sm: 2, md: 3, lg: 4 }}>
               {favorites.map((product) => (
-                <Grid size={{ xs: 12, lg: 6 }} key={product.id}>
-                  <WishlistItemCard
-                    product={product}
-                    onRemove={handleRemove}
-                    isRemoving={removingId === product.id}
-                  />
-                </Grid>
+                <ProductCard key={product.id} product={product} />
               ))}
-            </Grid>
+            </MasonryGrid>
           )}
         </Stack>
       </Container>
-
-      <Snackbar
-        open={showRemoveSuccess}
-        autoHideDuration={3000}
-        onClose={() => setShowRemoveSuccess(false)}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      >
-        <Alert
-          severity="info"
-          onClose={() => setShowRemoveSuccess(false)}
-          sx={{
-            bgcolor: "#1E293B",
-            color: "#FFFFFF",
-            fontWeight: 700,
-            borderRadius: "12px",
-            border: "1px solid rgba(255, 255, 255, 0.12)",
-          }}
-        >
-          Item removed from wishlist.
-        </Alert>
-      </Snackbar>
     </Box>
   );
 }
