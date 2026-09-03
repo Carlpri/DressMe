@@ -7,6 +7,7 @@ import {
   aiSearchSchema,
   aiStylistSchema,
   testAISchema,
+  analyzeProductSchema,
 } from "./ai.validation.js";
 
 const router = Router();
@@ -31,6 +32,15 @@ router.post(
   aiRateLimiter,
   validate(aiSearchSchema),
   controller.searchProducts
+);
+
+// Production AI Product Analysis endpoint (admin-authenticated & rate-limited)
+router.post(
+  "/analyze-product",
+  authenticate,
+  aiRateLimiter,
+  validate(analyzeProductSchema),
+  controller.analyzeProduct
 );
 
 export default router;

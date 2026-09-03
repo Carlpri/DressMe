@@ -3,12 +3,13 @@ import { z } from "zod";
 import { Gender, ProductStatus } from "@prisma/client";
 import prisma from "../../config/prisma.js";
 import { ApiError } from "../../utils/api-error.js";
-import type { AIStylistInput, AISearchInput, TestAIInput } from "./ai.validation.js";
+import type { AIStylistInput, AISearchInput, TestAIInput, AnalyzeProductInput } from "./ai.validation.js";
 import type {
   AIStylistResponseData,
   AISearchResponseData,
   OutfitRecommendation,
   SearchIntent,
+  AIProductAnalysisResult,
 } from "./ai.types.js";
 
 const MODEL = "minimax/minimax-m3";
@@ -443,4 +444,273 @@ Extract the following structured shopping intent:
     products: normalized,
     count: normalized.length,
   };
+}
+
+// ── AI Product Analysis ───────────────────────────────────────────────────────
+
+const PRODUCT_ANALYSIS_SYSTEM_PROMPT = `You are an AI Product Catalog Assistant for DressMe, a modern fashion marketplace based in Kenya.
+
+You will receive one or more fashion product images. Carefully analyse each product and generate a complete, structured product record.
+
+## CORE RULE
+NEVER invent information. Only identify attributes that are clearly visible or can be reasonably inferred from the image.
+For any information that cannot be reliably determined, return: "Unknown — verify manually"
+Do NOT guess: Brand, Exact material composition, Product size, Available sizes, Price, Discount, Stock quantity, SKU, Product availability, Country of origin, or Gender if genuinely ambiguous.
+ACCURACY IS MORE IMPORTANT THAN COMPLETING EVERY FIELD.
+
+Return your analysis as a structured JSON object with the following exact shape (fill every field):
+
+{
+  "identity": {
+    "productName": "professional product name with key visible characteristics",
+    "productType": "e.g. Dress, Shirt, Jeans, Jacket, Sneakers, Handbag",
+    "category": "e.g. Men's Clothing, Women's Clothing, Footwear, Accessories",
+    "subcategory": "e.g. Casual Dresses, Formal Shirts, Sneakers",
+    "gender": "Male | Female | Unisex | Unknown — verify manually",
+    "brand": "brand name if visible, else 'Unknown — verify manually'",
+    "productGroup": "e.g. Midi Dresses, Maxi Dresses, Sneakers, Casual Shirts"
+  },
+  "appearance": {
+    "primaryColor": "primary color",
+    "secondaryColors": "secondary colors or 'None'",
+    "colorFamily": "e.g. Black, White, Blue, Neutral, Multicolor",
+    "pattern": "e.g. Solid, Striped, Floral, Checked, None visible",
+    "print": "describe visible prints or 'None'",
+    "texture": "e.g. Smooth, Ribbed, Knitted, Lace, Denim",
+    "material": "material if clearly visible else 'Unknown — verify manually'",
+    "finish": "e.g. Matte, Glossy, Satin-like, Washed",
+    "visibleDetails": ["list", "of", "visible", "details"],
+    "logoBranding": "visible logo/branding or 'None visible'"
+  },
+  "style": {
+    "style": "e.g. Casual, Smart Casual, Formal, Streetwear, Sporty",
+    "aesthetic": "e.g. Elegant, Timeless | Modern, Minimalist",
+    "fit": "e.g. Slim Fit, Regular Fit, Oversized or 'Unknown — verify manually'",
+    "silhouette": "e.g. A-Line, Straight, Bodycon, Wide Leg",
+    "length": "e.g. Cropped, Mini, Midi, Maxi, Regular",
+    "formality": "Casual | Smart Casual | Business Casual | Formal",
+    "fashionLevel": "e.g. Classic, Contemporary, Trendy, Statement",
+    "styleKeywords": ["5", "to", "10", "keywords"]
+  },
+  "occasion": {
+    "primaryOccasion": "e.g. Everyday, Work, Date, Party, Wedding",
+    "suitableOccasions": ["list", "of", "suitable", "occasions"]
+  },
+  "weather": {
+    "weatherSuitability": ["Hot Weather", "Warm Weather", "etc"],
+    "climateSuitability": "explain suitable climate conditions",
+    "season": "All Season | Warm Season | Cool Season",
+    "layeringSuitability": "e.g. Excellent for layering | Not applicable"
+  },
+  "outfitIntelligence": {
+    "recommendedTops": "suitable tops or 'Not applicable — one-piece garment'",
+    "recommendedBottoms": "suitable bottoms or 'Not applicable — one-piece garment'",
+    "recommendedShoes": ["list of shoe types"],
+    "recommendedOuterwear": ["list of outerwear"],
+    "recommendedAccessories": ["list of accessories"],
+    "complementaryColors": ["colors that pair well"]
+  },
+  "descriptions": {
+    "shortDescription": "one concise sentence for a product card",
+    "fullDescription": "professional e-commerce product description paragraph",
+    "marketingDescription": "fashion-forward promotional description paragraph"
+  },
+  "seo": {
+    "seoTitle": "SEO title | DressMe",
+    "metaDescription": "120-160 character meta description",
+    "urlSlug": "clean-lowercase-url-slug",
+    "searchKeywords": ["8", "to", "15", "keywords"],
+    "searchSynonyms": ["alternative", "names"],
+    "relatedSearchTerms": ["natural", "search", "phrases"]
+  },
+  "dressMeTags": ["UPPERCASE", "TAGS", "COMMA-SEPARATED"],
+  "aiStylist": {
+    "bestFor": ["use case 1", "use case 2"],
+    "styleProfile": "e.g. Classic, Elegant, Timeless",
+    "recommendedUserIntent": "describe what a customer might search for",
+    "compatibleProductCategories": ["Pumps", "Blazers", "Handbags"],
+    "compatibleColors": ["colors"],
+    "outfitIdeas": ["Outfit 1: product + item + shoes", "Outfit 2: ...", "Outfit 3: ..."],
+    "stylingNotes": "concise styling guidance"
+  },
+  "confidence": {
+    "overallConfidence": "High | Medium | Low",
+    "highConfidenceAttributes": ["list of clearly visible attributes"],
+    "uncertainAttributes": ["list of inferred attributes"],
+    "humanVerificationRequired": ["Brand", "Exact material", "Available sizes", "Price", "SKU", "Stock", "Vendor", "Measurements", "Care instructions"]
+  },
+  "manualFields": {
+    "brand": "Unknown — enter manually",
+    "vendor": "Unknown — enter manually",
+    "sku": "Unknown — enter manually",
+    "price": "Unknown — enter manually",
+    "discountPrice": "Unknown — enter manually",
+    "currency": "KES",
+    "availableSizes": "Unknown — enter manually",
+    "availableQuantity": "Unknown — enter manually",
+    "stockStatus": "Unknown — enter manually",
+    "materialComposition": "Unknown — enter manually",
+    "productMeasurements": "Unknown — enter manually",
+    "careInstructions": "Unknown — enter manually"
+  },
+  "summary": {
+    "productName": "repeat the product name",
+    "category": "category",
+    "primaryColor": "primary color",
+    "style": "style",
+    "primaryOccasion": "primary occasion",
+    "weatherSuitability": "weather suitability summary",
+    "topDressMetags": "TOP 5-8 DRESSME TAGS",
+    "oneLineSellingPoint": "one compelling selling point sentence"
+  }
+}
+
+Validation rules before returning:
+1. Product name accurately describes the visible product.
+2. Category and subcategory make sense.
+3. Color is not invented.
+4. Material is not falsely claimed.
+5. Gender is appropriate.
+6. Tags do not contradict the product.
+7. Occasion recommendations are realistic.
+8. Styling recommendations make sense.
+9. SEO information matches the actual product.
+10. No unsupported claims are included.
+
+UNKNOWN IS BETTER THAN INCORRECT.`;
+
+export async function analyzeProduct(
+  input: AnalyzeProductInput
+): Promise<AIProductAnalysisResult> {
+  if (!process.env.AI_GATEWAY_API_KEY) {
+    throw new ApiError(503, "AI Gateway service is currently unconfigured.");
+  }
+
+  const imageContentParts = input.imageUrls.map((url) => ({
+    type: "image" as const,
+    image: url,
+  }));
+
+  const result = await generateObject({
+    model: gateway(MODEL),
+    messages: [
+      {
+        role: "user",
+        content: [
+          ...imageContentParts,
+          {
+            type: "text" as const,
+            text: PRODUCT_ANALYSIS_SYSTEM_PROMPT,
+          },
+        ],
+      },
+    ],
+    temperature: 0.3,
+    schema: z.object({
+      identity: z.object({
+        productName: z.string(),
+        productType: z.string(),
+        category: z.string(),
+        subcategory: z.string(),
+        gender: z.string(),
+        brand: z.string(),
+        productGroup: z.string(),
+      }),
+      appearance: z.object({
+        primaryColor: z.string(),
+        secondaryColors: z.string(),
+        colorFamily: z.string(),
+        pattern: z.string(),
+        print: z.string(),
+        texture: z.string(),
+        material: z.string(),
+        finish: z.string(),
+        visibleDetails: z.array(z.string()),
+        logoBranding: z.string(),
+      }),
+      style: z.object({
+        style: z.string(),
+        aesthetic: z.string(),
+        fit: z.string(),
+        silhouette: z.string(),
+        length: z.string(),
+        formality: z.string(),
+        fashionLevel: z.string(),
+        styleKeywords: z.array(z.string()),
+      }),
+      occasion: z.object({
+        primaryOccasion: z.string(),
+        suitableOccasions: z.array(z.string()),
+      }),
+      weather: z.object({
+        weatherSuitability: z.array(z.string()),
+        climateSuitability: z.string(),
+        season: z.string(),
+        layeringSuitability: z.string(),
+      }),
+      outfitIntelligence: z.object({
+        recommendedTops: z.string(),
+        recommendedBottoms: z.string(),
+        recommendedShoes: z.array(z.string()),
+        recommendedOuterwear: z.array(z.string()),
+        recommendedAccessories: z.array(z.string()),
+        complementaryColors: z.array(z.string()),
+      }),
+      descriptions: z.object({
+        shortDescription: z.string(),
+        fullDescription: z.string(),
+        marketingDescription: z.string(),
+      }),
+      seo: z.object({
+        seoTitle: z.string(),
+        metaDescription: z.string(),
+        urlSlug: z.string(),
+        searchKeywords: z.array(z.string()),
+        searchSynonyms: z.array(z.string()),
+        relatedSearchTerms: z.array(z.string()),
+      }),
+      dressMeTags: z.array(z.string()),
+      aiStylist: z.object({
+        bestFor: z.array(z.string()),
+        styleProfile: z.string(),
+        recommendedUserIntent: z.string(),
+        compatibleProductCategories: z.array(z.string()),
+        compatibleColors: z.array(z.string()),
+        outfitIdeas: z.array(z.string()),
+        stylingNotes: z.string(),
+      }),
+      confidence: z.object({
+        overallConfidence: z.enum(["High", "Medium", "Low"]),
+        highConfidenceAttributes: z.array(z.string()),
+        uncertainAttributes: z.array(z.string()),
+        humanVerificationRequired: z.array(z.string()),
+      }),
+      manualFields: z.object({
+        brand: z.string(),
+        vendor: z.string(),
+        sku: z.string(),
+        price: z.string(),
+        discountPrice: z.string(),
+        currency: z.string(),
+        availableSizes: z.string(),
+        availableQuantity: z.string(),
+        stockStatus: z.string(),
+        materialComposition: z.string(),
+        productMeasurements: z.string(),
+        careInstructions: z.string(),
+      }),
+      summary: z.object({
+        productName: z.string(),
+        category: z.string(),
+        primaryColor: z.string(),
+        style: z.string(),
+        primaryOccasion: z.string(),
+        weatherSuitability: z.string(),
+        topDressMetags: z.string(),
+        oneLineSellingPoint: z.string(),
+      }),
+    }),
+  });
+
+  return result.object as AIProductAnalysisResult;
 }

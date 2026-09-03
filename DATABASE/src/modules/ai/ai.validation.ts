@@ -69,3 +69,21 @@ export const aiSearchSchema = z.object({
 });
 
 export type AISearchInput = z.infer<typeof aiSearchSchema>["body"];
+
+export const analyzeProductSchema = z.object({
+  body: z
+    .object({
+      imageUrls: z
+        .array(
+          z
+            .string()
+            .min(1, "Each image URL must not be empty.")
+            .max(5000, "Image URL is too long.")
+        )
+        .min(1, "At least one image URL is required.")
+        .max(5, "Maximum 5 images allowed per analysis."),
+    })
+    .strict(),
+});
+
+export type AnalyzeProductInput = z.infer<typeof analyzeProductSchema>["body"];

@@ -5,6 +5,7 @@ import {
   streamAIResponse,
   generateStylistRecommendations,
   searchAIProducts,
+  analyzeProduct,
 } from "./ai.service.js";
 
 export class AIController {
@@ -47,6 +48,17 @@ export class AIController {
         ? "Products found successfully."
         : "No products currently match your request.",
       searchResult
+    );
+  });
+
+  analyzeProduct = asyncHandler(async (req: Request, res: Response) => {
+    const analysis = await analyzeProduct(req.body);
+
+    ApiResponse.success(
+      res,
+      200,
+      "Product analysed successfully.",
+      analysis
     );
   });
 }

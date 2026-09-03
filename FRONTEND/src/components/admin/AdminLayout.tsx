@@ -31,6 +31,7 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import CodeIcon from "@mui/icons-material/Code";
 import StorefrontIcon from "@mui/icons-material/Storefront";
 import LogoutIcon from "@mui/icons-material/Logout";
+import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import { useAuth } from "../../hooks/useAuth";
 import { ScrollToTop } from "../shared/ScrollToTop";
 
@@ -39,6 +40,7 @@ const DRAWER_WIDTH = 260;
 const NAV_ITEMS = [
   { label: "Dashboard", path: "/admin", icon: <DashboardIcon /> },
   { label: "Products", path: "/admin/products", icon: <ShoppingBagIcon /> },
+  { label: "AI Product Analysis", path: "/admin/ai-product-analysis", icon: <AutoAwesomeIcon /> },
   { label: "Media Library", path: "/admin/media", icon: <PermMediaIcon /> },
   { label: "Categories", path: "/admin/categories", icon: <CategoryIcon /> },
   { label: "Brands", path: "/admin/brands", icon: <LocalOfferIcon /> },

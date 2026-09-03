@@ -1,34 +1,7 @@
-export interface OutfitRecommendation {
-  title: string;
-  productIds: string[];
-  reason: string;
-}
+import axios from "axios";
+import { apiClient } from "../api/client";
 
-export interface AIStylistResponseData {
-  advice: string;
-  outfits: OutfitRecommendation[];
-  products: unknown[];
-}
-
-export interface SearchIntent {
-  gender?: "MALE" | "FEMALE" | "UNISEX" | null;
-  categories?: string[];
-  colors?: string[];
-  sizes?: string[];
-  priceMin?: number | null;
-  priceMax?: number | null;
-  style?: string | null;
-  occasion?: string | null;
-  keywords?: string[];
-}
-
-export interface AISearchResponseData {
-  intent: SearchIntent;
-  products: unknown[];
-  count: number;
-}
-
-// ── AI Product Analysis ───────────────────────────────────────────────────────
+// ── Types ─────────────────────────────────────────────────────────────────────
 
 export interface AIProductIdentity {
   productName: string;
@@ -158,3 +131,46 @@ export interface AIProductAnalysisResult {
   manualFields: AIProductManualFields;
   summary: AIProductSummary;
 }
+
+// ── Service ───────────────────────────────────────────────────────────────────
+
+export const aiProductAnalysisService = {
+  analyzeProduct: async (imageUrls: string[]): Promise<AIProductAnalysisResult> => {
+    try {
+      const response = await apiClient.post<{
+        success: boolean;
+        message: string;
+        data: AIProductAnalysisResult;
+      }>("/ai/analyze-product", { imageUrls });
+
+      return response.data.data;
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        const status = error.response?.status;
+        if (status === 401) {
+          throw new Error("Admin authentication required to use AI Product Analysis.");
+        }
+        if (status === 400) {
+          const serverMessage = error.response?.data?.message;
+          throw new Error(serverMessage || "Invalid request. Please provide valid image URLs.");
+        }
+        if (status === 429) {
+          throw new Error(
+            "You've reached your hourly AI request limit. Please try again later."
+          );
+        }
+        if (status === 500 || status === 503) {
+          throw new Error(
+            "AI Product Analysis is temporarily unavailable. Please try again in a few moments."
+          );
+        }
+        if (!error.response) {
+          throw new Error(
+            "Unable to connect to DressMe. Please check your internet connection and try again."
+          );
+        }
+      }
+      throw error;
+    }
+  },
+};

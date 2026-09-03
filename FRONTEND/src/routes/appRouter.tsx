@@ -32,6 +32,7 @@ import { VendorDashboardPage } from "../pages/vendor/VendorDashboardPage";
 import { AdminLayout } from "../components/admin/AdminLayout";
 import { AdminDashboardPage } from "../pages/admin/AdminDashboardPage";
 import { AdminProductsPage } from "../pages/admin/AdminProductsPage";
+import { AdminAIProductAnalysisPage } from "../pages/admin/AdminAIProductAnalysisPage";
 import { AdminMediaPage } from "../pages/admin/AdminMediaPage";
 import { AdminCategoriesPage } from "../pages/admin/AdminCategoriesPage";
 import { AdminBrandsPage } from "../pages/admin/AdminBrandsPage";
@@ -136,6 +137,7 @@ export const appRouter = createBrowserRouter([
         children: [
           { index: true, element: <AdminDashboardPage /> },
           { path: "products", element: <AdminProductsPage /> },
+          { path: "ai-product-analysis", element: <AdminAIProductAnalysisPage /> },
           { path: "media", element: <AdminMediaPage /> },
           { path: "categories", element: <AdminCategoriesPage /> },
           { path: "brands", element: <AdminBrandsPage /> },
