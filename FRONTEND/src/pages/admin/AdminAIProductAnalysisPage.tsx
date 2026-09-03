@@ -1,4 +1,5 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
+import { useLocation, useNavigate, Link as RouterLink } from "react-router-dom";
 import {
   Box,
   Stack,
@@ -19,6 +20,17 @@ import {
   TextField,
   Tooltip,
   LinearProgress,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Checkbox,
+  FormControlLabel,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
 } from "@mui/material";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
@@ -35,14 +47,34 @@ import SearchIcon from "@mui/icons-material/Search";
 import VerifiedUserIcon from "@mui/icons-material/VerifiedUser";
 import EditNoteIcon from "@mui/icons-material/EditNote";
 import LinkIcon from "@mui/icons-material/Link";
+import AddIcon from "@mui/icons-material/Add";
+import StorefrontIcon from "@mui/icons-material/Storefront";
+import OpenInNewIcon from "@mui/icons-material/OpenInNew";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { apiClient } from "../../api/client";
+import { useAuth } from "../../hooks/useAuth";
 import {
   aiProductAnalysisService,
   type AIProductAnalysisResult,
 } from "../../services/ai-product-analysis.service";
 import { uploadToCloudinary } from "../../services/cloudinary";
 
+interface ProductVariantRow {
+  sizeValue: string;
+  colorValue: string;
+  stock: number;
+  price: number;
+  sku?: string;
+  isAvailable?: boolean;
+}
+
 export function AdminAIProductAnalysisPage() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   // Uploaded product images state
@@ -66,7 +98,158 @@ export function AdminAIProductAnalysisPage() {
   });
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
-  // Handlers
+  // ── Database Reference Data ────────────────────────────────────────────────
+  const { data: categories = [] } = useQuery<any[]>({
+    queryKey: ["categories-all"],
+    queryFn: async () => {
+      const res = await apiClient.get("/categories?limit=100");
+      return res.data.data.items || res.data.data || [];
+    },
+  });
+
+  const { data: brands = [] } = useQuery<any[]>({
+    queryKey: ["brands-all"],
+    queryFn: async () => {
+      const res = await apiClient.get("/brands?limit=100");
+      return res.data.data.items || res.data.data || [];
+    },
+  });
+
+  const { data: vendors = [] } = useQuery<any[]>({
+    queryKey: ["vendors-all"],
+    queryFn: async () => {
+      const res = await apiClient.get("/vendors");
+      return res.data.data || [];
+    },
+  });
+
+  // ── Final Catalog Fields to Save with Outfit Intelligence ──────────────────
+  const [listingName, setListingName] = useState("");
+  const [listingDescription, setListingDescription] = useState("");
+  const [listingPrice, setListingPrice] = useState<number>(3500);
+  const [listingCompareAtPrice, setListingCompareAtPrice] = useState<number | undefined>(4500);
+  const [listingStock, setListingStock] = useState<number>(20);
+  const [listingSku, setListingSku] = useState("");
+  const [listingGender, setListingGender] = useState<"MALE" | "FEMALE" | "UNISEX">("FEMALE");
+  const [listingBrandId, setListingBrandId] = useState("");
+  const [listingCategoryIds, setListingCategoryIds] = useState<string[]>([]);
+  const [listingVendorId, setListingVendorId] = useState("");
+  const [listingStatus, setListingStatus] = useState<"ACTIVE" | "DRAFT">("ACTIVE");
+  const [isFeatured, setIsFeatured] = useState(false);
+  const [isTrending, setIsTrending] = useState(false);
+  const [isNewArrival, setIsNewArrival] = useState(true);
+
+  // Variant Rows
+  const [variants, setVariants] = useState<ProductVariantRow[]>([
+    { sizeValue: "S", colorValue: "Default", stock: 5, price: 3500, isAvailable: true },
+    { sizeValue: "M", colorValue: "Default", stock: 8, price: 3500, isAvailable: true },
+    { sizeValue: "L", colorValue: "Default", stock: 5, price: 3500, isAvailable: true },
+    { sizeValue: "XL", colorValue: "Default", stock: 2, price: 3500, isAvailable: true },
+  ]);
+
+  // Outfit Intelligence in Description Toggle
+  const [includeOutfitIntelligence, setIncludeOutfitIntelligence] = useState(true);
+
+  // Create Product Result
+  const [createdProduct, setCreatedProduct] = useState<any | null>(null);
+  const [saveError, setSaveError] = useState<string | null>(null);
+
+  // Handle passed location state from AdminProductsPage or other links
+  useEffect(() => {
+    if (location.state?.imageUrl && imageUrls.length === 0) {
+      setImageUrls([location.state.imageUrl]);
+    } else if (location.state?.product) {
+      const prod = location.state.product;
+      const urls = (prod.images || []).map((img: any) => img.imageUrl);
+      if (urls.length > 0) setImageUrls(urls);
+      setListingName(prod.name || "");
+      setListingPrice(prod.price || 3500);
+      setListingCompareAtPrice(prod.compareAtPrice || undefined);
+      setListingStock(prod.stock || 20);
+      setListingSku(prod.sku || "");
+      if (prod.brandId) setListingBrandId(prod.brandId);
+      if (prod.categories?.length) setListingCategoryIds(prod.categories.map((c: any) => c.id));
+      if (prod.vendorId) setListingVendorId(prod.vendorId);
+    }
+  }, [location.state]);
+
+  // Set default vendor if admin
+  useEffect(() => {
+    if (user?.role === "ADMIN" && !listingVendorId && vendors.length > 0) {
+      setListingVendorId(vendors[0].id);
+    }
+  }, [user?.role, listingVendorId, vendors]);
+
+  // Build the complete combined description with human-readable & AI-searchable outfit intelligence
+  const buildCombinedDescription = (res: AIProductAnalysisResult): string => {
+    const parts = [
+      res.descriptions.fullDescription,
+      "",
+      "### DressMe Outfit & Styling Intelligence",
+      `* **Dominant Style:** ${res.style.style} (${res.style.aesthetic})`,
+      `* **Primary Occasion:** ${res.occasion.primaryOccasion}${res.occasion.suitableOccasions?.length ? ` (Also: ${res.occasion.suitableOccasions.join(", ")})` : ""}`,
+      `* **Weather & Climate:** ${res.weather.weatherSuitability.join(", ")} | ${res.weather.season}`,
+      `* **Matching Shoes:** ${res.outfitIntelligence.recommendedShoes.join(", ")}`,
+      `* **Matching Outerwear:** ${res.outfitIntelligence.recommendedOuterwear.join(", ")}`,
+      `* **Matching Tops/Bottoms:** ${res.outfitIntelligence.recommendedTops} / ${res.outfitIntelligence.recommendedBottoms}`,
+      `* **Matching Accessories:** ${res.outfitIntelligence.recommendedAccessories.join(", ")}`,
+      `* **Complementary Colors:** ${res.outfitIntelligence.complementaryColors.join(", ")}`,
+      `* **Search Tags:** ${res.dressMeTags.join(", ")}`,
+    ];
+    return parts.join("\n");
+  };
+
+  // Populate form fields whenever an analysis succeeds
+  const populateFieldsFromAnalysis = (res: AIProductAnalysisResult) => {
+    setListingName(res.identity.productName);
+
+    // Build enriched description
+    const fullDesc = includeOutfitIntelligence ? buildCombinedDescription(res) : res.descriptions.fullDescription;
+    setListingDescription(fullDesc);
+
+    // Map Gender
+    const gUpper = (res.identity.gender || "").toUpperCase();
+    if (gUpper.includes("MALE") && !gUpper.includes("FEMALE")) {
+      setListingGender("MALE");
+    } else if (gUpper.includes("FEMALE")) {
+      setListingGender("FEMALE");
+    } else {
+      setListingGender("UNISEX");
+    }
+
+    // Auto-generate SKU
+    setListingSku(`DM-${Date.now().toString(36).toUpperCase()}-${Math.floor(Math.random() * 900 + 100)}`);
+
+    // Match Brand if possible
+    if (brands.length > 0) {
+      const detectedBrand = (res.identity.brand || "").toLowerCase();
+      const matchedBrand = brands.find((b: any) => b.name.toLowerCase() === detectedBrand);
+      setListingBrandId(matchedBrand ? matchedBrand.id : brands[0].id);
+    }
+
+    // Match Categories if possible
+    if (categories.length > 0) {
+      const detectedCat = (res.identity.category || "").toLowerCase();
+      const detectedSub = (res.identity.subcategory || "").toLowerCase();
+      const matchedCat = categories.find(
+        (c: any) => c.name.toLowerCase().includes(detectedCat) || detectedSub.includes(c.name.toLowerCase())
+      );
+      setListingCategoryIds([matchedCat ? matchedCat.id : categories[0].id]);
+    }
+
+    // Update variants with detected color
+    const detectedColor = res.appearance.primaryColor && res.appearance.primaryColor !== "None"
+      ? res.appearance.primaryColor
+      : "Standard";
+    setVariants([
+      { sizeValue: "S", colorValue: detectedColor, stock: 5, price: listingPrice, isAvailable: true },
+      { sizeValue: "M", colorValue: detectedColor, stock: 8, price: listingPrice, isAvailable: true },
+      { sizeValue: "L", colorValue: detectedColor, stock: 5, price: listingPrice, isAvailable: true },
+      { sizeValue: "XL", colorValue: detectedColor, stock: 2, price: listingPrice, isAvailable: true },
+    ]);
+  };
+
+  // Image Upload handler
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
@@ -90,7 +273,6 @@ export function AdminAIProductAnalysisPage() {
           });
           uploadedUrls.push(res.secure_url);
         } catch {
-          // If Cloudinary preset is missing in local dev, convert to Data URL for instant analysis
           const reader = new FileReader();
           const dataUrl = await new Promise<string>((resolve) => {
             reader.onload = () => resolve(reader.result as string);
@@ -134,16 +316,128 @@ export function AdminAIProductAnalysisPage() {
 
     setIsAnalyzing(true);
     setAnalysisError(null);
+    setSaveError(null);
 
     try {
       const result = await aiProductAnalysisService.analyzeProduct(imageUrls);
       setAnalysisResult(result);
-      setSnackbar({ open: true, message: "Product catalog analysis complete!" });
+      populateFieldsFromAnalysis(result);
+      setSnackbar({ open: true, message: "Product catalog analysis complete! Ready to confirm details." });
+      // Switch automatically to the Publish / Confirmation tab so admin can review and save
+      setActiveTab(6);
     } catch (err: any) {
       setAnalysisError(err.message || "Failed to analyze product. Please try again.");
     } finally {
       setIsAnalyzing(false);
     }
+  };
+
+  // Variant operations
+  const handleAddVariantRow = () => {
+    setVariants([
+      ...variants,
+      { sizeValue: "M", colorValue: variants[0]?.colorValue || "Default", stock: 5, price: listingPrice, isAvailable: true },
+    ]);
+  };
+
+  const handleRemoveVariantRow = (index: number) => {
+    setVariants(variants.filter((_, i) => i !== index));
+  };
+
+  const handleUpdateVariantRow = (index: number, field: keyof ProductVariantRow, value: any) => {
+    const updated = [...variants];
+    updated[index] = { ...updated[index], [field]: value };
+    setVariants(updated);
+  };
+
+  // ── Save to Database Mutation ──────────────────────────────────────────────
+  const createProductMutation = useMutation({
+    mutationFn: async (payload: any) => {
+      const res = await apiClient.post("/products", payload);
+      return res.data.data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["admin-products-list"] });
+      queryClient.invalidateQueries({ queryKey: ["products"] });
+      setCreatedProduct(data);
+      setSaveError(null);
+      setSnackbar({ open: true, message: `Product "${data.name}" saved to catalog with complete outfit intelligence!` });
+    },
+    onError: (error: any) => {
+      const msg = error.response?.data?.message || error.message || "Failed to save product to catalog.";
+      setSaveError(msg);
+    },
+  });
+
+  const handleSaveProductToCatalog = () => {
+    if (!listingName || listingName.trim().length < 2) {
+      setSaveError("Product name must be at least 2 characters.");
+      return;
+    }
+
+    if (!listingBrandId) {
+      setSaveError("Please select a brand.");
+      return;
+    }
+
+    if (!listingCategoryIds || listingCategoryIds.length === 0) {
+      setSaveError("Please select at least one category.");
+      return;
+    }
+
+    if (user?.role === "ADMIN" && !listingVendorId) {
+      setSaveError("Please select a vendor.");
+      return;
+    }
+
+    if (!listingPrice || Number(listingPrice) <= 0) {
+      setSaveError("Please enter a valid selling price greater than 0.");
+      return;
+    }
+
+    if (imageUrls.length === 0) {
+      setSaveError("At least one product image is required.");
+      return;
+    }
+
+    if (variants.length === 0) {
+      setSaveError("Please configure at least one size variant.");
+      return;
+    }
+
+    const payload = {
+      name: listingName.trim(),
+      description: listingDescription.trim(),
+      price: Number(listingPrice),
+      compareAtPrice: listingCompareAtPrice ? Number(listingCompareAtPrice) : null,
+      stock: Number(listingStock),
+      sku: listingSku.trim() || `DM-${Date.now()}`,
+      gender: listingGender,
+      categoryIds: listingCategoryIds,
+      brandId: listingBrandId,
+      vendorId: user?.role === "ADMIN" ? listingVendorId : undefined,
+      featured: isFeatured,
+      isTrending: isTrending,
+      isNewArrival: isNewArrival,
+      status: listingStatus,
+      images: imageUrls.map((url, idx) => ({
+        imageUrl: url,
+        isPrimary: idx === 0,
+        displayOrder: idx,
+        altText: listingName,
+      })),
+      variants: variants.map((v) => ({
+        sizeValue: v.sizeValue || undefined,
+        colorValue: v.colorValue || undefined,
+        stock: Number(v.stock),
+        price: Number(v.price || listingPrice),
+        compareAtPrice: listingCompareAtPrice ? Number(listingCompareAtPrice) : null,
+        sku: v.sku || `${listingSku}-${(v.sizeValue || "STD")}-${(v.colorValue || "CLR")}`.toUpperCase(),
+        isAvailable: v.isAvailable ?? true,
+      })),
+    };
+
+    createProductMutation.mutate(payload);
   };
 
   const copyToClipboard = (text: string, key: string) => {
@@ -262,34 +556,6 @@ ${res.aiStylist.outfitIdeas.map((idea) => `* ${idea}`).join("\n")}
 **High Confidence Attributes:** ${res.confidence.highConfidenceAttributes.join(", ")}
 **Uncertain Attributes:** ${res.confidence.uncertainAttributes.join(", ")}
 **Human Verification Required:** ${res.confidence.humanVerificationRequired.join(", ")}
-
----
-
-## MANUAL PRODUCT INFORMATION
-**Brand:** ${res.manualFields.brand}
-**Vendor:** ${res.manualFields.vendor}
-**SKU:** ${res.manualFields.sku}
-**Price:** ${res.manualFields.price}
-**Discount Price:** ${res.manualFields.discountPrice}
-**Currency:** ${res.manualFields.currency}
-**Available Sizes:** ${res.manualFields.availableSizes}
-**Available Quantity:** ${res.manualFields.availableQuantity}
-**Stock Status:** ${res.manualFields.stockStatus}
-**Material Composition:** ${res.manualFields.materialComposition}
-**Product Measurements:** ${res.manualFields.productMeasurements}
-**Care Instructions:** ${res.manualFields.careInstructions}
-
----
-
-## FINAL PRODUCT SUMMARY
-**PRODUCT NAME:** ${res.summary.productName}
-**CATEGORY:** ${res.summary.category}
-**PRIMARY COLOR:** ${res.summary.primaryColor}
-**STYLE:** ${res.summary.style}
-**PRIMARY OCCASION:** ${res.summary.primaryOccasion}
-**WEATHER SUITABILITY:** ${res.summary.weatherSuitability}
-**TOP DRESSME TAGS:** ${res.summary.topDressMetags}
-**ONE-LINE SELLING POINT:** ${res.summary.oneLineSellingPoint}
 `;
   };
 
@@ -340,7 +606,7 @@ ${res.aiStylist.outfitIdeas.map((idea) => `* ${idea}`).join("\n")}
                   AI Product Catalog Assistant
                 </Typography>
                 <Typography variant="body2" sx={{ color: "text.secondary" }}>
-                  Analyze fashion product images and instantly extract structured, search-ready e-commerce records.
+                  Analyze images, generate complete outfit intelligence, confirm pricing & sizes, and publish directly to the DressMe catalog.
                 </Typography>
               </Box>
             </Stack>
@@ -372,6 +638,55 @@ ${res.aiStylist.outfitIdeas.map((idea) => `* ${idea}`).join("\n")}
           </Stack>
         </Stack>
       </Paper>
+
+      {/* Success Banner when product has been created */}
+      {createdProduct && (
+        <Paper
+          elevation={0}
+          sx={{
+            p: 3,
+            mb: 4,
+            borderRadius: 3,
+            bgcolor: "success.light",
+            color: "success.contrastText",
+            border: "1px solid",
+            borderColor: "success.main",
+          }}
+        >
+          <Stack direction={{ xs: "column", sm: "row" }} justifyContent="space-between" alignItems={{ sm: "center" }} spacing={2}>
+            <Box>
+              <Typography variant="h6" sx={{ fontWeight: 800, display: "flex", alignItems: "center", gap: 1 }}>
+                <CheckCircleIcon /> Product Published to Store Catalog!
+              </Typography>
+              <Typography variant="body2">
+                "{createdProduct.name}" has been saved with full outfit intelligence, sizes, and pricing.
+              </Typography>
+            </Box>
+            <Stack direction="row" spacing={1.5}>
+              <Button
+                variant="contained"
+                size="small"
+                component={RouterLink}
+                to={`/products/${createdProduct.slug}`}
+                target="_blank"
+                endIcon={<OpenInNewIcon />}
+                sx={{ bgcolor: "white", color: "success.dark", fontWeight: 700, "&:hover": { bgcolor: "#f0fdf4" } }}
+              >
+                View Live in Store
+              </Button>
+              <Button
+                variant="outlined"
+                size="small"
+                component={RouterLink}
+                to="/admin/products"
+                sx={{ color: "white", borderColor: "white", fontWeight: 700 }}
+              >
+                Admin Catalog
+              </Button>
+            </Stack>
+          </Stack>
+        </Paper>
+      )}
 
       <Grid container spacing={3}>
         {/* Left Column: Image Management */}
@@ -531,7 +846,7 @@ ${res.aiStylist.outfitIdeas.map((idea) => `* ${idea}`).join("\n")}
           </Paper>
         </Grid>
 
-        {/* Right Column: Analysis Results or Empty State */}
+        {/* Right Column: Analysis Results & Publishing Form */}
         <Grid size={{ xs: 12, lg: 8 }}>
           {analysisError && (
             <Alert severity="error" sx={{ mb: 3, borderRadius: 2 }} onClose={() => setAnalysisError(null)}>
@@ -569,9 +884,10 @@ ${res.aiStylist.outfitIdeas.map((idea) => `* ${idea}`).join("\n")}
               <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
                 No Product Analyzed Yet
               </Typography>
-              <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 450, mx: "auto", mb: 3 }}>
-                Upload photos of your product on the left and click <strong>Analyze Product with AI</strong>. The model will adhere to
-                DressMe catalog standards and Kenyan fashion e-commerce guidelines.
+              <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 480, mx: "auto", mb: 3 }}>
+                Upload photos of your product on the left and click <strong>Analyze Product with AI</strong>. The assistant will extract
+                silhouettes, textures, style, occasions, matching shoes/tops, and let you set price, size, and brand to publish all outfit
+                information together into the database.
               </Typography>
             </Paper>
           )}
@@ -590,7 +906,7 @@ ${res.aiStylist.outfitIdeas.map((idea) => `* ${idea}`).join("\n")}
             >
               <CircularProgress size={56} sx={{ mb: 3 }} />
               <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>
-                Extracting Product Intelligence...
+                Extracting Product & Outfit Intelligence...
               </Typography>
               <Typography variant="body2" color="text.secondary" sx={{ maxWidth: 420, mx: "auto" }}>
                 Analyzing silhouettes, patterns, materials, styling occasions, climate suitability, and SEO tags via the AI Gateway.
@@ -641,6 +957,17 @@ ${res.aiStylist.outfitIdeas.map((idea) => `* ${idea}`).join("\n")}
                       "{analysisResult.summary.oneLineSellingPoint}"
                     </Typography>
                   </Box>
+
+                  <Button
+                    variant="contained"
+                    color="success"
+                    size="medium"
+                    onClick={() => setActiveTab(6)}
+                    startIcon={<StorefrontIcon />}
+                    sx={{ fontWeight: 700, whiteSpace: "nowrap" }}
+                  >
+                    Confirm & Publish Product
+                  </Button>
                 </Stack>
               </Paper>
 
@@ -663,7 +990,12 @@ ${res.aiStylist.outfitIdeas.map((idea) => `* ${idea}`).join("\n")}
                 <Tab icon={<EditNoteIcon />} iconPosition="start" label="Descriptions" />
                 <Tab icon={<SearchIcon />} iconPosition="start" label="SEO & Tags" />
                 <Tab icon={<PsychologyIcon />} iconPosition="start" label="AI Stylist" />
-                <Tab icon={<VerifiedUserIcon />} iconPosition="start" label="Verification" />
+                <Tab
+                  icon={<StorefrontIcon color="primary" />}
+                  iconPosition="start"
+                  label="Confirm, Price & Save"
+                  sx={{ color: "primary.main", fontWeight: 800 }}
+                />
               </Tabs>
 
               {/* Tab 0: Identity & Appearance */}
@@ -687,7 +1019,7 @@ ${res.aiStylist.outfitIdeas.map((idea) => `* ${idea}`).join("\n")}
                         <Typography variant="body1" sx={{ fontWeight: 600 }}>{analysisResult.identity.productGroup}</Typography>
                       </Grid>
                       <Grid size={{ xs: 12, sm: 6 }}>
-                        <Typography variant="caption" color="text.secondary">Brand</Typography>
+                        <Typography variant="caption" color="text.secondary">Detected Brand</Typography>
                         <Typography variant="body1" sx={{ fontWeight: 600 }}>{analysisResult.identity.brand}</Typography>
                       </Grid>
                     </Grid>
@@ -840,7 +1172,7 @@ ${res.aiStylist.outfitIdeas.map((idea) => `* ${idea}`).join("\n")}
 
                   <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: "1px solid", borderColor: "divider" }}>
                     <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 2 }}>
-                      Outfit Pairing Intelligence
+                      Outfit Pairing Intelligence (Stored with Product)
                     </Typography>
                     <Grid container spacing={2}>
                       <Grid size={{ xs: 12, sm: 6 }}>
@@ -1055,121 +1387,318 @@ ${res.aiStylist.outfitIdeas.map((idea) => `* ${idea}`).join("\n")}
                 </Stack>
               )}
 
-              {/* Tab 6: Verification & Manual Entry */}
+              {/* Tab 6: Complete Listing & Save to Catalog */}
               {activeTab === 6 && (
                 <Stack spacing={3}>
+                  {saveError && (
+                    <Alert severity="error" sx={{ borderRadius: 2 }} onClose={() => setSaveError(null)}>
+                      {saveError}
+                    </Alert>
+                  )}
+
+                  {/* Section 1: Catalog Details */}
                   <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: "1px solid", borderColor: "divider" }}>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1 }}>
-                      AI Confidence Breakdown
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-                      Rule enforced: <strong>Never invent unconfirmed information</strong>. The model flags uncertain and unverified
-                      fields below.
-                    </Typography>
-
-                    <Grid container spacing={2}>
-                      <Grid size={{ xs: 12, sm: 6 }}>
-                        <Typography variant="caption" sx={{ fontWeight: 700, color: "success.main" }}>
-                          High Confidence Attributes
-                        </Typography>
-                        <Stack spacing={0.5} sx={{ mt: 1 }}>
-                          {analysisResult.confidence.highConfidenceAttributes.map((attr, idx) => (
-                            <Typography key={idx} variant="body2" sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                              <CheckCircleIcon sx={{ fontSize: 16, color: "success.main" }} /> {attr}
-                            </Typography>
-                          ))}
-                        </Stack>
-                      </Grid>
-
-                      <Grid size={{ xs: 12, sm: 6 }}>
-                        <Typography variant="caption" sx={{ fontWeight: 700, color: "warning.main" }}>
-                          Uncertain / Inferred Attributes
-                        </Typography>
-                        <Stack spacing={0.5} sx={{ mt: 1 }}>
-                          {analysisResult.confidence.uncertainAttributes.map((attr, idx) => (
-                            <Typography key={idx} variant="body2" sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                              • {attr}
-                            </Typography>
-                          ))}
-                        </Stack>
-                      </Grid>
-                    </Grid>
-
-                    <Divider sx={{ my: 2 }} />
-                    <Typography variant="caption" sx={{ fontWeight: 700, color: "error.main" }}>
-                      Human Verification Required Before Listing
-                    </Typography>
-                    <Stack direction="row" spacing={1} flexWrap="wrap" sx={{ gap: 1, mt: 1 }}>
-                      {analysisResult.confidence.humanVerificationRequired.map((req, idx) => (
-                        <Chip key={idx} label={req} size="small" color="error" variant="outlined" />
-                      ))}
+                    <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
+                      <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+                        1. Product Identity & Pricing
+                      </Typography>
+                      <Chip label="Auto-filled from AI Analysis" size="small" color="primary" variant="outlined" />
                     </Stack>
-                  </Paper>
 
-                  {/* Manual Fields Form */}
-                  <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: "1px solid", borderColor: "divider" }}>
-                    <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 2 }}>
-                      Manual Catalog Fields (Prepared for Entry)
-                    </Typography>
                     <Grid container spacing={2}>
-                      <Grid size={{ xs: 12, sm: 6 }}>
-                        <TextField fullWidth size="small" label="Brand" defaultValue={analysisResult.manualFields.brand} />
-                      </Grid>
-                      <Grid size={{ xs: 12, sm: 6 }}>
-                        <TextField fullWidth size="small" label="Vendor" defaultValue={analysisResult.manualFields.vendor} />
-                      </Grid>
-                      <Grid size={{ xs: 12, sm: 6 }}>
-                        <TextField fullWidth size="small" label="SKU" defaultValue={analysisResult.manualFields.sku} />
-                      </Grid>
-                      <Grid size={{ xs: 12, sm: 6 }}>
-                        <TextField
-                          fullWidth
-                          size="small"
-                          label="Currency & Price"
-                          defaultValue={`${analysisResult.manualFields.currency} ${analysisResult.manualFields.price}`}
-                        />
-                      </Grid>
-                      <Grid size={{ xs: 12, sm: 6 }}>
-                        <TextField
-                          fullWidth
-                          size="small"
-                          label="Available Sizes"
-                          defaultValue={analysisResult.manualFields.availableSizes}
-                        />
-                      </Grid>
-                      <Grid size={{ xs: 12, sm: 6 }}>
-                        <TextField
-                          fullWidth
-                          size="small"
-                          label="Available Quantity"
-                          defaultValue={analysisResult.manualFields.availableQuantity}
-                        />
-                      </Grid>
-                      <Grid size={{ xs: 12, sm: 6 }}>
-                        <TextField
-                          fullWidth
-                          size="small"
-                          label="Stock Status"
-                          defaultValue={analysisResult.manualFields.stockStatus}
-                        />
-                      </Grid>
-                      <Grid size={{ xs: 12, sm: 6 }}>
-                        <TextField
-                          fullWidth
-                          size="small"
-                          label="Material Composition"
-                          defaultValue={analysisResult.manualFields.materialComposition}
-                        />
-                      </Grid>
                       <Grid size={{ xs: 12 }}>
                         <TextField
                           fullWidth
-                          size="small"
-                          label="Care Instructions"
-                          defaultValue={analysisResult.manualFields.careInstructions}
+                          label="Product Name *"
+                          value={listingName}
+                          onChange={(e) => setListingName(e.target.value)}
+                          helperText="Customer-facing name shown in marketplace"
                         />
                       </Grid>
+
+                      <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                        <TextField
+                          fullWidth
+                          type="number"
+                          label="Selling Price (KES) *"
+                          value={listingPrice}
+                          onChange={(e) => setListingPrice(Number(e.target.value))}
+                          InputProps={{ startAdornment: <Typography sx={{ mr: 1, color: "text.secondary" }}>KES</Typography> }}
+                        />
+                      </Grid>
+
+                      <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                        <TextField
+                          fullWidth
+                          type="number"
+                          label="Compare At Price (KES)"
+                          value={listingCompareAtPrice || ""}
+                          onChange={(e) => setListingCompareAtPrice(e.target.value ? Number(e.target.value) : undefined)}
+                          helperText="Original price before discount"
+                        />
+                      </Grid>
+
+                      <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                        <TextField
+                          fullWidth
+                          type="number"
+                          label="Total Available Stock *"
+                          value={listingStock}
+                          onChange={(e) => setListingStock(Number(e.target.value))}
+                        />
+                      </Grid>
+
+                      <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                        <TextField
+                          fullWidth
+                          label="Product SKU *"
+                          value={listingSku}
+                          onChange={(e) => setListingSku(e.target.value)}
+                        />
+                      </Grid>
+
+                      <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                        <FormControl fullWidth>
+                          <InputLabel>Brand *</InputLabel>
+                          <Select
+                            value={listingBrandId}
+                            label="Brand *"
+                            onChange={(e) => setListingBrandId(e.target.value)}
+                          >
+                            {brands.map((b: any) => (
+                              <MenuItem key={b.id} value={b.id}>
+                                {b.name}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                      </Grid>
+
+                      <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                        <FormControl fullWidth>
+                          <InputLabel>Category *</InputLabel>
+                          <Select
+                            multiple
+                            value={listingCategoryIds}
+                            label="Category *"
+                            onChange={(e) => setListingCategoryIds(typeof e.target.value === "string" ? [e.target.value] : e.target.value)}
+                            renderValue={(selected) =>
+                              categories
+                                .filter((c: any) => selected.includes(c.id))
+                                .map((c: any) => c.name)
+                                .join(", ")
+                            }
+                          >
+                            {categories.map((c: any) => (
+                              <MenuItem key={c.id} value={c.id}>
+                                <Checkbox checked={listingCategoryIds.indexOf(c.id) > -1} />
+                                {c.name}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
+                      </Grid>
+
+                      {user?.role === "ADMIN" && (
+                        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                          <FormControl fullWidth>
+                            <InputLabel>Vendor *</InputLabel>
+                            <Select
+                              value={listingVendorId}
+                              label="Vendor *"
+                              onChange={(e) => setListingVendorId(e.target.value)}
+                            >
+                              {vendors.map((v: any) => (
+                                <MenuItem key={v.id} value={v.id}>
+                                  {v.businessName}
+                                </MenuItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+                        </Grid>
+                      )}
+
+                      <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                        <FormControl fullWidth>
+                          <InputLabel>Gender *</InputLabel>
+                          <Select
+                            value={listingGender}
+                            label="Gender *"
+                            onChange={(e) => setListingGender(e.target.value as any)}
+                          >
+                            <MenuItem value="FEMALE">Female</MenuItem>
+                            <MenuItem value="MALE">Male</MenuItem>
+                            <MenuItem value="UNISEX">Unisex</MenuItem>
+                          </Select>
+                        </FormControl>
+                      </Grid>
                     </Grid>
+                  </Paper>
+
+                  {/* Section 2: Sizes & Variants */}
+                  <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: "1px solid", borderColor: "divider" }}>
+                    <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
+                      <Box>
+                        <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+                          2. Sizes & Color Variants
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          Confirm available sizes, inventory stock per size, and specific colors.
+                        </Typography>
+                      </Box>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        startIcon={<AddIcon />}
+                        onClick={handleAddVariantRow}
+                      >
+                        Add Variant
+                      </Button>
+                    </Stack>
+
+                    <Table size="small">
+                      <TableHead>
+                        <TableRow>
+                          <TableCell sx={{ fontWeight: 700 }}>Size (e.g. S, M, L, 42)</TableCell>
+                          <TableCell sx={{ fontWeight: 700 }}>Color</TableCell>
+                          <TableCell sx={{ fontWeight: 700 }}>Stock Qty</TableCell>
+                          <TableCell sx={{ fontWeight: 700 }}>Price (KES)</TableCell>
+                          <TableCell align="right" sx={{ fontWeight: 700 }}>Action</TableCell>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody>
+                        {variants.map((v, index) => (
+                          <TableRow key={index}>
+                            <TableCell>
+                              <TextField
+                                size="small"
+                                value={v.sizeValue}
+                                placeholder="Size"
+                                onChange={(e) => handleUpdateVariantRow(index, "sizeValue", e.target.value)}
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <TextField
+                                size="small"
+                                value={v.colorValue}
+                                placeholder="Color"
+                                onChange={(e) => handleUpdateVariantRow(index, "colorValue", e.target.value)}
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <TextField
+                                size="small"
+                                type="number"
+                                value={v.stock}
+                                onChange={(e) => handleUpdateVariantRow(index, "stock", Number(e.target.value))}
+                                sx={{ width: 90 }}
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <TextField
+                                size="small"
+                                type="number"
+                                value={v.price}
+                                onChange={(e) => handleUpdateVariantRow(index, "price", Number(e.target.value))}
+                                sx={{ width: 110 }}
+                              />
+                            </TableCell>
+                            <TableCell align="right">
+                              <IconButton
+                                size="small"
+                                color="error"
+                                onClick={() => handleRemoveVariantRow(index)}
+                                disabled={variants.length <= 1}
+                              >
+                                <DeleteOutlineIcon fontSize="small" />
+                              </IconButton>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </Paper>
+
+                  {/* Section 3: Description & Outfit Intelligence Stored Together */}
+                  <Paper elevation={0} sx={{ p: 3, borderRadius: 3, border: "1px solid", borderColor: "divider" }}>
+                    <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 1 }}>
+                      <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+                        3. Outfit Intelligence & Search Indexing
+                      </Typography>
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={includeOutfitIntelligence}
+                            onChange={(e) => {
+                              setIncludeOutfitIntelligence(e.target.checked);
+                              if (analysisResult) {
+                                setListingDescription(
+                                  e.target.checked
+                                    ? buildCombinedDescription(analysisResult)
+                                    : analysisResult.descriptions.fullDescription
+                                );
+                              }
+                            }}
+                          />
+                        }
+                        label={<Typography variant="body2" sx={{ fontWeight: 600 }}>Store Outfit Intelligence in Description</Typography>}
+                      />
+                    </Stack>
+                    <Typography variant="caption" color="text.secondary" sx={{ display: "block", mb: 2 }}>
+                      When stored together, searches for matching shoes, outerwear, complementary colors, and occasions will immediately index and find this product!
+                    </Typography>
+
+                    <TextField
+                      fullWidth
+                      multiline
+                      rows={6}
+                      label="Complete Product Description & Outfit Pairing Data *"
+                      value={listingDescription}
+                      onChange={(e) => setListingDescription(e.target.value)}
+                    />
+                  </Paper>
+
+                  {/* Save Action Bar */}
+                  <Paper
+                    elevation={0}
+                    sx={{
+                      p: 3,
+                      borderRadius: 3,
+                      bgcolor: "background.paper",
+                      border: "2px solid",
+                      borderColor: "primary.main",
+                      boxShadow: "0 8px 24px rgba(0,0,0,0.06)",
+                    }}
+                  >
+                    <Stack direction={{ xs: "column", sm: "row" }} justifyContent="space-between" alignItems={{ sm: "center" }} spacing={2}>
+                      <Box>
+                        <Typography variant="h6" sx={{ fontWeight: 800 }}>
+                          Ready to Publish Product?
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                          This will save the product into PostgreSQL with all {imageUrls.length} images, {variants.length} size variants, and full outfit pairing intelligence.
+                        </Typography>
+                      </Box>
+
+                      <Button
+                        variant="contained"
+                        color="primary"
+                        size="large"
+                        onClick={handleSaveProductToCatalog}
+                        disabled={createProductMutation.isPending}
+                        startIcon={createProductMutation.isPending ? <CircularProgress size={20} color="inherit" /> : <StorefrontIcon />}
+                        sx={{
+                          py: 1.5,
+                          px: 4,
+                          fontWeight: 800,
+                          fontSize: "1rem",
+                          borderRadius: 2,
+                          boxShadow: "0 4px 14px rgba(0,0,0,0.15)",
+                        }}
+                      >
+                        {createProductMutation.isPending ? "Saving to Catalog..." : "Publish Product to Store"}
+                      </Button>
+                    </Stack>
                   </Paper>
                 </Stack>
               )}
@@ -1181,7 +1710,7 @@ ${res.aiStylist.outfitIdeas.map((idea) => `* ${idea}`).join("\n")}
       {/* Snackbar feedback */}
       <Snackbar
         open={snackbar.open}
-        autoHideDuration={3000}
+        autoHideDuration={3500}
         onClose={() => setSnackbar({ ...snackbar, open: false })}
         message={snackbar.message}
       />

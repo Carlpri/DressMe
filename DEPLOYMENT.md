@@ -23,6 +23,7 @@ FRONTEND_URL=https://your-app.vercel.app,https://your-app-git-*.vercel.app
 CLOUDINARY_CLOUD_NAME=<cloud-name>
 CLOUDINARY_API_KEY=<api-key>
 CLOUDINARY_API_SECRET=<api-secret>
+AI_GATEWAY_API_KEY=<vercel-ai-gateway-api-key>
 ```
 
 `FRONTEND_URL` accepts a comma-separated allowlist. Use a wildcard only for the preview URL pattern you control. Do not seed production with sample data unless that is intentional; the existing seed script is for development/demo data.

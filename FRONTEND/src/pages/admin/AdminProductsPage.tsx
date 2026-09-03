@@ -27,22 +27,28 @@ import {
   Paper,
   Alert,
   Snackbar,
+  Tooltip,
 } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import CollectionsIcon from "@mui/icons-material/Collections";
+import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClient } from "../../api/client";
 import { MediaPickerModal } from "../../components/admin/MediaPickerModal";
 import { ImageUploader } from "../../components/admin/ImageUploader";
 import { useFormatCurrency } from "../../utils/currency";
 import { useAuth } from "../../hooks/useAuth";
+import { aiProductAnalysisService } from "../../services/ai-product-analysis.service";
 
 export function AdminProductsPage() {
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const formatCurrency = useFormatCurrency();
   const { user } = useAuth();
+  const [isAnalyzingAI, setIsAnalyzingAI] = useState(false);
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<any | null>(null);
@@ -358,6 +364,64 @@ export function AdminProductsPage() {
     setVariants(updated);
   };
 
+  const handleAutoFillWithAI = async () => {
+    const imagesToAnalyze = [primaryImageUrl, ...galleryUrls].filter(Boolean);
+    if (imagesToAnalyze.length === 0) {
+      setSaveError("Please upload or select at least one product image before analyzing with AI.");
+      return;
+    }
+    setIsAnalyzingAI(true);
+    setSaveError(null);
+    try {
+      const res = await aiProductAnalysisService.analyzeProduct(imagesToAnalyze);
+      setName(res.identity.productName);
+
+      const combinedDesc = [
+        res.descriptions.fullDescription,
+        "",
+        "### DressMe Outfit & Styling Intelligence",
+        `* **Dominant Style:** ${res.style.style} (${res.style.aesthetic})`,
+        `* **Primary Occasion:** ${res.occasion.primaryOccasion}${res.occasion.suitableOccasions?.length ? ` (Also: ${res.occasion.suitableOccasions.join(", ")})` : ""}`,
+        `* **Weather & Climate:** ${res.weather.weatherSuitability.join(", ")} | ${res.weather.season}`,
+        `* **Matching Shoes:** ${res.outfitIntelligence.recommendedShoes.join(", ")}`,
+        `* **Matching Outerwear:** ${res.outfitIntelligence.recommendedOuterwear.join(", ")}`,
+        `* **Matching Tops/Bottoms:** ${res.outfitIntelligence.recommendedTops} / ${res.outfitIntelligence.recommendedBottoms}`,
+        `* **Matching Accessories:** ${res.outfitIntelligence.recommendedAccessories.join(", ")}`,
+        `* **Complementary Colors:** ${res.outfitIntelligence.complementaryColors.join(", ")}`,
+        `* **Search Tags:** ${res.dressMeTags.join(", ")}`,
+      ].join("\n");
+      setDescription(combinedDesc);
+
+      const gUpper = (res.identity.gender || "").toUpperCase();
+      if (gUpper.includes("MALE") && !gUpper.includes("FEMALE")) setGender("MALE");
+      else if (gUpper.includes("FEMALE")) setGender("FEMALE");
+      else setGender("UNISEX");
+
+      if (brands.length > 0 && res.identity.brand) {
+        const matched = brands.find((b: any) => b.name.toLowerCase() === res.identity.brand.toLowerCase());
+        if (matched) setBrandId(matched.id);
+      }
+
+      if (categories.length > 0 && res.identity.category) {
+        const matched = categories.find((c: any) => c.name.toLowerCase().includes(res.identity.category.toLowerCase()));
+        if (matched) setCategoryIds([matched.id]);
+      }
+
+      if (res.appearance.primaryColor && variants.length > 0) {
+        setVariants(variants.map((v) => ({ ...v, colorValue: res.appearance.primaryColor })));
+      }
+
+      setSuccessSnackbar({
+        open: true,
+        message: "AI analysis complete! Name, outfit intelligence, and attributes auto-filled.",
+      });
+    } catch (err: any) {
+      setSaveError(err.message || "Failed to auto-fill with AI analysis.");
+    } finally {
+      setIsAnalyzingAI(false);
+    }
+  };
+
   const handleSave = () => {
     if (!name || name.trim().length < 2) {
       setSaveError("Product name must be at least 2 characters.");
@@ -589,6 +653,15 @@ export function AdminProductsPage() {
                       />
                     </TableCell>
                     <TableCell align="right">
+                      <Tooltip title="AI Outfit Analysis & Catalog Assistant">
+                        <IconButton
+                          size="small"
+                          color="primary"
+                          onClick={() => navigate("/admin/ai-product-analysis", { state: { product: prod } })}
+                        >
+                          <AutoAwesomeIcon fontSize="small" />
+                        </IconButton>
+                      </Tooltip>
                       <IconButton size="small" onClick={() => handleOpenEdit(prod)}>
                         <EditIcon fontSize="small" />
                       </IconButton>
@@ -734,7 +807,18 @@ export function AdminProductsPage() {
                 Product Images & Gallery
               </Typography>
 
-              <Stack direction="row" spacing={2} alignItems="center" mb={2}>
+              <Stack direction="row" spacing={2} alignItems="center" mb={2} flexWrap="wrap">
+                <Button
+                  variant="contained"
+                  color="secondary"
+                  size="small"
+                  startIcon={isAnalyzingAI ? <CircularProgress size={16} color="inherit" /> : <AutoAwesomeIcon />}
+                  disabled={(!primaryImageUrl && galleryUrls.length === 0) || isAnalyzingAI}
+                  onClick={handleAutoFillWithAI}
+                  sx={{ fontWeight: 700 }}
+                >
+                  {isAnalyzingAI ? "Analyzing Garment..." : "Auto-Fill with AI Analysis"}
+                </Button>
                 <Button
                   variant="outlined"
                   size="small"

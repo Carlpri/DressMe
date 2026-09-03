@@ -26,11 +26,13 @@ import {
   FormControl,
   InputLabel,
   Snackbar,
+  Paper,
 } from "@mui/material";
 import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
 import FavoriteIcon from "@mui/icons-material/Favorite";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import ShareIcon from "@mui/icons-material/Share";
+import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import { useProducts, useProduct } from "../../hooks/useProducts";
 import { useAddToCart } from "../../hooks/useCart";
 import { useFavorites, useAddToFavorites, useRemoveFromFavorites } from "../../hooks/useFavorites";
@@ -47,6 +49,36 @@ import { WhatsAppService } from "../../services/whatsapp.service";
 import { useAppSettings } from "../../hooks/useAppSettings";
 import { useRecentlyViewed } from "../../hooks/useRecentlyViewed";
 import { useEffect } from "react";
+
+const parseOutfitIntelligence = (desc: string) => {
+  if (!desc || !desc.includes("DressMe Outfit & Styling Intelligence")) {
+    return { mainDescription: desc, outfitDetails: null };
+  }
+  const splitIndex = desc.indexOf("### DressMe Outfit & Styling Intelligence");
+  const mainDescription = desc.substring(0, splitIndex).trim();
+  const rawOutfit = desc.substring(splitIndex);
+
+  const getBulletValue = (label: string) => {
+    const regex = new RegExp(`\\*\\*${label}:?\\*\\*\\s*([^\\n*]+)`, "i");
+    const match = rawOutfit.match(regex);
+    return match ? match[1].trim() : null;
+  };
+
+  return {
+    mainDescription,
+    outfitDetails: {
+      style: getBulletValue("Dominant Style"),
+      occasion: getBulletValue("Primary Occasion") || getBulletValue("Occasion"),
+      weather: getBulletValue("Weather & Climate"),
+      matchingShoes: getBulletValue("Matching Shoes"),
+      matchingOuterwear: getBulletValue("Matching Outerwear"),
+      matchingPieces: getBulletValue("Matching Tops/Bottoms"),
+      accessories: getBulletValue("Matching Accessories"),
+      complementaryColors: getBulletValue("Complementary Colors"),
+      tags: getBulletValue("Search Tags"),
+    },
+  };
+};
 
 export function ProductDetailsPage() {
   const { slug } = useParams<{ slug: string }>();
@@ -359,9 +391,91 @@ export function ProductDetailsPage() {
                 )}
               </Stack>
 
-              <Typography color="text.secondary" sx={{ lineHeight: 1.6 }}>
-                {product.description}
-              </Typography>
+              {(() => {
+                const { mainDescription, outfitDetails } = parseOutfitIntelligence(product.description);
+                return (
+                  <Stack spacing={2}>
+                    <Typography color="text.secondary" sx={{ lineHeight: 1.6, whiteSpace: "pre-line" }}>
+                      {mainDescription}
+                    </Typography>
+
+                    {outfitDetails && (
+                      <Paper
+                        elevation={0}
+                        sx={{
+                          p: 2.5,
+                          borderRadius: 2.5,
+                          bgcolor: "#F8FAFC",
+                          border: "1px solid",
+                          borderColor: "rgba(0,0,0,0.08)",
+                        }}
+                      >
+                        <Stack direction="row" spacing={1} alignItems="center" mb={1.5}>
+                          <AutoAwesomeIcon color="primary" fontSize="small" />
+                          <Typography variant="subtitle2" sx={{ fontWeight: 700, textTransform: "uppercase", letterSpacing: 0.5 }}>
+                            Complete The Look & Outfit Pairings
+                          </Typography>
+                        </Stack>
+
+                        <Grid container spacing={1.5}>
+                          {outfitDetails.matchingShoes && (
+                            <Grid size={{ xs: 12, sm: 6 }}>
+                              <Typography variant="caption" color="text.secondary" display="block">
+                                Recommended Matching Shoes
+                              </Typography>
+                              <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                                {outfitDetails.matchingShoes}
+                              </Typography>
+                            </Grid>
+                          )}
+                          {outfitDetails.matchingPieces && (
+                            <Grid size={{ xs: 12, sm: 6 }}>
+                              <Typography variant="caption" color="text.secondary" display="block">
+                                Matching Pieces
+                              </Typography>
+                              <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                                {outfitDetails.matchingPieces}
+                              </Typography>
+                            </Grid>
+                          )}
+                          {outfitDetails.matchingOuterwear && (
+                            <Grid size={{ xs: 12, sm: 6 }}>
+                              <Typography variant="caption" color="text.secondary" display="block">
+                                Matching Outerwear & Layers
+                              </Typography>
+                              <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                                {outfitDetails.matchingOuterwear}
+                              </Typography>
+                            </Grid>
+                          )}
+                          {outfitDetails.accessories && (
+                            <Grid size={{ xs: 12, sm: 6 }}>
+                              <Typography variant="caption" color="text.secondary" display="block">
+                                Recommended Accessories
+                              </Typography>
+                              <Typography variant="body2" sx={{ fontWeight: 600 }}>
+                                {outfitDetails.accessories}
+                              </Typography>
+                            </Grid>
+                          )}
+                          {outfitDetails.complementaryColors && (
+                            <Grid size={{ xs: 12 }}>
+                              <Typography variant="caption" color="text.secondary" display="block">
+                                Complementary Colors
+                              </Typography>
+                              <Stack direction="row" spacing={0.5} flexWrap="wrap" sx={{ gap: 0.5, mt: 0.5 }}>
+                                {outfitDetails.complementaryColors.split(",").map((c, i) => (
+                                  <Chip key={i} label={c.trim()} size="small" variant="outlined" sx={{ fontSize: "0.75rem" }} />
+                                ))}
+                              </Stack>
+                            </Grid>
+                          )}
+                        </Grid>
+                      </Paper>
+                    )}
+                  </Stack>
+                );
+              })()}
 
               {/* Variants */}
               {(product.variants?.length ?? 0) > 0 && (
