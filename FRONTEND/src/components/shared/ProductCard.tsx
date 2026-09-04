@@ -27,9 +27,14 @@ interface ProductCardProps {
   product: Product;
 }
 
+// Standard apparel size sort order
+const STANDARD_SIZE_ORDER = [
+  "XXS", "XS", "S", "M", "L", "XL", "2XL", "XXL", "3XL", "XXXL", "4XL", "5XL", "ONE SIZE", "OS",
+];
+
 // How many px of the hover panel peek above the card bottom when NOT hovered.
-// This is exactly what is always visible: price + size row.
-const PEEK_HEIGHT = 48; // px (price row ~28px + 20px padding)
+// This is exactly what is always visible at all times: price row.
+const PEEK_HEIGHT = 46; // px
 
 export function ProductCard({ product }: ProductCardProps) {
   const navigate = useNavigate();
@@ -49,9 +54,19 @@ export function ProductCard({ product }: ProductCardProps) {
   const addToFavorites = useAddToFavorites();
   const removeFromFavorites = useRemoveFromFavorites();
 
-  // Long-press refs for touch reveal
-  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const didLongPress = useRef(false);  // true if the touch was a hold, not a tap
+  // Auto-retract timer ref for touch reveal (displays for a short while ~2.8s)
+  const autoCloseTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const touchStartedWhileRevealed = useRef(false);
+  const touchMoved = useRef(false);
+
+  // Clear timers on unmount
+  useEffect(() => {
+    return () => {
+      if (autoCloseTimer.current) {
+        clearTimeout(autoCloseTimer.current);
+      }
+    };
+  }, []);
 
   // Close card when user clicks or touches outside
   useEffect(() => {
@@ -60,6 +75,10 @@ export function ProductCard({ product }: ProductCardProps) {
     const handleOutsideInteraction = (e: MouseEvent | TouchEvent) => {
       if (cardRef.current && !cardRef.current.contains(e.target as Node)) {
         setIsHovered(false);
+        if (autoCloseTimer.current) {
+          clearTimeout(autoCloseTimer.current);
+          autoCloseTimer.current = null;
+        }
       }
     };
 
@@ -134,71 +153,96 @@ export function ProductCard({ product }: ProductCardProps) {
     }
   };
 
-  // ── Mouse click: always navigate ────────────────────────────────────────
-  const handleCardClick = (e: React.MouseEvent) => {
-    // If this click was synthesised from a long-press touch, swallow it
-    if (didLongPress.current) {
-      didLongPress.current = false;
-      e.preventDefault();
+  // ── Touch & Scroll reveal helper: immediate reveal for short whiles (~2.8s) ───
+  const triggerTouchReveal = () => {
+    setIsHovered(true);
+    if (autoCloseTimer.current) {
+      clearTimeout(autoCloseTimer.current);
+    }
+    autoCloseTimer.current = setTimeout(() => {
+      setIsHovered(false);
+      autoCloseTimer.current = null;
+    }, 2800);
+  };
+
+  const handleMouseEnter = () => {
+    if (autoCloseTimer.current) {
+      clearTimeout(autoCloseTimer.current);
+      autoCloseTimer.current = null;
+    }
+    setIsHovered(true);
+  };
+
+  const handleMouseLeave = () => {
+    if (autoCloseTimer.current) {
+      clearTimeout(autoCloseTimer.current);
+      autoCloseTimer.current = null;
+    }
+    setIsHovered(false);
+  };
+
+  // ── Touch: immediate reveal on contact, even during scrolling ───
+  const handleTouchStart = () => {
+    touchStartedWhileRevealed.current = isHovered;
+    touchMoved.current = false;
+    triggerTouchReveal();
+  };
+
+  const handleTouchMove = () => {
+    touchMoved.current = true;
+    // Keep revealed while scrolling; do not cancel the reveal
+  };
+
+  // ── Card click/tap navigation ───
+  const handleCardClick = () => {
+    if (touchMoved.current) {
+      touchMoved.current = false;
       return;
     }
-    navigate(`/products/${product.slug}`);
-  };
-
-  // ── Touch: short tap → navigate, long press (≥350 ms) → reveal panel ───
-  const handleTouchStart = (e: React.TouchEvent) => {
-    didLongPress.current = false;
-    longPressTimer.current = setTimeout(() => {
-      didLongPress.current = true;
-      setIsHovered(true);
-    }, 350);
-  };
-
-  const handleTouchEnd = () => {
-    // Cancel the timer — if it hadn't fired yet this was a short tap (→ click handler navigates)
-    if (longPressTimer.current) {
-      clearTimeout(longPressTimer.current);
-      longPressTimer.current = null;
+    // If clicked on desktop mouse or if tapped while already revealed: navigate
+    if (touchStartedWhileRevealed.current || !("ontouchstart" in window)) {
+      navigate(`/products/${product.slug}`);
+    } else {
+      // First tap reveals details for a short while
+      triggerTouchReveal();
     }
   };
 
-  // If the finger moves (scroll), cancel the long-press
-  const handleTouchMove = () => {
-    if (longPressTimer.current) {
-      clearTimeout(longPressTimer.current);
-      longPressTimer.current = null;
-    }
-  };
-
-  // Sizes
-  const sizeMap = new Map<string, { id: string; inStock: boolean }>();
+  // ── IN-STOCK SIZES (displayed on top at rest) ───────────────────────────
+  const inStockSizesMap = new Map<string, string>();
   for (const v of product.variants ?? []) {
-    if (v.sizeValue) {
-      const key = v.sizeValue.trim().toUpperCase();
-      if (!sizeMap.has(key)) sizeMap.set(key, { id: v.id, inStock: (v.stock ?? 0) > 0 });
-      else if ((v.stock ?? 0) > 0) sizeMap.set(key, { id: v.id, inStock: true });
+    if (v.sizeValue && (v.stock ?? 0) > 0) {
+      const trimmed = v.sizeValue.trim();
+      const key = trimmed.toUpperCase();
+      if (!inStockSizesMap.has(key)) {
+        inStockSizesMap.set(key, trimmed);
+      }
     }
   }
-  const sizes = [...sizeMap.entries()];
-  const visibleSizes = sizes.slice(0, 3);
+  const inStockSizes = Array.from(inStockSizesMap.entries())
+    .sort(([keyA], [keyB]) => {
+      const idxA = STANDARD_SIZE_ORDER.indexOf(keyA);
+      const idxB = STANDARD_SIZE_ORDER.indexOf(keyB);
+      if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+      if (idxA !== -1) return -1;
+      if (idxB !== -1) return 1;
+      return keyA.localeCompare(keyB);
+    })
+    .map(([, original]) => original);
 
-  // Colors
+  // ── COLOR VARIANTS (displayed below sizes at rest) ──────────────────────
   const colorMap = new Map<string, { id: string; inStock: boolean }>();
   for (const v of product.variants ?? []) {
     if (v.colorValue) {
       const key = v.colorValue.trim();
-      if (!colorMap.has(key)) colorMap.set(key, { id: v.id, inStock: (v.stock ?? 0) > 0 });
-      else if ((v.stock ?? 0) > 0) colorMap.set(key, { id: v.id, inStock: true });
+      if (!colorMap.has(key)) {
+        colorMap.set(key, { id: v.id, inStock: (v.stock ?? 0) > 0 });
+      } else if ((v.stock ?? 0) > 0) {
+        colorMap.set(key, { id: v.id, inStock: true });
+      }
     }
   }
-  const visibleColors = [...colorMap.entries()].slice(0, 4);
-  const isValidCssColor = (c: string) => {
-    const s = new Option().style;
-    s.color = c.toLowerCase();
-    return s.color !== "";
-  };
-  const useSwatches =
-    visibleColors.length > 0 && visibleColors.every(([label]) => isValidCssColor(label));
+  const colorVariants = Array.from(colorMap.entries());
 
   return (
     <>
@@ -207,10 +251,9 @@ export function ProductCard({ product }: ProductCardProps) {
         ref={cardRef}
         onClick={handleCardClick}
         onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
         onTouchMove={handleTouchMove}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
         role="article"
         tabIndex={0}
         onKeyDown={(e) => {
@@ -283,7 +326,7 @@ export function ProductCard({ product }: ProductCardProps) {
             </Box>
           )}
 
-          {/* Subtle bottom shadow gradient — delicate, allows full outfit view while making price/size legible */}
+          {/* Subtle bottom shadow gradient — delicate, allows full outfit view while making price legible */}
           <Box
             sx={{
               position: "absolute",
@@ -297,6 +340,106 @@ export function ProductCard({ product }: ProductCardProps) {
             }}
           />
         </Box>
+
+        {/* ── TOP SECTION AT REST: IN-STOCK SIZES ON TOP + COLOR VARIANT DOTS BELOW ──
+            Disappear when hover / touch reveal is initiated
+        */}
+        <Stack
+          direction="column"
+          spacing={0.5}
+          alignItems="flex-start"
+          sx={{
+            position: "absolute",
+            top: { xs: 8, sm: 10 },
+            left: { xs: 8, sm: 10 },
+            right: { xs: 8, sm: 10 },
+            zIndex: 5,
+            opacity: isHovered ? 0 : 1,
+            transform: isHovered ? "translateY(-8px)" : "translateY(0)",
+            transition: "opacity 0.28s cubic-bezier(0.16, 1, 0.3, 1), transform 0.28s cubic-bezier(0.16, 1, 0.3, 1)",
+            pointerEvents: isHovered ? "none" : "auto",
+          }}
+        >
+          {/* Sizes on top (only in-stock) */}
+          {inStockSizes.length > 0 && (
+            <Stack direction="row" spacing={0.35} flexWrap="wrap" useFlexGap sx={{ gap: 0.35 }}>
+              {inStockSizes.slice(0, 5).map((size) => (
+                <Box
+                  key={size}
+                  sx={{
+                    px: { xs: 0.55, sm: 0.65 },
+                    py: 0.2,
+                    borderRadius: "4px",
+                    bgcolor: "rgba(10, 14, 22, 0.78)",
+                    backdropFilter: "blur(10px)",
+                    WebkitBackdropFilter: "blur(10px)",
+                    border: "1px solid rgba(255, 255, 255, 0.2)",
+                    fontSize: { xs: "0.55rem", sm: "0.6rem" },
+                    fontWeight: 800,
+                    color: "#FFFFFF",
+                    letterSpacing: "0.02em",
+                    boxShadow: "0 2px 6px rgba(0,0,0,0.45)",
+                    lineHeight: 1.1,
+                  }}
+                >
+                  {size}
+                </Box>
+              ))}
+              {inStockSizes.length > 5 && (
+                <Box
+                  sx={{
+                    px: 0.5,
+                    py: 0.2,
+                    borderRadius: "4px",
+                    bgcolor: "rgba(10, 14, 22, 0.65)",
+                    backdropFilter: "blur(8px)",
+                    border: "1px solid rgba(255, 255, 255, 0.12)",
+                    fontSize: "0.52rem",
+                    fontWeight: 700,
+                    color: "rgba(255, 255, 255, 0.75)",
+                    lineHeight: 1.1,
+                  }}
+                >
+                  +{inStockSizes.length - 5}
+                </Box>
+              )}
+            </Stack>
+          )}
+
+          {/* Color variant dots below sizes */}
+          {colorVariants.length > 1 && (
+            <Stack direction="row" spacing={0.5} alignItems="center">
+              {colorVariants.slice(0, 6).map(([colorName, { inStock }]) => (
+                <Box
+                  key={colorName}
+                  title={colorName}
+                  sx={{
+                    width: { xs: 9, sm: 10 },
+                    height: { xs: 9, sm: 10 },
+                    borderRadius: "50%",
+                    bgcolor: colorName.toLowerCase(),
+                    border: "1.5px solid rgba(255, 255, 255, 0.75)",
+                    boxShadow: "0 1px 4px rgba(0, 0, 0, 0.6)",
+                    opacity: inStock ? 1 : 0.35,
+                    flexShrink: 0,
+                  }}
+                />
+              ))}
+              {colorVariants.length > 6 && (
+                <Typography
+                  sx={{
+                    fontSize: "0.52rem",
+                    color: "rgba(255,255,255,0.8)",
+                    fontWeight: 800,
+                    textShadow: "0 1px 3px rgba(0,0,0,0.8)",
+                  }}
+                >
+                  +{colorVariants.length - 6}
+                </Typography>
+              )}
+            </Stack>
+          )}
+        </Stack>
 
         {/* ── TOP-LEFT BADGES (hover / touch reveal) ─────────────────────── */}
         <Stack
@@ -638,7 +781,7 @@ export function ProductCard({ product }: ProductCardProps) {
             </Button>
           </Box>
 
-          {/* ── ALWAYS-VISIBLE PEEK ROW: PRICE + SIZE (ALWAYS VISIBLE) ──── */}
+          {/* ── ALWAYS-VISIBLE PEEK ROW: PRICE (ALWAYS VISIBLE AT ALL TIMES) ──── */}
           <Stack
             direction="row"
             alignItems="center"
@@ -679,70 +822,46 @@ export function ProductCard({ product }: ProductCardProps) {
               )}
             </Stack>
 
-            {/* Sizes or color swatches */}
-            <Stack direction="row" alignItems="center" spacing={0.3} sx={{ flexShrink: 0 }}>
-              {useSwatches
-                ? visibleColors.slice(0, 4).map(([label, { inStock }]) => (
-                    <Box
-                      key={label}
-                      title={label}
-                      sx={{
-                        width: { xs: 9, sm: 10 },
-                        height: { xs: 9, sm: 10 },
-                        borderRadius: "50%",
-                        bgcolor: label.toLowerCase(),
-                        border: "1.5px solid rgba(255,255,255,0.4)",
-                        boxShadow: "0 1px 3px rgba(0,0,0,0.6)",
-                        opacity: inStock ? 1 : 0.3,
-                        flexShrink: 0,
-                      }}
-                    />
-                  ))
-                : visibleSizes.map(([label, { id, inStock }]) => (
-                    <Box
-                      key={label}
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        if (inStock) setSelectedVariantId(id);
-                      }}
-                      sx={{
-                        px: 0.5,
-                        py: 0.15,
-                        borderRadius: "4px",
-                        bgcolor:
-                          selectedVariantId === id
-                            ? "rgba(0,200,150,0.3)"
-                            : inStock
-                            ? "rgba(0,0,0,0.45)"
-                            : "rgba(0,0,0,0.2)",
-                        backdropFilter: "blur(4px)",
-                        WebkitBackdropFilter: "blur(4px)",
-                        border: "1px solid",
-                        borderColor:
-                          selectedVariantId === id
-                            ? "#00C896"
-                            : inStock
-                            ? "rgba(255,255,255,0.25)"
-                            : "rgba(255,255,255,0.08)",
-                        boxShadow: "0 1px 3px rgba(0,0,0,0.4)",
-                        fontSize: "0.55rem",
-                        fontWeight: 700,
-                        color:
-                          selectedVariantId === id
-                            ? "#00C896"
-                            : inStock
-                            ? "#FFF"
-                            : "rgba(255,255,255,0.35)",
-                        textDecoration: inStock ? "none" : "line-through",
-                        cursor: inStock ? "pointer" : "default",
-                        flexShrink: 0,
-                      }}
-                    >
-                      {label}
-                    </Box>
-                  ))}
-            </Stack>
+            {/* Right indicator: Low stock / Sold out / Discount savings */}
+            {isOutOfStock ? (
+              <Chip
+                label="Sold Out"
+                size="small"
+                sx={{
+                  bgcolor: "rgba(220,38,38,0.85)",
+                  color: "#FFF",
+                  fontWeight: 800,
+                  fontSize: "0.55rem",
+                  height: 18,
+                  px: 0.3,
+                }}
+              />
+            ) : isLowStock ? (
+              <Chip
+                label={`Only ${totalStock} left`}
+                size="small"
+                sx={{
+                  bgcolor: "rgba(234,88,12,0.85)",
+                  color: "#FFF",
+                  fontWeight: 800,
+                  fontSize: "0.55rem",
+                  height: 18,
+                  px: 0.3,
+                }}
+              />
+            ) : hasSalePrice && discountPercent > 0 ? (
+              <Typography
+                sx={{
+                  fontSize: "0.62rem",
+                  color: "#00C896",
+                  fontWeight: 800,
+                  letterSpacing: "0.02em",
+                  textShadow: "0 1px 4px rgba(0,0,0,0.8)",
+                }}
+              >
+                SAVE {discountPercent}%
+              </Typography>
+            ) : null}
           </Stack>
         </Box>
       </Box>

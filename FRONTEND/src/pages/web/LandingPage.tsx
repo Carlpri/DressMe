@@ -11,7 +11,6 @@ import {
   Stack,
   TextField,
   Typography,
-  useTheme,
   Chip,
   alpha,
 } from "@mui/material";
@@ -32,10 +31,14 @@ import { MasonryGrid } from "../../components/shared/MasonryGrid";
 import { LoadingSkeleton } from "../../components/shared/LoadingSkeleton";
 import { useSiteSettingsContext } from "../../contexts/SiteSettingsContext";
 
-/* ── Palette ─────────────────────────────────────────────────────────────── */
+/* ── Light Mode Luxury Palette ───────────────────────────────────────────── */
 const GOLD = "#C9A96E";
+const GOLD_DARK = "#9E7B3B";
 const DARK = "#0D0D0D";
-const CARD_BG = "#141414";
+const BG_PAGE = "#FFFFFF";
+const BG_ALT = "#F9F6F2";
+const CARD_BG = "#FFFFFF";
+const BORDER_LIGHT = "rgba(0, 0, 0, 0.07)";
 
 /* ── 3-D rotating hero images ─────────────────────────────────────────────
    Pure CSS perspective + rotateY — no canvas, no lib, zero bundle cost.     */
@@ -93,13 +96,13 @@ function CountUp({ target, suffix = "" }: { target: number; suffix?: string }) {
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
     <Stack direction="row" alignItems="center" spacing={1.5} mb={0.5}>
-      <Box sx={{ width: 32, height: 2, bgcolor: GOLD, borderRadius: 1, flexShrink: 0 }} />
+      <Box sx={{ width: 32, height: 2, bgcolor: GOLD_DARK, borderRadius: 1, flexShrink: 0 }} />
       <Typography
         sx={{
           fontSize: "0.72rem",
           fontWeight: 800,
           letterSpacing: "0.12em",
-          color: GOLD,
+          color: GOLD_DARK,
           textTransform: "uppercase",
         }}
       >
@@ -111,7 +114,6 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 
 /* ══════════════════════════════════════════════════════════════════════════ */
 export function LandingPage() {
-  const theme = useTheme();
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
   const [activeSlide, setActiveSlide] = useState(0);
@@ -145,28 +147,29 @@ export function LandingPage() {
   };
 
   return (
-    <Box sx={{ bgcolor: "#F9F6F2", minHeight: "100vh" }}>
+    <Box sx={{ bgcolor: BG_PAGE, color: DARK, minHeight: "100vh" }}>
       {/* ════════════════════════════════════════════════════════════════════
-          HERO
+          HERO (Light Mode)
       ════════════════════════════════════════════════════════════════════ */}
       <Box
         sx={{
           position: "relative",
           minHeight: { xs: "100vh", md: "100vh" },
-          bgcolor: DARK,
+          bgcolor: BG_ALT,
           overflow: "hidden",
           display: "flex",
           alignItems: "center",
+          borderBottom: `1px solid ${BORDER_LIGHT}`,
         }}
       >
-        {/* ambient blobs — no canvas, pure CSS radial gradients */}
+        {/* ambient blobs — luxury warm champagne radial gradients */}
         <Box
           sx={{
             position: "absolute",
             inset: 0,
             background: `
-              radial-gradient(ellipse 60% 50% at 75% 40%, rgba(201,169,110,0.07) 0%, transparent 70%),
-              radial-gradient(ellipse 40% 40% at 20% 70%, rgba(201,169,110,0.04) 0%, transparent 60%)
+              radial-gradient(ellipse 65% 50% at 75% 40%, rgba(201,169,110,0.13) 0%, transparent 70%),
+              radial-gradient(ellipse 45% 45% at 20% 70%, rgba(201,169,110,0.08) 0%, transparent 60%)
             `,
             pointerEvents: "none",
           }}
@@ -176,8 +179,8 @@ export function LandingPage() {
           sx={{
             position: "absolute",
             inset: 0,
-            backgroundImage: `linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-              linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)`,
+            backgroundImage: `linear-gradient(rgba(0,0,0,0.025) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(0,0,0,0.025) 1px, transparent 1px)`,
             backgroundSize: "64px 64px",
             pointerEvents: "none",
           }}
@@ -193,17 +196,17 @@ export function LandingPage() {
                   <Box
                     sx={{
                       px: 1.5,
-                      py: 0.4,
+                      py: 0.45,
                       borderRadius: "6px",
-                      bgcolor: "rgba(201,169,110,0.12)",
-                      border: "1px solid rgba(201,169,110,0.25)",
+                      bgcolor: "rgba(201,169,110,0.14)",
+                      border: "1px solid rgba(201,169,110,0.32)",
                       display: "flex",
                       alignItems: "center",
                       gap: 0.75,
                     }}
                   >
-                    <AutoAwesomeIcon sx={{ fontSize: 13, color: GOLD }} />
-                    <Typography sx={{ fontSize: "0.72rem", fontWeight: 700, color: GOLD, letterSpacing: "0.06em" }}>
+                    <AutoAwesomeIcon sx={{ fontSize: 13, color: GOLD_DARK }} />
+                    <Typography sx={{ fontSize: "0.72rem", fontWeight: 800, color: GOLD_DARK, letterSpacing: "0.08em" }}>
                       THE FUTURE OF FASHION
                     </Typography>
                   </Box>
@@ -217,7 +220,7 @@ export function LandingPage() {
                       fontWeight: 900,
                       fontSize: { xs: "3rem", sm: "3.8rem", md: "4.5rem", lg: "5.2rem" },
                       lineHeight: 1.05,
-                      color: "white",
+                      color: DARK,
                       letterSpacing: "-0.03em",
                     }}
                   >
@@ -226,7 +229,7 @@ export function LandingPage() {
                     <Box
                       component="span"
                       sx={{
-                        background: `linear-gradient(135deg, ${GOLD} 0%, #e8c97e 50%, ${GOLD} 100%)`,
+                        background: `linear-gradient(135deg, ${GOLD_DARK} 0%, ${GOLD} 50%, #B89355 100%)`,
                         WebkitBackgroundClip: "text",
                         WebkitTextFillColor: "transparent",
                         backgroundClip: "text",
@@ -235,7 +238,7 @@ export function LandingPage() {
                       a Model.
                     </Box>
                     <br />
-                    <Box component="span" sx={{ color: "rgba(255,255,255,0.35)", fontWeight: 400, fontSize: "0.72em" }}>
+                    <Box component="span" sx={{ color: "rgba(0,0,0,0.36)", fontWeight: 400, fontSize: "0.72em" }}>
                       Look Every Part.
                     </Box>
                   </Typography>
@@ -244,7 +247,7 @@ export function LandingPage() {
                 {/* sub-copy */}
                 <Typography
                   sx={{
-                    color: "rgba(255,255,255,0.55)",
+                    color: "#475569",
                     fontSize: { xs: "1rem", md: "1.1rem" },
                     lineHeight: 1.7,
                     maxWidth: 480,
@@ -273,19 +276,19 @@ export function LandingPage() {
                     variant="outlined"
                     sx={{
                       "& .MuiOutlinedInput-root": {
-                        bgcolor: "rgba(255,255,255,0.06)",
-                        backdropFilter: "blur(12px)",
+                        bgcolor: "#FFFFFF",
                         borderRadius: "12px",
                         height: 52,
-                        color: "white",
-                        "& fieldset": { borderColor: "rgba(255,255,255,0.1)" },
-                        "&:hover fieldset": { borderColor: "rgba(201,169,110,0.4)" },
+                        color: DARK,
+                        boxShadow: "0 4px 18px rgba(0,0,0,0.04)",
+                        "& fieldset": { borderColor: "rgba(0,0,0,0.12)" },
+                        "&:hover fieldset": { borderColor: GOLD },
                         "&.Mui-focused fieldset": { borderColor: GOLD },
                       },
-                      "& input::placeholder": { color: "rgba(255,255,255,0.35)", opacity: 1 },
+                      "& input::placeholder": { color: "#94A3B8", opacity: 1 },
                     }}
                     InputProps={{
-                      startAdornment: <SearchIcon sx={{ color: "rgba(255,255,255,0.35)", mr: 1.5, fontSize: 20 }} />,
+                      startAdornment: <SearchIcon sx={{ color: "#94A3B8", mr: 1.5, fontSize: 20 }} />,
                     }}
                   />
                   <Button
@@ -293,13 +296,13 @@ export function LandingPage() {
                     variant="contained"
                     sx={{
                       height: 52,
-                      px: 3,
+                      px: 3.5,
                       borderRadius: "12px",
                       fontWeight: 700,
                       bgcolor: GOLD,
                       color: DARK,
                       minWidth: { xs: "100%", sm: 120 },
-                      "&:hover": { bgcolor: "#e8c97e", boxShadow: `0 8px 24px rgba(201,169,110,0.4)` },
+                      "&:hover": { bgcolor: "#D8B87D", boxShadow: `0 8px 24px rgba(201,169,110,0.35)` },
                       transition: "all 0.25s ease",
                     }}
                   >
@@ -320,9 +323,9 @@ export function LandingPage() {
                       borderRadius: "12px",
                       fontWeight: 700,
                       fontSize: "0.9rem",
-                      bgcolor: GOLD,
-                      color: DARK,
-                      "&:hover": { bgcolor: "#e8c97e", boxShadow: `0 8px 24px rgba(201,169,110,0.4)` },
+                      bgcolor: DARK,
+                      color: "#FFFFFF",
+                      "&:hover": { bgcolor: GOLD, color: DARK, boxShadow: `0 8px 24px rgba(201,169,110,0.35)` },
                       transition: "all 0.25s ease",
                     }}
                   >
@@ -338,9 +341,10 @@ export function LandingPage() {
                       borderRadius: "12px",
                       fontWeight: 600,
                       fontSize: "0.9rem",
-                      color: "rgba(255,255,255,0.8)",
-                      borderColor: "rgba(255,255,255,0.2)",
-                      "&:hover": { borderColor: GOLD, color: GOLD, bgcolor: "rgba(201,169,110,0.06)" },
+                      color: DARK,
+                      borderColor: "rgba(0,0,0,0.18)",
+                      bgcolor: "#FFFFFF",
+                      "&:hover": { borderColor: GOLD, color: GOLD_DARK, bgcolor: "rgba(201,169,110,0.06)" },
                       transition: "all 0.25s ease",
                     }}
                   >
@@ -353,7 +357,7 @@ export function LandingPage() {
                   direction="row"
                   spacing={0}
                   divider={
-                    <Box sx={{ width: "1px", bgcolor: "rgba(255,255,255,0.1)", mx: 3, alignSelf: "stretch" }} />
+                    <Box sx={{ width: "1px", bgcolor: "rgba(0,0,0,0.08)", mx: 3, alignSelf: "stretch" }} />
                   }
                   sx={{ mt: 2 }}
                 >
@@ -364,11 +368,11 @@ export function LandingPage() {
                   ].map((stat) => (
                     <Box key={stat.label}>
                       <Typography
-                        sx={{ fontWeight: 800, fontSize: "1.5rem", color: "white", lineHeight: 1 }}
+                        sx={{ fontWeight: 800, fontSize: "1.5rem", color: DARK, lineHeight: 1 }}
                       >
                         <CountUp target={stat.value} suffix={stat.suffix} />
                       </Typography>
-                      <Typography sx={{ fontSize: "0.72rem", color: "rgba(255,255,255,0.35)", mt: 0.4, letterSpacing: "0.06em" }}>
+                      <Typography sx={{ fontSize: "0.72rem", color: "#64748B", mt: 0.4, letterSpacing: "0.06em", fontWeight: 600 }}>
                         {stat.label}
                       </Typography>
                     </Box>
@@ -396,7 +400,7 @@ export function LandingPage() {
                     2: "rotateY(-28deg) translateZ(-120px) translateX(-110px) scale(0.88)",
                   };
                   const zIndexes: Record<number, number> = { 0: 3, 1: 2, 2: 1 };
-                  const opacities: Record<number, number> = { 0: 1, 1: 0.65, 2: 0.45 };
+                  const opacities: Record<number, number> = { 0: 1, 1: 0.7, 2: 0.5 };
 
                   return (
                     <Box
@@ -418,8 +422,8 @@ export function LandingPage() {
                         cursor: offset === 0 ? "default" : "pointer",
                         boxShadow:
                           offset === 0
-                            ? "0 40px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(201,169,110,0.2)"
-                            : "0 20px 40px rgba(0,0,0,0.4)",
+                            ? "0 30px 60px rgba(0,0,0,0.18), 0 0 0 1px rgba(201,169,110,0.3)"
+                            : "0 15px 30px rgba(0,0,0,0.1)",
                       }}
                     >
                       {/* image */}
@@ -449,11 +453,11 @@ export function LandingPage() {
                           label={slide.label}
                           size="small"
                           sx={{
-                            bgcolor: "rgba(201,169,110,0.2)",
-                            color: GOLD,
+                            bgcolor: "rgba(201,169,110,0.9)",
+                            color: DARK,
                             fontWeight: 700,
                             fontSize: "0.65rem",
-                            border: "1px solid rgba(201,169,110,0.3)",
+                            border: "1px solid rgba(201,169,110,0.4)",
                             mb: 1,
                           }}
                         />
@@ -479,7 +483,7 @@ export function LandingPage() {
                         width: i === activeSlide ? 24 : 8,
                         height: 6,
                         borderRadius: 3,
-                        bgcolor: i === activeSlide ? GOLD : "rgba(255,255,255,0.2)",
+                        bgcolor: i === activeSlide ? GOLD_DARK : "rgba(0,0,0,0.2)",
                         cursor: "pointer",
                         transition: "all 0.4s ease",
                       }}
@@ -502,7 +506,7 @@ export function LandingPage() {
             flexDirection: "column",
             alignItems: "center",
             gap: 0.75,
-            opacity: 0.4,
+            opacity: 0.5,
             animation: "bounce 2s ease infinite",
             "@keyframes bounce": {
               "0%, 100%": { transform: "translateX(-50%) translateY(0)" },
@@ -510,15 +514,15 @@ export function LandingPage() {
             },
           }}
         >
-          <Typography sx={{ fontSize: "0.65rem", color: "white", letterSpacing: "0.1em" }}>SCROLL</Typography>
-          <Box sx={{ width: 1, height: 32, bgcolor: "white", borderRadius: 1 }} />
+          <Typography sx={{ fontSize: "0.65rem", color: "#64748B", letterSpacing: "0.1em", fontWeight: 700 }}>SCROLL</Typography>
+          <Box sx={{ width: 1, height: 32, bgcolor: "#94A3B8", borderRadius: 1 }} />
         </Box>
       </Box>
 
       {/* ════════════════════════════════════════════════════════════════════
-          FEATURES STRIP
+          FEATURES STRIP (Light Mode)
       ════════════════════════════════════════════════════════════════════ */}
-      <Box sx={{ bgcolor: CARD_BG, borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+      <Box sx={{ bgcolor: CARD_BG, borderBottom: `1px solid ${BORDER_LIGHT}` }}>
         <Container maxWidth="xl">
           <Grid container>
             {[
@@ -535,12 +539,12 @@ export function LandingPage() {
                   sx={{
                     py: 2.5,
                     px: 3,
-                    borderRight: i < 3 ? "1px solid rgba(255,255,255,0.06)" : "none",
-                    "& svg": { color: GOLD, fontSize: 22 },
+                    borderRight: i < 3 ? `1px solid ${BORDER_LIGHT}` : "none",
+                    "& svg": { color: GOLD_DARK, fontSize: 22 },
                   }}
                 >
                   {item.icon}
-                  <Typography sx={{ fontSize: "0.8rem", fontWeight: 600, color: "rgba(255,255,255,0.7)" }}>
+                  <Typography sx={{ fontSize: "0.82rem", fontWeight: 700, color: "#334155" }}>
                     {item.text}
                   </Typography>
                 </Stack>
@@ -551,9 +555,9 @@ export function LandingPage() {
       </Box>
 
       {/* ════════════════════════════════════════════════════════════════════
-          TRENDING NOW
+          TRENDING NOW (Light Mode)
       ════════════════════════════════════════════════════════════════════ */}
-      <Box sx={{ py: { xs: 8, md: 12 }, bgcolor: "#F9F6F2" }}>
+      <Box sx={{ py: { xs: 8, md: 12 }, bgcolor: BG_PAGE }}>
         <Container maxWidth="xl">
           <Stack spacing={5}>
             <Stack direction="row" justifyContent="space-between" alignItems="flex-end">
@@ -562,7 +566,7 @@ export function LandingPage() {
                 <Typography variant="h3" sx={{ fontWeight: 800, color: DARK, letterSpacing: "-0.02em" }}>
                   What Everyone's Wearing
                 </Typography>
-                <Typography sx={{ color: "rgba(0,0,0,0.45)", mt: 0.5 }}>
+                <Typography sx={{ color: "#64748B", mt: 0.5 }}>
                   The most-loved looks from our community right now
                 </Typography>
               </Box>
@@ -570,7 +574,7 @@ export function LandingPage() {
                 variant="text"
                 endIcon={<NorthEastIcon />}
                 onClick={() => navigate(ROUTES.customerDashboard)}
-                sx={{ display: { xs: "none", md: "flex" }, color: DARK, fontWeight: 700, "&:hover": { color: GOLD } }}
+                sx={{ display: { xs: "none", md: "flex" }, color: DARK, fontWeight: 700, "&:hover": { color: GOLD_DARK } }}
               >
                 View All
               </Button>
@@ -600,17 +604,17 @@ export function LandingPage() {
       </Box>
 
       {/* ════════════════════════════════════════════════════════════════════
-          SHOP BY CATEGORY
+          SHOP BY CATEGORY (Light Mode)
       ════════════════════════════════════════════════════════════════════ */}
-      <Box sx={{ py: { xs: 8, md: 12 }, bgcolor: DARK }}>
+      <Box sx={{ py: { xs: 8, md: 12 }, bgcolor: BG_ALT, borderTop: `1px solid ${BORDER_LIGHT}`, borderBottom: `1px solid ${BORDER_LIGHT}` }}>
         <Container maxWidth="xl">
           <Stack spacing={6}>
             <Box sx={{ textAlign: "center" }}>
               <SectionLabel>Categories</SectionLabel>
-              <Typography variant="h3" sx={{ fontWeight: 800, color: "white", letterSpacing: "-0.02em" }}>
+              <Typography variant="h3" sx={{ fontWeight: 800, color: DARK, letterSpacing: "-0.02em" }}>
                 Shop by Style
               </Typography>
-              <Typography sx={{ color: "rgba(255,255,255,0.4)", mt: 0.5 }}>
+              <Typography sx={{ color: "#64748B", mt: 0.5 }}>
                 Find exactly what you're looking for
               </Typography>
             </Box>
@@ -635,11 +639,12 @@ export function LandingPage() {
                         borderRadius: "16px",
                         overflow: "hidden",
                         cursor: "pointer",
-                        border: "1px solid rgba(255,255,255,0.07)",
+                        border: `1px solid ${BORDER_LIGHT}`,
+                        boxShadow: "0 4px 16px rgba(0,0,0,0.05)",
                         "&:hover .cat-overlay": { opacity: 1 },
                         "&:hover .cat-img": { transform: "scale(1.07)" },
-                        "&:hover": { boxShadow: `0 0 0 1.5px ${GOLD}` },
-                        transition: "box-shadow 0.3s ease",
+                        "&:hover": { boxShadow: `0 8px 28px rgba(0,0,0,0.12), 0 0 0 1.5px ${GOLD}` },
+                        transition: "all 0.3s ease",
                       }}
                     >
                       {category.image ? (
@@ -656,7 +661,7 @@ export function LandingPage() {
                           sx={{
                             width: "100%",
                             height: "100%",
-                            background: `linear-gradient(135deg, #1a1a1a ${i * 8}%, #2a2a2a 100%)`,
+                            background: `linear-gradient(135deg, #e5e5e5 ${i * 8}%, #f0f0f0 100%)`,
                             transition: "transform 0.5s ease",
                           }}
                         />
@@ -673,7 +678,7 @@ export function LandingPage() {
                         sx={{
                           position: "absolute",
                           inset: 0,
-                          bgcolor: "rgba(201,169,110,0.1)",
+                          bgcolor: "rgba(201,169,110,0.12)",
                           opacity: 0,
                           transition: "opacity 0.3s ease",
                         }}
@@ -693,9 +698,9 @@ export function LandingPage() {
       </Box>
 
       {/* ════════════════════════════════════════════════════════════════════
-          BRANDS
+          BRANDS (Light Mode)
       ════════════════════════════════════════════════════════════════════ */}
-      <Box sx={{ py: { xs: 8, md: 12 }, bgcolor: "#F9F6F2" }}>
+      <Box sx={{ py: { xs: 8, md: 12 }, bgcolor: BG_PAGE }}>
         <Container maxWidth="xl">
           <Stack spacing={6}>
             <Stack direction="row" justifyContent="space-between" alignItems="flex-end">
@@ -704,7 +709,7 @@ export function LandingPage() {
                 <Typography variant="h3" sx={{ fontWeight: 800, color: DARK, letterSpacing: "-0.02em" }}>
                   Curated Collections
                 </Typography>
-                <Typography sx={{ color: "rgba(0,0,0,0.45)", mt: 0.5 }}>
+                <Typography sx={{ color: "#64748B", mt: 0.5 }}>
                   Discover leading African and international fashion labels
                 </Typography>
               </Box>
@@ -730,13 +735,14 @@ export function LandingPage() {
                         gap: 2,
                         p: 2.5,
                         borderRadius: "16px",
-                        bgcolor: "white",
-                        border: "1px solid rgba(0,0,0,0.06)",
+                        bgcolor: "#FFFFFF",
+                        border: "1px solid rgba(0,0,0,0.07)",
+                        boxShadow: "0 2px 10px rgba(0,0,0,0.03)",
                         cursor: "pointer",
                         transition: "all 0.25s ease",
                         "&:hover": {
                           borderColor: GOLD,
-                          boxShadow: `0 8px 24px rgba(0,0,0,0.08)`,
+                          boxShadow: `0 10px 24px rgba(0,0,0,0.08)`,
                           transform: "translateY(-2px)",
                         },
                       }}
@@ -758,7 +764,7 @@ export function LandingPage() {
                         {brand.logo ? (
                           <Box component="img" src={brand.logo} alt={brand.name} sx={{ width: "100%", height: "100%", objectFit: "contain" }} />
                         ) : (
-                          <Typography sx={{ fontWeight: 800, color: GOLD, fontSize: "1.2rem" }}>
+                          <Typography sx={{ fontWeight: 800, color: GOLD_DARK, fontSize: "1.2rem" }}>
                             {brand.name.charAt(0)}
                           </Typography>
                         )}
@@ -770,8 +776,13 @@ export function LandingPage() {
                         {brand.description && (
                           <Typography
                             variant="body2"
-                            color="text.secondary"
-                            sx={{ display: "-webkit-box", WebkitLineClamp: 1, WebkitBoxOrient: "vertical", overflow: "hidden" }}
+                            sx={{
+                              color: "#64748B",
+                              display: "-webkit-box",
+                              WebkitLineClamp: 1,
+                              WebkitBoxOrient: "vertical",
+                              overflow: "hidden",
+                            }}
                           >
                             {brand.description}
                           </Typography>
@@ -788,17 +799,17 @@ export function LandingPage() {
       </Box>
 
       {/* ════════════════════════════════════════════════════════════════════
-          FEATURED STORES
+          FEATURED STORES (Light Mode)
       ════════════════════════════════════════════════════════════════════ */}
-      <Box sx={{ py: { xs: 8, md: 12 }, bgcolor: DARK }}>
+      <Box sx={{ py: { xs: 8, md: 12 }, bgcolor: BG_ALT, borderTop: `1px solid ${BORDER_LIGHT}`, borderBottom: `1px solid ${BORDER_LIGHT}` }}>
         <Container maxWidth="xl">
           <Stack spacing={6}>
             <Box sx={{ textAlign: "center" }}>
               <SectionLabel>Stores</SectionLabel>
-              <Typography variant="h3" sx={{ fontWeight: 800, color: "white", letterSpacing: "-0.02em" }}>
+              <Typography variant="h3" sx={{ fontWeight: 800, color: DARK, letterSpacing: "-0.02em" }}>
                 Meet Our Vendors
               </Typography>
-              <Typography sx={{ color: "rgba(255,255,255,0.4)", mt: 0.5 }}>
+              <Typography sx={{ color: "#64748B", mt: 0.5 }}>
                 Kenya's finest fashion retailers, all in one place
               </Typography>
             </Box>
@@ -818,13 +829,14 @@ export function LandingPage() {
                     <Card
                       sx={{
                         height: "100%",
-                        bgcolor: "#1a1a1a",
-                        border: "1px solid rgba(255,255,255,0.07)",
+                        bgcolor: "#FFFFFF",
+                        border: "1px solid rgba(0,0,0,0.08)",
                         borderRadius: "20px",
                         overflow: "hidden",
                         cursor: "pointer",
+                        boxShadow: "0 4px 18px rgba(0,0,0,0.04)",
                         transition: "all 0.3s ease",
-                        "&:hover": { borderColor: GOLD, transform: "translateY(-4px)", boxShadow: `0 20px 40px rgba(0,0,0,0.4)` },
+                        "&:hover": { borderColor: GOLD, transform: "translateY(-4px)", boxShadow: `0 16px 36px rgba(0,0,0,0.1)` },
                       }}
                     >
                       <Box sx={{ height: 180, position: "relative", overflow: "hidden" }}>
@@ -849,7 +861,7 @@ export function LandingPage() {
                               height: 46,
                               borderRadius: "12px",
                               bgcolor: vendor.logo ? "transparent" : alpha(GOLD, 0.12),
-                              border: "1px solid rgba(255,255,255,0.1)",
+                              border: "1px solid rgba(0,0,0,0.08)",
                               display: "flex",
                               alignItems: "center",
                               justifyContent: "center",
@@ -860,18 +872,18 @@ export function LandingPage() {
                             {vendor.logo ? (
                               <Box component="img" src={vendor.logo} alt={vendor.businessName} sx={{ width: "100%", height: "100%", objectFit: "contain" }} />
                             ) : (
-                              <Typography sx={{ fontWeight: 800, color: GOLD }}>{vendor.businessName.charAt(0)}</Typography>
+                              <Typography sx={{ fontWeight: 800, color: GOLD_DARK }}>{vendor.businessName.charAt(0)}</Typography>
                             )}
                           </Box>
                           <Box sx={{ flex: 1 }}>
-                            <Typography sx={{ fontWeight: 700, color: "white" }}>{vendor.businessName}</Typography>
-                            <Typography sx={{ fontSize: "0.78rem", color: "rgba(255,255,255,0.4)" }}>{vendor.location}</Typography>
+                            <Typography sx={{ fontWeight: 700, color: DARK }}>{vendor.businessName}</Typography>
+                            <Typography sx={{ fontSize: "0.78rem", color: "#64748B" }}>{vendor.location}</Typography>
                           </Box>
                         </Stack>
                         {vendor.description && (
                           <Typography
                             sx={{
-                              color: "rgba(255,255,255,0.5)",
+                              color: "#475569",
                               fontSize: "0.85rem",
                               lineHeight: 1.6,
                               display: "-webkit-box",
@@ -889,11 +901,11 @@ export function LandingPage() {
                           size="small"
                           fullWidth
                           sx={{
-                            borderColor: "rgba(255,255,255,0.15)",
-                            color: "rgba(255,255,255,0.7)",
+                            borderColor: "rgba(0,0,0,0.15)",
+                            color: DARK,
                             borderRadius: "10px",
                             fontWeight: 600,
-                            "&:hover": { borderColor: GOLD, color: GOLD, bgcolor: "rgba(201,169,110,0.06)" },
+                            "&:hover": { borderColor: GOLD, color: GOLD_DARK, bgcolor: "rgba(201,169,110,0.08)" },
                           }}
                         >
                           Visit Store →
@@ -909,9 +921,9 @@ export function LandingPage() {
       </Box>
 
       {/* ════════════════════════════════════════════════════════════════════
-          NEW ARRIVALS
+          NEW ARRIVALS (Light Mode)
       ════════════════════════════════════════════════════════════════════ */}
-      <Box sx={{ py: { xs: 8, md: 12 }, bgcolor: "#F9F6F2" }}>
+      <Box sx={{ py: { xs: 8, md: 12 }, bgcolor: BG_PAGE }}>
         <Container maxWidth="xl">
           <Stack spacing={5}>
             <Stack direction="row" justifyContent="space-between" alignItems="flex-end">
@@ -920,7 +932,7 @@ export function LandingPage() {
                 <Typography variant="h3" sx={{ fontWeight: 800, color: DARK, letterSpacing: "-0.02em" }}>
                   Just Dropped
                 </Typography>
-                <Typography sx={{ color: "rgba(0,0,0,0.45)", mt: 0.5 }}>
+                <Typography sx={{ color: "#64748B", mt: 0.5 }}>
                   Fresh styles just landed in our collection
                 </Typography>
               </Box>
@@ -928,7 +940,7 @@ export function LandingPage() {
                 variant="text"
                 endIcon={<NorthEastIcon />}
                 onClick={() => navigate(ROUTES.customerDashboard)}
-                sx={{ display: { xs: "none", md: "flex" }, color: DARK, fontWeight: 700, "&:hover": { color: GOLD } }}
+                sx={{ display: { xs: "none", md: "flex" }, color: DARK, fontWeight: 700, "&:hover": { color: GOLD_DARK } }}
               >
                 View All
               </Button>
@@ -952,21 +964,23 @@ export function LandingPage() {
       </Box>
 
       {/* ════════════════════════════════════════════════════════════════════
-          AI STYLIST BANNER
+          AI STYLIST BANNER (Light Mode)
       ════════════════════════════════════════════════════════════════════ */}
       <Box
         sx={{
           py: { xs: 8, md: 12 },
-          background: `linear-gradient(135deg, ${DARK} 0%, #1a1208 50%, #0d0d0d 100%)`,
+          background: `linear-gradient(135deg, #FAF7F2 0%, #F5ECE0 50%, #FAF6EE 100%)`,
           position: "relative",
           overflow: "hidden",
+          borderTop: `1px solid ${BORDER_LIGHT}`,
+          borderBottom: `1px solid ${BORDER_LIGHT}`,
         }}
       >
         <Box
           sx={{
             position: "absolute",
             inset: 0,
-            background: `radial-gradient(ellipse 60% 80% at 80% 50%, rgba(201,169,110,0.1) 0%, transparent 70%)`,
+            background: `radial-gradient(ellipse 60% 80% at 80% 50%, rgba(201,169,110,0.18) 0%, transparent 70%)`,
             pointerEvents: "none",
           }}
         />
@@ -974,14 +988,14 @@ export function LandingPage() {
           <Grid container spacing={6} alignItems="center">
             <Grid size={{ xs: 12, md: 7 }}>
               <SectionLabel>AI-Powered</SectionLabel>
-              <Typography variant="h2" sx={{ fontWeight: 900, color: "white", letterSpacing: "-0.03em", mt: 1, mb: 2 }}>
+              <Typography variant="h2" sx={{ fontWeight: 900, color: DARK, letterSpacing: "-0.03em", mt: 1, mb: 2 }}>
                 Your Personal{" "}
-                <Box component="span" sx={{ background: `linear-gradient(135deg, ${GOLD}, #e8c97e)`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
+                <Box component="span" sx={{ background: `linear-gradient(135deg, ${GOLD_DARK}, #C9A96E)`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
                   AI Stylist
                 </Box>{" "}
                 is Here
               </Typography>
-              <Typography sx={{ color: "rgba(255,255,255,0.55)", fontSize: "1.1rem", lineHeight: 1.7, mb: 4, maxWidth: 520 }}>
+              <Typography sx={{ color: "#475569", fontSize: "1.1rem", lineHeight: 1.7, mb: 4, maxWidth: 520 }}>
                 Tell us your occasion, body type, and style goals. We'll curate a complete outfit — head to toe — with matching pieces from our catalog ready to add to your cart instantly.
               </Typography>
               <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
@@ -995,9 +1009,9 @@ export function LandingPage() {
                     borderRadius: "12px",
                     fontWeight: 700,
                     fontSize: "0.95rem",
-                    bgcolor: GOLD,
-                    color: DARK,
-                    "&:hover": { bgcolor: "#e8c97e", boxShadow: `0 8px 24px rgba(201,169,110,0.35)` },
+                    bgcolor: DARK,
+                    color: "#FFFFFF",
+                    "&:hover": { bgcolor: GOLD, color: DARK, boxShadow: `0 8px 24px rgba(201,169,110,0.35)` },
                   }}
                 >
                   Try AI Stylist Free →
@@ -1011,9 +1025,10 @@ export function LandingPage() {
                     py: 1.75,
                     borderRadius: "12px",
                     fontWeight: 600,
-                    color: "rgba(255,255,255,0.7)",
-                    borderColor: "rgba(255,255,255,0.15)",
-                    "&:hover": { borderColor: GOLD, color: GOLD },
+                    color: DARK,
+                    borderColor: "rgba(0,0,0,0.2)",
+                    bgcolor: "#FFFFFF",
+                    "&:hover": { borderColor: GOLD, color: GOLD_DARK },
                   }}
                 >
                   Browse Catalog
@@ -1028,32 +1043,32 @@ export function LandingPage() {
                     sx={{
                       px: 3,
                       py: 1.5,
-                      bgcolor: "rgba(255,255,255,0.04)",
-                      border: "1px solid rgba(255,255,255,0.08)",
+                      bgcolor: "rgba(255,255,255,0.9)",
+                      border: "1px solid rgba(201,169,110,0.28)",
                       borderRadius: "12px",
-                      backdropFilter: "blur(8px)",
+                      boxShadow: "0 4px 16px rgba(0,0,0,0.04)",
                       display: "flex",
                       alignItems: "center",
                       gap: 2,
                       transform: `translateX(${[0, 20, -10][i]}px)`,
                     }}
                   >
-                    <AutoAwesomeIcon sx={{ fontSize: 18, color: GOLD }} />
-                    <Typography sx={{ color: "rgba(255,255,255,0.7)", fontSize: "0.9rem", fontWeight: 500 }}>{tag}</Typography>
+                    <AutoAwesomeIcon sx={{ fontSize: 18, color: GOLD_DARK }} />
+                    <Typography sx={{ color: "#334155", fontSize: "0.9rem", fontWeight: 600 }}>{tag}</Typography>
                   </Box>
                 ))}
                 <Box
                   sx={{
                     px: 3,
                     py: 2,
-                    bgcolor: alpha(GOLD, 0.12),
-                    border: `1px solid ${alpha(GOLD, 0.3)}`,
+                    bgcolor: alpha(GOLD, 0.16),
+                    border: `1px solid ${alpha(GOLD, 0.35)}`,
                     borderRadius: "12px",
                     mt: 1,
                     transform: "translateX(10px)",
                   }}
                 >
-                  <Typography sx={{ color: GOLD, fontWeight: 700, fontSize: "0.85rem" }}>
+                  <Typography sx={{ color: GOLD_DARK, fontWeight: 700, fontSize: "0.85rem" }}>
                     ✨ Generating your perfect outfit…
                   </Typography>
                 </Box>
@@ -1064,16 +1079,16 @@ export function LandingPage() {
       </Box>
 
       {/* ════════════════════════════════════════════════════════════════════
-          NEWSLETTER
+          NEWSLETTER (Light Mode)
       ════════════════════════════════════════════════════════════════════ */}
-      <Box sx={{ py: { xs: 8, md: 12 }, bgcolor: "#F9F6F2" }}>
+      <Box sx={{ py: { xs: 8, md: 12 }, bgcolor: BG_PAGE }}>
         <Container maxWidth="md">
           <Stack spacing={4} alignItems="center" textAlign="center">
             <SectionLabel>Newsletter</SectionLabel>
             <Typography variant="h3" sx={{ fontWeight: 800, color: DARK, letterSpacing: "-0.02em" }}>
               Stay Ahead of the Trend
             </Typography>
-            <Typography sx={{ color: "rgba(0,0,0,0.45)", maxWidth: 480, lineHeight: 1.7 }}>
+            <Typography sx={{ color: "#64748B", maxWidth: 480, lineHeight: 1.7 }}>
               Get early access to new collections, exclusive offers, and style tips curated by our AI every week.
             </Typography>
             <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5} sx={{ width: "100%", maxWidth: 480 }}>
@@ -1085,7 +1100,7 @@ export function LandingPage() {
                   "& .MuiOutlinedInput-root": {
                     height: 52,
                     borderRadius: "12px",
-                    bgcolor: "white",
+                    bgcolor: BG_ALT,
                     "& fieldset": { borderColor: "rgba(0,0,0,0.12)" },
                     "&:hover fieldset": { borderColor: GOLD },
                     "&.Mui-focused fieldset": { borderColor: GOLD },
@@ -1101,6 +1116,7 @@ export function LandingPage() {
                   borderRadius: "12px",
                   fontWeight: 700,
                   bgcolor: DARK,
+                  color: "#FFFFFF",
                   minWidth: { xs: "100%", sm: 140 },
                   "&:hover": { bgcolor: GOLD, color: DARK },
                   transition: "all 0.25s ease",
