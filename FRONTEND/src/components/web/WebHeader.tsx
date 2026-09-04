@@ -97,11 +97,11 @@ export function WebHeader() {
         position="sticky"
         elevation={0}
         sx={{
-          bgcolor: { xs: "rgba(7,9,14,0.96)", md: "background.paper" },
+          bgcolor: "background.paper",
           backdropFilter: "blur(20px)",
           WebkitBackdropFilter: "blur(20px)",
           borderBottom: "1px solid",
-          borderColor: { xs: "rgba(255,255,255,0.07)", md: "divider" },
+          borderColor: "divider",
           // keep desktop py, tighter on mobile
           py: { xs: 0.5, md: 1 },
         }}
@@ -115,16 +115,51 @@ export function WebHeader() {
                 component={RouterLink}
                 to={ROUTES.landing}
                 underline="none"
-                sx={{ display: "flex", alignItems: "center" }}
+                sx={{ display: "flex", alignItems: "center", overflow: "hidden" }}
               >
+                {/* Animated "Dress Me" text on small screens moving left to right while fading */}
+                <Typography
+                  component="span"
+                  sx={{
+                    display: { xs: "inline-block", md: "none" },
+                    fontWeight: 900,
+                    fontSize: { xs: "0.88rem", sm: "1rem" },
+                    letterSpacing: "-0.01em",
+                    color: "text.primary",
+                    mr: 1,
+                    whiteSpace: "nowrap",
+                    animation: "dressMeSlideFade 3.5s cubic-bezier(0.4, 0, 0.2, 1) infinite",
+                    "@keyframes dressMeSlideFade": {
+                      "0%": {
+                        opacity: 0,
+                        transform: "translateX(-16px)",
+                      },
+                      "25%": {
+                        opacity: 1,
+                        transform: "translateX(-2px)",
+                      },
+                      "75%": {
+                        opacity: 1,
+                        transform: "translateX(2px)",
+                      },
+                      "100%": {
+                        opacity: 0,
+                        transform: "translateX(16px)",
+                      },
+                    },
+                  }}
+                >
+                  Dress Me
+                </Typography>
+
                 {settings?.logoUrl ? (
                   <Box
                     component="img"
                     src={settings.logoUrl}
                     alt={settings?.siteName || "DressMe"}
                     sx={{
-                      height: { xs: 44, md: 96 },
-                      maxWidth: { xs: 160, md: 300 },
+                      height: { xs: 38, sm: 44, md: 96 },
+                      maxWidth: { xs: 120, sm: 160, md: 300 },
                       objectFit: "contain",
                       display: "block",
                     }}

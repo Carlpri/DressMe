@@ -381,24 +381,39 @@ export function LandingPage() {
               </Stack>
             </Grid>
 
-            {/* ── RIGHT: 3D rotating card stack ───────────────────────── */}
-            <Grid size={{ xs: 12, md: 6 }} sx={{ display: { xs: "none", md: "flex" }, justifyContent: "center", alignItems: "center" }}>
+            {/* ── RIGHT: 3D rotating card stack (scaled down & proportional on mobile) ── */}
+            <Grid
+              size={{ xs: 12, md: 6 }}
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                mt: { xs: 4, md: 0 },
+                mb: { xs: 4, md: 0 },
+              }}
+            >
               <Box
                 sx={{
                   position: "relative",
-                  width: 400,
-                  height: 540,
-                  perspective: "1200px",
+                  width: { xs: 260, sm: 320, md: 380, lg: 400 },
+                  height: { xs: 350, sm: 430, md: 510, lg: 540 },
+                  perspective: { xs: "800px", md: "1200px" },
                 }}
               >
                 {HERO_SLIDES.map((slide, i) => {
                   const offset = (i - activeSlide + HERO_SLIDES.length) % HERO_SLIDES.length;
-                  /* 0 = front, 1 = right, 2 = left (behind) */
-                  const transforms: Record<number, string> = {
+                  /* Proportional 3D transforms for mobile & desktop */
+                  const transformsMobile: Record<number, string> = {
+                    0: "rotateY(0deg) translateZ(0px) scale(1)",
+                    1: "rotateY(18deg) translateZ(-50px) translateX(45px) scale(0.9)",
+                    2: "rotateY(-18deg) translateZ(-50px) translateX(-45px) scale(0.9)",
+                  };
+                  const transformsDesktop: Record<number, string> = {
                     0: "rotateY(0deg) translateZ(0px) scale(1)",
                     1: "rotateY(28deg) translateZ(-120px) translateX(110px) scale(0.88)",
                     2: "rotateY(-28deg) translateZ(-120px) translateX(-110px) scale(0.88)",
                   };
+
                   const zIndexes: Record<number, number> = { 0: 3, 1: 2, 2: 1 };
                   const opacities: Record<number, number> = { 0: 1, 1: 0.7, 2: 0.5 };
 
@@ -412,18 +427,21 @@ export function LandingPage() {
                         left: 0,
                         width: "100%",
                         height: "100%",
-                        borderRadius: "24px",
+                        borderRadius: { xs: "18px", md: "24px" },
                         overflow: "hidden",
                         transformStyle: "preserve-3d",
-                        transform: transforms[offset] ?? transforms[2],
+                        transform: {
+                          xs: transformsMobile[offset] ?? transformsMobile[2],
+                          md: transformsDesktop[offset] ?? transformsDesktop[2],
+                        },
                         zIndex: zIndexes[offset] ?? 1,
                         opacity: opacities[offset] ?? 0.4,
                         transition: "transform 0.7s cubic-bezier(0.4,0,0.2,1), opacity 0.7s ease",
                         cursor: offset === 0 ? "default" : "pointer",
                         boxShadow:
                           offset === 0
-                            ? "0 30px 60px rgba(0,0,0,0.18), 0 0 0 1px rgba(201,169,110,0.3)"
-                            : "0 15px 30px rgba(0,0,0,0.1)",
+                            ? "0 24px 48px rgba(0,0,0,0.16), 0 0 0 1px rgba(201,169,110,0.3)"
+                            : "0 12px 24px rgba(0,0,0,0.08)",
                       }}
                     >
                       {/* image */}
@@ -448,7 +466,7 @@ export function LandingPage() {
                         }}
                       />
                       {/* card footer info */}
-                      <Box sx={{ position: "absolute", bottom: 0, left: 0, right: 0, p: 3 }}>
+                      <Box sx={{ position: "absolute", bottom: 0, left: 0, right: 0, p: { xs: 2, md: 3 } }}>
                         <Chip
                           label={slide.label}
                           size="small"
@@ -458,10 +476,17 @@ export function LandingPage() {
                             fontWeight: 700,
                             fontSize: "0.65rem",
                             border: "1px solid rgba(201,169,110,0.4)",
-                            mb: 1,
+                            mb: 0.75,
                           }}
                         />
-                        <Typography sx={{ fontWeight: 700, color: "white", fontSize: "1.1rem", lineHeight: 1.2 }}>
+                        <Typography
+                          sx={{
+                            fontWeight: 700,
+                            color: "white",
+                            fontSize: { xs: "0.95rem", md: "1.1rem" },
+                            lineHeight: 1.2,
+                          }}
+                        >
                           {slide.caption}
                         </Typography>
                       </Box>
@@ -473,7 +498,13 @@ export function LandingPage() {
                 <Stack
                   direction="row"
                   spacing={1}
-                  sx={{ position: "absolute", bottom: -32, left: "50%", transform: "translateX(-50%)", zIndex: 10 }}
+                  sx={{
+                    position: "absolute",
+                    bottom: { xs: -24, md: -32 },
+                    left: "50%",
+                    transform: "translateX(-50%)",
+                    zIndex: 10,
+                  }}
                 >
                   {HERO_SLIDES.map((_, i) => (
                     <Box
@@ -1035,40 +1066,40 @@ export function LandingPage() {
                 </Button>
               </Stack>
             </Grid>
-            <Grid size={{ xs: 12, md: 5 }} sx={{ display: { xs: "none", md: "flex" }, justifyContent: "center" }}>
-              <Stack spacing={2}>
+            <Grid size={{ xs: 12, md: 5 }} sx={{ display: "flex", justifyContent: "center", mt: { xs: 4, md: 0 }, width: "100%" }}>
+              <Stack spacing={1.5} sx={{ width: "100%", maxWidth: { xs: 340, sm: 400, md: 440 } }}>
                 {["Occasion: Business Casual", "Budget: KES 5,000–15,000", "Style: Modern Minimalist"].map((tag, i) => (
                   <Box
                     key={tag}
                     sx={{
-                      px: 3,
-                      py: 1.5,
+                      px: { xs: 2, sm: 3 },
+                      py: { xs: 1.2, sm: 1.5 },
                       bgcolor: "rgba(255,255,255,0.9)",
                       border: "1px solid rgba(201,169,110,0.28)",
                       borderRadius: "12px",
                       boxShadow: "0 4px 16px rgba(0,0,0,0.04)",
                       display: "flex",
                       alignItems: "center",
-                      gap: 2,
-                      transform: `translateX(${[0, 20, -10][i]}px)`,
+                      gap: 1.5,
+                      transform: { xs: "none", md: `translateX(${[0, 20, -10][i]}px)` },
                     }}
                   >
-                    <AutoAwesomeIcon sx={{ fontSize: 18, color: GOLD_DARK }} />
-                    <Typography sx={{ color: "#334155", fontSize: "0.9rem", fontWeight: 600 }}>{tag}</Typography>
+                    <AutoAwesomeIcon sx={{ fontSize: 16, color: GOLD_DARK }} />
+                    <Typography sx={{ color: "#334155", fontSize: { xs: "0.82rem", sm: "0.9rem" }, fontWeight: 600 }}>{tag}</Typography>
                   </Box>
                 ))}
                 <Box
                   sx={{
-                    px: 3,
-                    py: 2,
+                    px: { xs: 2, sm: 3 },
+                    py: { xs: 1.5, sm: 2 },
                     bgcolor: alpha(GOLD, 0.16),
                     border: `1px solid ${alpha(GOLD, 0.35)}`,
                     borderRadius: "12px",
                     mt: 1,
-                    transform: "translateX(10px)",
+                    transform: { xs: "none", md: "translateX(10px)" },
                   }}
                 >
-                  <Typography sx={{ color: GOLD_DARK, fontWeight: 700, fontSize: "0.85rem" }}>
+                  <Typography sx={{ color: GOLD_DARK, fontWeight: 700, fontSize: { xs: "0.8rem", sm: "0.85rem" } }}>
                     ✨ Generating your perfect outfit…
                   </Typography>
                 </Box>
