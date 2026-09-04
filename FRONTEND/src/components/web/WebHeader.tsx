@@ -80,14 +80,14 @@ export function WebHeader() {
     width: 36,
     height: 36,
     borderRadius: "10px",
-    color: "rgba(255,255,255,0.85)",
-    bgcolor: "rgba(255,255,255,0.05)",
-    border: "1px solid rgba(255,255,255,0.09)",
+    color: "#0D0D0D",
+    bgcolor: "rgba(0,0,0,0.04)",
+    border: "1px solid rgba(0,0,0,0.08)",
     transition: "all 0.2s ease",
     "&:hover": {
-      bgcolor: "rgba(255,255,255,0.12)",
-      borderColor: "rgba(255,255,255,0.2)",
-      color: "#fff",
+      bgcolor: "rgba(0,0,0,0.08)",
+      borderColor: "rgba(0,0,0,0.15)",
+      color: "#00C896",
     },
   };
 
@@ -102,64 +102,98 @@ export function WebHeader() {
           WebkitBackdropFilter: "blur(20px)",
           borderBottom: "1px solid",
           borderColor: "divider",
-          // keep desktop py, tighter on mobile
           py: { xs: 0.5, md: 1 },
         }}
       >
-        <Container maxWidth="xl">
+        <Container maxWidth="xl" sx={{ px: { xs: 1, sm: 1.5, md: 2 } }}>
           <Toolbar disableGutters sx={{ gap: { xs: 1, md: 2 }, minHeight: { xs: 56, md: 64 } }}>
 
-            {/* ── LOGO ────────────────────────────────────────────────────── */}
-            <Box sx={{ display: "flex", alignItems: "center", flexGrow: 1 }}>
+            {/* ── LOGO (Extreme Left + Once-on-Refresh Animated Text Reveal) ── */}
+            <Box
+              sx={{
+                position: "relative",
+                display: "flex",
+                alignItems: "center",
+                flexGrow: 1,
+                minHeight: { xs: 42, sm: 48, md: 54 },
+              }}
+            >
+              {/* Animated "DressMe" text that moves slowly from left to right while fading once on refresh */}
+              <Typography
+                component="div"
+                aria-hidden="true"
+                sx={{
+                  position: "absolute",
+                  left: 0,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  fontWeight: 900,
+                  fontFamily: "'Outfit', 'Inter', -apple-system, sans-serif",
+                  fontSize: { xs: "1.2rem", sm: "1.45rem", md: "1.8rem" },
+                  letterSpacing: "-0.02em",
+                  color: "#0D0D0D",
+                  whiteSpace: "nowrap",
+                  pointerEvents: "none",
+                  zIndex: 2,
+                  animation: "dressMeWordSlideFade 2.0s cubic-bezier(0.25, 0.1, 0.25, 1) 0.1s forwards",
+                  "@keyframes dressMeWordSlideFade": {
+                    "0%": {
+                      opacity: 0,
+                      transform: "translateY(-50%) translateX(0px)",
+                    },
+                    "15%": {
+                      opacity: 1,
+                      transform: "translateY(-50%) translateX(10px)",
+                    },
+                    "60%": {
+                      opacity: 0.95,
+                      transform: "translateY(-50%) translateX(40px)",
+                    },
+                    "90%": {
+                      opacity: 0,
+                      transform: "translateY(-50%) translateX(72px)",
+                    },
+                    "100%": {
+                      opacity: 0,
+                      transform: "translateY(-50%) translateX(82px)",
+                      visibility: "hidden",
+                    },
+                  },
+                }}
+              >
+                DressMe
+              </Typography>
+
+              {/* Logo: positioned on the extreme left, smoothly appears after the word finishes fading */}
               <Link
                 component={RouterLink}
                 to={ROUTES.landing}
                 underline="none"
-                sx={{ display: "flex", alignItems: "center", overflow: "hidden" }}
-              >
-                {/* Animated "Dress Me" text on small screens moving left to right while fading */}
-                <Typography
-                  component="span"
-                  sx={{
-                    display: { xs: "inline-block", md: "none" },
-                    fontWeight: 900,
-                    fontSize: { xs: "0.88rem", sm: "1rem" },
-                    letterSpacing: "-0.01em",
-                    color: "text.primary",
-                    mr: 1,
-                    whiteSpace: "nowrap",
-                    animation: "dressMeSlideFade 3.5s cubic-bezier(0.4, 0, 0.2, 1) infinite",
-                    "@keyframes dressMeSlideFade": {
-                      "0%": {
-                        opacity: 0,
-                        transform: "translateX(-16px)",
-                      },
-                      "25%": {
-                        opacity: 1,
-                        transform: "translateX(-2px)",
-                      },
-                      "75%": {
-                        opacity: 1,
-                        transform: "translateX(2px)",
-                      },
-                      "100%": {
-                        opacity: 0,
-                        transform: "translateX(16px)",
-                      },
+                sx={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  opacity: 0,
+                  animation: "dressMeLogoReveal 0.6s cubic-bezier(0.16, 1, 0.3, 1) 1.9s forwards",
+                  "@keyframes dressMeLogoReveal": {
+                    "0%": {
+                      opacity: 0,
+                      transform: "scale(0.94)",
                     },
-                  }}
-                >
-                  Dress Me
-                </Typography>
-
+                    "100%": {
+                      opacity: 1,
+                      transform: "scale(1)",
+                    },
+                  },
+                }}
+              >
                 {settings?.logoUrl ? (
                   <Box
                     component="img"
                     src={settings.logoUrl}
                     alt={settings?.siteName || "DressMe"}
                     sx={{
-                      height: { xs: 38, sm: 44, md: 96 },
-                      maxWidth: { xs: 120, sm: 160, md: 300 },
+                      height: { xs: 38, sm: 44, md: 54 },
+                      maxWidth: { xs: 120, sm: 160, md: 240 },
                       objectFit: "contain",
                       display: "block",
                     }}
@@ -212,40 +246,56 @@ export function WebHeader() {
                       component={RouterLink}
                       to={ROUTES.wishlist}
                       size="small"
-                      sx={{ color: "text.primary" }}
+                      sx={{
+                        ...iconBtnSx,
+                        width: 38,
+                        height: 38,
+                      }}
                       aria-label="Wishlist"
                     >
                       <Badge badgeContent={favCount} color="error">
-                        <FavoriteBorderRoundedIcon />
+                        <FavoriteBorderRoundedIcon sx={{ fontSize: 20 }} />
                       </Badge>
                     </IconButton>
                     <IconButton
                       component={RouterLink}
                       to={ROUTES.customerCart}
                       size="small"
-                      sx={{ color: "text.primary" }}
+                      sx={{
+                        ...iconBtnSx,
+                        width: 38,
+                        height: 38,
+                      }}
                       aria-label="Cart"
                     >
                       <Badge badgeContent={cartCount} color="primary">
-                        <ShoppingBagOutlinedIcon />
+                        <ShoppingBagOutlinedIcon sx={{ fontSize: 20 }} />
                       </Badge>
                     </IconButton>
                     <IconButton
                       component={RouterLink}
                       to={ROUTES.profile}
                       size="small"
-                      sx={{ color: "text.primary" }}
+                      sx={{
+                        ...iconBtnSx,
+                        width: 38,
+                        height: 38,
+                      }}
                       aria-label="Account"
                     >
-                      <PersonRoundedIcon />
+                      <PersonRoundedIcon sx={{ fontSize: 20 }} />
                     </IconButton>
                     <IconButton
                       onClick={handleLogout}
                       size="small"
-                      sx={{ color: "text.primary" }}
+                      sx={{
+                        ...iconBtnSx,
+                        width: 38,
+                        height: 38,
+                      }}
                       aria-label="Logout"
                     >
-                      <LogoutRoundedIcon />
+                      <LogoutRoundedIcon sx={{ fontSize: 20 }} />
                     </IconButton>
                   </>
                 ) : (
@@ -254,11 +304,15 @@ export function WebHeader() {
                       component={RouterLink}
                       to={ROUTES.customerCart}
                       size="small"
-                      sx={{ color: "text.primary" }}
+                      sx={{
+                        ...iconBtnSx,
+                        width: 38,
+                        height: 38,
+                      }}
                       aria-label="Cart"
                     >
                       <Badge badgeContent={cartCount} color="primary">
-                        <ShoppingBagOutlinedIcon />
+                        <ShoppingBagOutlinedIcon sx={{ fontSize: 20 }} />
                       </Badge>
                     </IconButton>
                     <Link
@@ -322,7 +376,7 @@ export function WebHeader() {
                     {favCount > 0 ? (
                       <FavoriteRoundedIcon sx={{ fontSize: 18, color: "#EF4444" }} />
                     ) : (
-                      <FavoriteBorderRoundedIcon sx={{ fontSize: 18 }} />
+                      <FavoriteBorderRoundedIcon sx={{ fontSize: 18, color: "#0D0D0D" }} />
                     )}
                   </Badge>
                 </IconButton>
@@ -350,7 +404,7 @@ export function WebHeader() {
                       },
                     }}
                   >
-                    <ShoppingBagOutlinedIcon sx={{ fontSize: 18 }} />
+                    <ShoppingBagOutlinedIcon sx={{ fontSize: 18, color: "#0D0D0D" }} />
                   </Badge>
                 </IconButton>
 
@@ -391,12 +445,12 @@ export function WebHeader() {
                   size="small"
                   sx={{
                     ...iconBtnSx,
-                    bgcolor: menuOpen ? "rgba(0,200,150,0.15)" : "rgba(255,255,255,0.05)",
-                    borderColor: menuOpen ? "rgba(0,200,150,0.35)" : "rgba(255,255,255,0.09)",
-                    color: menuOpen ? "#00C896" : "rgba(255,255,255,0.85)",
+                    bgcolor: menuOpen ? "rgba(0,200,150,0.12)" : "rgba(0,0,0,0.04)",
+                    borderColor: menuOpen ? "rgba(0,200,150,0.35)" : "rgba(0,0,0,0.08)",
+                    color: menuOpen ? "#00C896" : "#0D0D0D",
                   }}
                 >
-                  <MenuRoundedIcon sx={{ fontSize: 18 }} />
+                  <MenuRoundedIcon sx={{ fontSize: 18, color: menuOpen ? "#00C896" : "#0D0D0D" }} />
                 </IconButton>
               </Stack>
             )}
@@ -406,7 +460,7 @@ export function WebHeader() {
       </AppBar>
 
       {/* ══════════════════════════════════════════════════════════════════════
-          MOBILE MENU DRAWER — slides up from bottom
+          MOBILE MENU DRAWER — slides up from bottom (Light theme)
       ══════════════════════════════════════════════════════════════════════ */}
       <Drawer
         anchor="bottom"
@@ -417,12 +471,12 @@ export function WebHeader() {
           display: { xs: "block", md: "none" },
           "& .MuiDrawer-paper": {
             borderRadius: "24px 24px 0 0",
-            bgcolor: "#0B0E14",
-            border: "1px solid rgba(255,255,255,0.1)",
+            bgcolor: "#FFFFFF",
+            border: "1px solid rgba(0,0,0,0.08)",
             borderBottom: "none",
             backdropFilter: "blur(24px)",
             WebkitBackdropFilter: "blur(24px)",
-            boxShadow: "0 -20px 60px rgba(0,0,0,0.8)",
+            boxShadow: "0 -20px 60px rgba(0,0,0,0.12)",
             maxHeight: "82vh",
             overflowY: "auto",
           },
@@ -436,7 +490,7 @@ export function WebHeader() {
               width: 36,
               height: 4,
               borderRadius: 2,
-              bgcolor: "rgba(255,255,255,0.15)",
+              bgcolor: "rgba(0,0,0,0.12)",
               mx: "auto",
               mb: 2,
             }}
@@ -445,7 +499,7 @@ export function WebHeader() {
           {/* Header row */}
           <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
             <Typography
-              sx={{ fontWeight: 800, fontSize: "1.05rem", color: "#FFF", letterSpacing: "-0.01em" }}
+              sx={{ fontWeight: 800, fontSize: "1.05rem", color: "#0D0D0D", letterSpacing: "-0.01em" }}
             >
               Menu
             </Typography>
@@ -453,12 +507,12 @@ export function WebHeader() {
               onClick={closeMenu}
               size="small"
               sx={{
-                color: "rgba(255,255,255,0.5)",
-                bgcolor: "rgba(255,255,255,0.05)",
+                color: "rgba(0,0,0,0.55)",
+                bgcolor: "rgba(0,0,0,0.04)",
                 borderRadius: "10px",
                 width: 32,
                 height: 32,
-                "&:hover": { color: "#fff", bgcolor: "rgba(255,255,255,0.1)" },
+                "&:hover": { color: "#0D0D0D", bgcolor: "rgba(0,0,0,0.08)" },
               }}
             >
               <CloseRoundedIcon sx={{ fontSize: 16 }} />
@@ -485,14 +539,14 @@ export function WebHeader() {
                     px: 1.5,
                     py: 1.3,
                     borderRadius: "14px",
-                    bgcolor: active ? "rgba(0,200,150,0.1)" : "transparent",
+                    bgcolor: active ? "rgba(0,200,150,0.09)" : "transparent",
                     border: "1px solid",
-                    borderColor: active ? "rgba(0,200,150,0.25)" : "transparent",
+                    borderColor: active ? "rgba(0,200,150,0.3)" : "transparent",
                     textDecoration: "none",
                     transition: "all 0.18s ease",
                     "&:hover": {
-                      bgcolor: "rgba(255,255,255,0.05)",
-                      borderColor: "rgba(255,255,255,0.1)",
+                      bgcolor: "rgba(0,0,0,0.03)",
+                      borderColor: "rgba(0,0,0,0.08)",
                     },
                   }}
                 >
@@ -501,14 +555,14 @@ export function WebHeader() {
                       width: 34,
                       height: 34,
                       borderRadius: "10px",
-                      bgcolor: active ? "rgba(0,200,150,0.15)" : "rgba(255,255,255,0.05)",
+                      bgcolor: active ? "rgba(0,200,150,0.15)" : "rgba(0,0,0,0.04)",
                       display: "grid",
                       placeItems: "center",
                       flexShrink: 0,
                     }}
                   >
                     <Icon
-                      sx={{ fontSize: 17, color: active ? "#00C896" : "rgba(255,255,255,0.55)" }}
+                      sx={{ fontSize: 17, color: active ? "#00C896" : "rgba(0,0,0,0.55)" }}
                     />
                   </Box>
                   <Typography
@@ -516,20 +570,20 @@ export function WebHeader() {
                       flex: 1,
                       fontWeight: active ? 700 : 500,
                       fontSize: "0.95rem",
-                      color: active ? "#00C896" : "rgba(255,255,255,0.85)",
+                      color: active ? "#00C896" : "#1A202C",
                     }}
                   >
                     {label}
                   </Typography>
                   <ChevronRightRoundedIcon
-                    sx={{ fontSize: 16, color: active ? "#00C896" : "rgba(255,255,255,0.2)" }}
+                    sx={{ fontSize: 16, color: active ? "#00C896" : "rgba(0,0,0,0.25)" }}
                   />
                 </Box>
               );
             })}
           </Stack>
 
-          <Divider sx={{ borderColor: "rgba(255,255,255,0.07)", mb: 2 }} />
+          <Divider sx={{ borderColor: "rgba(0,0,0,0.06)", mb: 2 }} />
 
           {/* ── USER SECTION ─────────────────────────────────────────────── */}
           {isAuthenticated ? (
@@ -548,7 +602,7 @@ export function WebHeader() {
                   borderRadius: "14px",
                   textDecoration: "none",
                   transition: "all 0.18s ease",
-                  "&:hover": { bgcolor: "rgba(255,255,255,0.05)" },
+                  "&:hover": { bgcolor: "rgba(0,0,0,0.03)" },
                 }}
               >
                 <Avatar
@@ -570,7 +624,7 @@ export function WebHeader() {
                     sx={{
                       fontWeight: 700,
                       fontSize: "0.9rem",
-                      color: "#FFF",
+                      color: "#0D0D0D",
                       overflow: "hidden",
                       textOverflow: "ellipsis",
                       whiteSpace: "nowrap",
@@ -581,7 +635,7 @@ export function WebHeader() {
                   <Typography
                     sx={{
                       fontSize: "0.72rem",
-                      color: "rgba(255,255,255,0.4)",
+                      color: "rgba(0,0,0,0.5)",
                       overflow: "hidden",
                       textOverflow: "ellipsis",
                       whiteSpace: "nowrap",
@@ -590,7 +644,7 @@ export function WebHeader() {
                     {user?.email || "View profile"}
                   </Typography>
                 </Box>
-                <ChevronRightRoundedIcon sx={{ fontSize: 16, color: "rgba(255,255,255,0.2)" }} />
+                <ChevronRightRoundedIcon sx={{ fontSize: 16, color: "rgba(0,0,0,0.25)" }} />
               </Box>
 
               {/* Logout */}
@@ -617,7 +671,7 @@ export function WebHeader() {
                     width: 34,
                     height: 34,
                     borderRadius: "10px",
-                    bgcolor: "rgba(255,255,255,0.04)",
+                    bgcolor: "rgba(0,0,0,0.04)",
                     display: "grid",
                     placeItems: "center",
                     flexShrink: 0,
@@ -625,7 +679,7 @@ export function WebHeader() {
                 >
                   <LogoutRoundedIcon
                     className="logout-icon"
-                    sx={{ fontSize: 17, color: "rgba(255,255,255,0.4)", transition: "color 0.2s" }}
+                    sx={{ fontSize: 17, color: "rgba(0,0,0,0.5)", transition: "color 0.2s" }}
                   />
                 </Box>
                 <Typography
@@ -633,7 +687,7 @@ export function WebHeader() {
                   sx={{
                     fontWeight: 500,
                     fontSize: "0.95rem",
-                    color: "rgba(255,255,255,0.5)",
+                    color: "rgba(0,0,0,0.6)",
                     transition: "color 0.2s",
                   }}
                 >
@@ -656,9 +710,9 @@ export function WebHeader() {
                   py: 1.3,
                   borderRadius: "14px",
                   textDecoration: "none",
-                  border: "1px solid rgba(255,255,255,0.1)",
+                  border: "1px solid rgba(0,0,0,0.1)",
                   transition: "all 0.18s ease",
-                  "&:hover": { bgcolor: "rgba(255,255,255,0.05)" },
+                  "&:hover": { bgcolor: "rgba(0,0,0,0.04)" },
                 }}
               >
                 <Box
@@ -666,14 +720,14 @@ export function WebHeader() {
                     width: 34,
                     height: 34,
                     borderRadius: "10px",
-                    bgcolor: "rgba(255,255,255,0.05)",
+                    bgcolor: "rgba(0,0,0,0.04)",
                     display: "grid",
                     placeItems: "center",
                   }}
                 >
-                  <LoginRoundedIcon sx={{ fontSize: 17, color: "rgba(255,255,255,0.55)" }} />
+                  <LoginRoundedIcon sx={{ fontSize: 17, color: "rgba(0,0,0,0.6)" }} />
                 </Box>
-                <Typography sx={{ fontWeight: 600, fontSize: "0.95rem", color: "rgba(255,255,255,0.85)" }}>
+                <Typography sx={{ fontWeight: 600, fontSize: "0.95rem", color: "text.primary" }}>
                   Sign In
                 </Typography>
               </Box>
