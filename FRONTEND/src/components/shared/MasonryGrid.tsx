@@ -6,8 +6,8 @@ interface MasonryGridProps {
   children: React.ReactNode;
   /** Number of columns at each breakpoint. Defaults to 2 / 3 / 4 / 5 */
   columns?: { xs?: number; sm?: number; md?: number; lg?: number; xl?: number };
-  /** Gap between items in pixels. Defaults to 12 on xs, 16 on md+ */
-  gap?: number | string;
+  /** Gap between items in pixels or responsive object. Defaults to { xs: "10px", sm: "12px", md: "16px" } */
+  gap?: number | string | { xs?: string | number; sm?: string | number; md?: string | number; lg?: string | number; xl?: string | number };
   sx?: SxProps<Theme>;
 }
 

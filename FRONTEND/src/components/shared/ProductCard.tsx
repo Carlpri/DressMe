@@ -208,18 +208,40 @@ export function ProductCard({ product }: ProductCardProps) {
     }
   };
 
-  // ── IN-STOCK SIZES (displayed on top at rest) ───────────────────────────
+  // ── SIZES (displayed on top at rest) ───────────────────────────
   const inStockSizesMap = new Map<string, string>();
-  for (const v of product.variants ?? []) {
-    if (v.sizeValue && (v.stock ?? 0) > 0) {
-      const trimmed = v.sizeValue.trim();
+  const allSizesMap = new Map<string, string>();
+
+  for (const v of (product.variants ?? []) as any[]) {
+    const rawSize = v.sizeValue || v.size || (v.sizeObj && v.sizeObj.name);
+    if (rawSize && typeof rawSize === "string") {
+      const trimmed = rawSize.trim();
       const key = trimmed.toUpperCase();
-      if (!inStockSizesMap.has(key)) {
+      if (key) {
+        allSizesMap.set(key, trimmed);
+        const inStock = v.stock === undefined || v.stock === null ? true : Number(v.stock) > 0;
+        if (inStock) {
+          inStockSizesMap.set(key, trimmed);
+        }
+      }
+    }
+  }
+
+  // Also check product.sizes or product.availableSizes if present
+  if (Array.isArray((product as any).sizes)) {
+    for (const s of (product as any).sizes) {
+      if (typeof s === "string" && s.trim()) {
+        const trimmed = s.trim();
+        const key = trimmed.toUpperCase();
+        allSizesMap.set(key, trimmed);
         inStockSizesMap.set(key, trimmed);
       }
     }
   }
-  const inStockSizes = Array.from(inStockSizesMap.entries())
+
+  const effectiveSizesMap = inStockSizesMap.size > 0 ? inStockSizesMap : allSizesMap;
+
+  const inStockSizes = Array.from(effectiveSizesMap.entries())
     .sort(([keyA], [keyB]) => {
       const idxA = STANDARD_SIZE_ORDER.indexOf(keyA);
       const idxB = STANDARD_SIZE_ORDER.indexOf(keyB);
@@ -326,6 +348,20 @@ export function ProductCard({ product }: ProductCardProps) {
             </Box>
           )}
 
+          {/* Subtle top shadow gradient — ensures top hollow sizes and color dots are crystal clear on all photos */}
+          <Box
+            sx={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              height: "22%",
+              pointerEvents: "none",
+              background:
+                "linear-gradient(to bottom, rgba(0,0,0,0.42) 0%, rgba(0,0,0,0.1) 60%, transparent 100%)",
+            }}
+          />
+
           {/* Subtle bottom shadow gradient — delicate, allows full outfit view while making price legible */}
           <Box
             sx={{
@@ -346,7 +382,7 @@ export function ProductCard({ product }: ProductCardProps) {
         */}
         <Stack
           direction="column"
-          spacing={0.5}
+          spacing={0.4}
           alignItems="flex-start"
           sx={{
             position: "absolute",
@@ -360,25 +396,24 @@ export function ProductCard({ product }: ProductCardProps) {
             pointerEvents: isHovered ? "none" : "auto",
           }}
         >
-          {/* Sizes on top (only in-stock) */}
+          {/* Sizes on top (hollow outline with subtle shadow) */}
           {inStockSizes.length > 0 && (
-            <Stack direction="row" spacing={0.35} flexWrap="wrap" useFlexGap sx={{ gap: 0.35 }}>
+            <Stack direction="row" spacing={0.3} flexWrap="wrap" useFlexGap sx={{ gap: 0.3 }}>
               {inStockSizes.slice(0, 5).map((size) => (
                 <Box
                   key={size}
                   sx={{
-                    px: { xs: 0.55, sm: 0.65 },
-                    py: 0.2,
-                    borderRadius: "4px",
-                    bgcolor: "rgba(10, 14, 22, 0.78)",
-                    backdropFilter: "blur(10px)",
-                    WebkitBackdropFilter: "blur(10px)",
-                    border: "1px solid rgba(255, 255, 255, 0.2)",
-                    fontSize: { xs: "0.55rem", sm: "0.6rem" },
+                    px: { xs: 0.45, sm: 0.55 },
+                    py: 0.1,
+                    borderRadius: "3px",
+                    bgcolor: "transparent",
+                    border: "1px solid rgba(255, 255, 255, 0.8)",
+                    fontSize: { xs: "0.56rem", sm: "0.62rem" },
                     fontWeight: 800,
                     color: "#FFFFFF",
-                    letterSpacing: "0.02em",
-                    boxShadow: "0 2px 6px rgba(0,0,0,0.45)",
+                    letterSpacing: "0.03em",
+                    boxShadow: "0 1px 4px rgba(0,0,0,0.55)",
+                    textShadow: "0 1px 3px rgba(0,0,0,0.9), 0 0 2px rgba(0,0,0,0.8)",
                     lineHeight: 1.1,
                   }}
                 >
@@ -388,15 +423,15 @@ export function ProductCard({ product }: ProductCardProps) {
               {inStockSizes.length > 5 && (
                 <Box
                   sx={{
-                    px: 0.5,
-                    py: 0.2,
-                    borderRadius: "4px",
-                    bgcolor: "rgba(10, 14, 22, 0.65)",
-                    backdropFilter: "blur(8px)",
-                    border: "1px solid rgba(255, 255, 255, 0.12)",
+                    px: 0.4,
+                    py: 0.1,
+                    borderRadius: "3px",
+                    bgcolor: "transparent",
+                    border: "1px solid rgba(255, 255, 255, 0.55)",
                     fontSize: "0.52rem",
                     fontWeight: 700,
-                    color: "rgba(255, 255, 255, 0.75)",
+                    color: "rgba(255, 255, 255, 0.9)",
+                    textShadow: "0 1px 3px rgba(0,0,0,0.9)",
                     lineHeight: 1.1,
                   }}
                 >
@@ -408,19 +443,19 @@ export function ProductCard({ product }: ProductCardProps) {
 
           {/* Color variant dots below sizes */}
           {colorVariants.length > 1 && (
-            <Stack direction="row" spacing={0.5} alignItems="center">
+            <Stack direction="row" spacing={0.4} alignItems="center">
               {colorVariants.slice(0, 6).map(([colorName, { inStock }]) => (
                 <Box
                   key={colorName}
                   title={colorName}
                   sx={{
-                    width: { xs: 9, sm: 10 },
-                    height: { xs: 9, sm: 10 },
+                    width: { xs: 8, sm: 9 },
+                    height: { xs: 8, sm: 9 },
                     borderRadius: "50%",
                     bgcolor: colorName.toLowerCase(),
-                    border: "1.5px solid rgba(255, 255, 255, 0.75)",
-                    boxShadow: "0 1px 4px rgba(0, 0, 0, 0.6)",
-                    opacity: inStock ? 1 : 0.35,
+                    border: "1.5px solid rgba(255, 255, 255, 0.85)",
+                    boxShadow: "0 1px 3px rgba(0, 0, 0, 0.7)",
+                    opacity: inStock ? 1 : 0.4,
                     flexShrink: 0,
                   }}
                 />
@@ -429,9 +464,9 @@ export function ProductCard({ product }: ProductCardProps) {
                 <Typography
                   sx={{
                     fontSize: "0.52rem",
-                    color: "rgba(255,255,255,0.8)",
+                    color: "rgba(255,255,255,0.9)",
                     fontWeight: 800,
-                    textShadow: "0 1px 3px rgba(0,0,0,0.8)",
+                    textShadow: "0 1px 3px rgba(0,0,0,0.9)",
                   }}
                 >
                   +{colorVariants.length - 6}
