@@ -327,7 +327,7 @@ export function AIStylistPage() {
                 <Tab
                   icon={<CheckroomIcon sx={{ fontSize: 18 }} />}
                   iconPosition="start"
-                  label="Build Your Outfit (AI)"
+                  label="Outfit Builder"
                 />
                 <Tab
                   icon={<SearchIcon sx={{ fontSize: 18 }} />}

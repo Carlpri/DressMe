@@ -47,7 +47,7 @@ const DESKTOP_NAV = [
   { label: "Products", path: ROUTES.customerDashboard },
   { label: "Categories", path: ROUTES.categories },
   { label: "Brands", path: ROUTES.brands },
-  { label: "Build Your Outfit", path: ROUTES.aiStylist },
+  { label: "Outfit Builder", path: ROUTES.aiStylist },
 ];
 
 // ─── Mobile drawer menu sections ─────────────────────────────────────────────
@@ -55,7 +55,7 @@ const MENU_NAV = [
   { label: "Products", path: ROUTES.customerDashboard, Icon: GridViewRoundedIcon },
   { label: "Categories", path: ROUTES.categories, Icon: StyleRoundedIcon },
   { label: "Brands", path: ROUTES.brands, Icon: StorefrontRoundedIcon },
-  { label: "Build Your Outfit", path: ROUTES.aiStylist, Icon: AutoAwesomeRoundedIcon },
+  { label: "Outfit Builder", path: ROUTES.aiStylist, Icon: AutoAwesomeRoundedIcon },
 ];
 
 export function WebHeader() {
@@ -399,11 +399,11 @@ export function WebHeader() {
                   </Badge>
                 </IconButton>
 
-                {/* Build Your Outfit pill */}
+                {/* Outfit Builder mobile create pill */}
                 <Box
                   component={RouterLink}
                   to={ROUTES.aiStylist}
-                  aria-label="Build Your Outfit"
+                  aria-label="Outfit Builder"
                   sx={{
                     display: "flex",
                     alignItems: "center",
@@ -411,21 +411,21 @@ export function WebHeader() {
                     px: 1.2,
                     height: 32,
                     borderRadius: "20px",
-                    bgcolor: "rgba(0,200,150,0.12)",
-                    border: "1px solid rgba(0,200,150,0.3)",
-                    color: "#00C896",
+                    bgcolor: "rgba(13,94,75,0.08)",
+                    border: "1px solid rgba(13,94,75,0.22)",
+                    color: "#0D5E4B",
                     textDecoration: "none",
                     transition: "all 0.2s ease",
                     "&:hover": {
-                      bgcolor: "rgba(0,200,150,0.22)",
-                      borderColor: "#00C896",
+                      bgcolor: "rgba(13,94,75,0.14)",
+                      borderColor: "#0D5E4B",
                     },
                     "&:active": { transform: "scale(0.95)" },
                   }}
                 >
-                  <AutoAwesomeRoundedIcon sx={{ fontSize: 13 }} />
+                  <AutoAwesomeRoundedIcon sx={{ fontSize: 13, color: "#00C896" }} />
                   <Typography sx={{ fontSize: "0.68rem", fontWeight: 800, letterSpacing: "0.02em", lineHeight: 1 }}>
-                    Outfit
+                    Create
                   </Typography>
                 </Box>
 

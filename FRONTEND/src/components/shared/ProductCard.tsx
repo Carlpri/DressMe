@@ -230,19 +230,17 @@ export function ProductCard({ product, variant = "default", size }: ProductCardP
           position: "relative",
           width: "100%",
           cursor: "pointer",
-          bgcolor: isLarge ? "#FFFFFF" : "transparent",
-          borderRadius: isLarge ? "14px" : "6px",
-          border: isLarge ? "1px solid rgba(0,0,0,0.06)" : "none",
-          boxShadow: isLarge
-            ? (isHovered ? "0 16px 36px rgba(0,0,0,0.09)" : "0 4px 18px rgba(0,0,0,0.03)")
-            : "none",
-          p: isLarge ? { xs: 1, sm: 1.25 } : 0,
+          bgcolor: "transparent",
+          borderRadius: 0,
+          border: "none",
+          boxShadow: "none",
+          p: 0,
           outline: "none",
           breakInside: "avoid",
           WebkitTapHighlightColor: "transparent",
           "&:focus-visible": { outline: `2px solid ${EMERALD}`, outlineOffset: 2 },
-          transform: isHovered ? "translateY(-4px)" : "translateY(0)",
-          transition: "all 0.32s cubic-bezier(0.16, 1, 0.3, 1)",
+          transform: isHovered ? "translateY(-2px)" : "translateY(0)",
+          transition: "transform 0.28s cubic-bezier(0.16, 1, 0.3, 1)",
         }}
       >
         {/* ─────────────────────────────────────────────────────────────────
@@ -255,7 +253,7 @@ export function ProductCard({ product, variant = "default", size }: ProductCardP
             position: "relative",
             width: "100%",
             overflow: "hidden",
-            borderRadius: isLarge ? "10px" : "4px",
+            borderRadius: "4px",
             bgcolor: "#0E131C",
           }}
         >
@@ -300,18 +298,19 @@ export function ProductCard({ product, variant = "default", size }: ProductCardP
                 top: { xs: 8, sm: 10 },
                 right: { xs: 8, sm: 10 },
                 zIndex: 5,
-                bgcolor: "rgba(13,94,75,0.85)",
+                bgcolor: "transparent",
+                background: "linear-gradient(135deg, #0D5E4B 0%, #00C896 100%)",
                 backdropFilter: "blur(8px)",
                 WebkitBackdropFilter: "blur(8px)",
                 color: "#FFFFFF",
                 fontWeight: 800,
                 fontSize: { xs: "0.55rem", sm: "0.62rem" },
                 letterSpacing: "0.03em",
-                borderRadius: "6px",
+                borderRadius: "4px",
                 px: 0.8,
                 py: 0.3,
-                border: "1px solid rgba(16,185,129,0.35)",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.25)",
+                border: "1px solid rgba(255,255,255,0.25)",
+                boxShadow: "0 2px 10px rgba(0,200,150,0.3)",
                 pointerEvents: "none",
                 opacity: isHovered ? 0 : 1,
                 transition: "opacity 0.22s ease",
@@ -539,15 +538,15 @@ export function ProductCard({ product, variant = "default", size }: ProductCardP
               disabled={isOutOfStock || addToCart.isPending}
               onClick={handleAddToCart}
               sx={{
-                py: { xs: 0.55, sm: 0.65 }, borderRadius: "6px",
+                py: { xs: 0.55, sm: 0.65 }, borderRadius: "4px",
                 fontWeight: 700, fontSize: { xs: "0.65rem", sm: "0.7rem" },
                 letterSpacing: "0.02em", textTransform: "none",
-                bgcolor: isOutOfStock ? "rgba(255,255,255,0.08)" : EMERALD,
+                background: isOutOfStock ? "rgba(255,255,255,0.08)" : "linear-gradient(135deg, #0D5E4B 0%, #00C896 100%)",
                 color: isOutOfStock ? "rgba(255,255,255,0.3)" : "#fff",
-                boxShadow: isOutOfStock ? "none" : `0 3px 12px ${EMERALD_GLOW}`,
+                boxShadow: isOutOfStock ? "none" : "0 3px 12px rgba(0,200,150,0.35)",
                 backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)",
                 transition: "all 0.2s ease",
-                "&:hover": { bgcolor: "#0D9B6A", boxShadow: `0 5px 20px ${EMERALD_GLOW}`, transform: "translateY(-1px)" },
+                "&:hover": { background: "linear-gradient(135deg, #094738 0%, #00B285 100%)", boxShadow: "0 5px 20px rgba(0,200,150,0.45)", transform: "translateY(-1px)" },
                 "&.Mui-disabled": { bgcolor: "rgba(255,255,255,0.04)", color: "rgba(255,255,255,0.18)" },
               }}
             >

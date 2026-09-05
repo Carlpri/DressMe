@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { Link as RouterLink, useSearchParams } from "react-router-dom";
 import {
   Box,
   Container,
@@ -17,6 +17,7 @@ import {
 import SearchIcon from "@mui/icons-material/Search";
 import CloseIcon from "@mui/icons-material/Close";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
+import { ROUTES } from "../../constants/routes";
 import { useProducts } from "../../hooks/useProducts";
 import { useCategories } from "../../hooks/useCategories";
 import { useBrands } from "../../hooks/useBrands";
@@ -24,6 +25,15 @@ import { ProductCard } from "../../components/shared/ProductCard";
 import { MasonryGrid } from "../../components/shared/MasonryGrid";
 import { LoadingSkeleton } from "../../components/shared/LoadingSkeleton";
 import type { ProductFilters } from "../../types/product";
+
+const DEFAULT_CATEGORIES = [
+  { id: "streetwear", name: "Streetwear", slug: "streetwear" },
+  { id: "suits", name: "Suits & Formal", slug: "suits" },
+  { id: "dresses", name: "Dresses", slug: "dresses" },
+  { id: "accessories", name: "Accessories", slug: "accessories" },
+  { id: "footwear", name: "Footwear", slug: "footwear" },
+  { id: "traditional", name: "African / Traditional", slug: "traditional" },
+];
 
 const GENDER_OPTIONS = [
   { value: "", label: "All" },
@@ -67,6 +77,7 @@ export function ProductsPage() {
 
   const { data: categories } = useCategories();
   const { data: brands } = useBrands();
+  const displayCategories = categories && categories.length > 0 ? categories : DEFAULT_CATEGORIES;
 
   const updateFilter = (key: string, value: string) => {
     const newParams = new URLSearchParams(searchParams);
@@ -188,20 +199,20 @@ export function ProductsPage() {
                 fontSize: { xs: "0.78rem", sm: "0.82rem" },
                 height: { xs: 34, sm: 38 },
                 px: { xs: 0.5, sm: 1 },
-                bgcolor: !category ? "#0D0D0D" : "#F4F4F5",
+                background: !category ? "linear-gradient(135deg, #0D5E4B 0%, #00C896 100%)" : "#F4F4F5",
                 color: !category ? "#FFFFFF" : "#27272A",
                 border: "1px solid",
-                borderColor: !category ? "#0D0D0D" : "rgba(0,0,0,0.06)",
-                boxShadow: !category ? "0 2px 8px rgba(0,0,0,0.18)" : "none",
+                borderColor: !category ? "#0D5E4B" : "rgba(0,0,0,0.06)",
+                boxShadow: !category ? "0 2px 10px rgba(0,200,150,0.3)" : "none",
                 transition: "all 0.2s ease",
                 "&:hover": {
-                  bgcolor: !category ? "#262626" : "#E4E4E7",
+                  background: !category ? "linear-gradient(135deg, #094738 0%, #00B285 100%)" : "#E4E4E7",
                 },
               }}
             />
 
             {/* Category Pills */}
-            {categories?.map((cat) => {
+            {displayCategories.map((cat) => {
               const isActive = category === cat.slug;
               return (
                 <Chip
@@ -215,15 +226,15 @@ export function ProductsPage() {
                     fontSize: { xs: "0.78rem", sm: "0.82rem" },
                     height: { xs: 34, sm: 38 },
                     px: { xs: 0.5, sm: 1 },
-                    bgcolor: isActive ? "#0D0D0D" : "#F4F4F5",
+                    background: isActive ? "linear-gradient(135deg, #0D5E4B 0%, #00C896 100%)" : "#F4F4F5",
                     color: isActive ? "#FFFFFF" : "#27272A",
                     border: "1px solid",
-                    borderColor: isActive ? "#0D0D0D" : "rgba(0,0,0,0.06)",
-                    boxShadow: isActive ? "0 2px 8px rgba(0,0,0,0.18)" : "none",
+                    borderColor: isActive ? "#0D5E4B" : "rgba(0,0,0,0.06)",
+                    boxShadow: isActive ? "0 2px 10px rgba(0,200,150,0.3)" : "none",
                     flexShrink: 0,
                     transition: "all 0.2s ease",
                     "&:hover": {
-                      bgcolor: isActive ? "#262626" : "#E4E4E7",
+                      background: isActive ? "linear-gradient(135deg, #094738 0%, #00B285 100%)" : "#E4E4E7",
                     },
                   }}
                 />
@@ -404,8 +415,8 @@ export function ProductsPage() {
           <Box sx={{ width: "100%", pt: 1 }}>
             {isLoading ? (
               <MasonryGrid
-                columns={{ xs: 2, sm: 2, md: 3, lg: 4, xl: 5 }}
-                gap={{ xs: "8px", sm: "10px", md: "14px" }}
+                columns={{ xs: 1, sm: 2, md: 3, lg: 4, xl: 5 }}
+                gap={{ xs: "12px", sm: "14px", md: "16px" }}
               >
                 {[...Array(10)].map((_, i) => (
                   <LoadingSkeleton key={i} height={340} />
@@ -443,8 +454,8 @@ export function ProductsPage() {
             ) : (
               <>
                 <MasonryGrid
-                  columns={{ xs: 2, sm: 2, md: 3, lg: 4, xl: 5 }}
-                  gap={{ xs: "8px", sm: "10px", md: "14px" }}
+                  columns={{ xs: 1, sm: 2, md: 3, lg: 4, xl: 5 }}
+                  gap={{ xs: "12px", sm: "14px", md: "16px" }}
                 >
                   {products?.items.map((product) => (
                     <ProductCard key={product.id} product={product} />
@@ -480,6 +491,56 @@ export function ProductsPage() {
           </Box>
         </Stack>
       </Container>
+
+      {/* Floating Outfit Builder Entry Point */}
+      <Box
+        component={RouterLink}
+        to={ROUTES.aiStylist}
+        sx={{
+          position: "fixed",
+          bottom: { xs: 20, sm: 28 },
+          right: { xs: 20, sm: 28 },
+          zIndex: 99,
+          display: "flex",
+          alignItems: "center",
+          gap: 1,
+          px: { xs: 1.75, sm: 2.25 },
+          py: { xs: 1.2, sm: 1.35 },
+          borderRadius: "9999px",
+          background: "linear-gradient(135deg, #0D5E4B 0%, #00C896 100%)",
+          color: "#FFFFFF",
+          textDecoration: "none",
+          boxShadow: "0 6px 20px rgba(0,200,150,0.4)",
+          transition: "all 0.25s cubic-bezier(0.16, 1, 0.3, 1)",
+          "&:hover": {
+            transform: "translateY(-2px) scale(1.03)",
+            boxShadow: "0 8px 24px rgba(0,200,150,0.55)",
+          },
+          "&:active": { transform: "scale(0.97)" },
+        }}
+      >
+        <AutoAwesomeIcon sx={{ fontSize: { xs: 18, sm: 20 }, color: "#FFFFFF" }} />
+        <Typography
+          sx={{
+            fontWeight: 800,
+            fontSize: { xs: "0.82rem", sm: "0.9rem" },
+            letterSpacing: "0.01em",
+            display: { xs: "none", sm: "inline" },
+          }}
+        >
+          Outfit Builder
+        </Typography>
+        <Typography
+          sx={{
+            fontWeight: 800,
+            fontSize: "0.78rem",
+            letterSpacing: "0.01em",
+            display: { xs: "inline", sm: "none" },
+          }}
+        >
+          Create
+        </Typography>
+      </Box>
     </Box>
   );
 }

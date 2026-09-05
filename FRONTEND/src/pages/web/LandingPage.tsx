@@ -348,7 +348,7 @@ export function LandingPage() {
                       transition: "all 0.25s ease",
                     }}
                   >
-                    Build Your Outfit →
+                    Outfit Builder →
                   </Button>
                 </Stack>
 
@@ -558,7 +558,7 @@ export function LandingPage() {
           <Grid container>
             {[
               { icon: <CheckroomIcon />, text: "Model-Curated Outfits" },
-              { icon: <AutoAwesomeIcon />, text: "Build Your Outfit (AI)" },
+              { icon: <AutoAwesomeIcon />, text: "Outfit Builder (AI)" },
               { icon: <LocalShippingOutlinedIcon />, text: "48-Hour Delivery" },
               { icon: <StoreIcon />, text: "500+ Verified Brands" },
             ].map((item, i) => (
@@ -978,13 +978,13 @@ export function LandingPage() {
             </Stack>
 
             {newLoading ? (
-              <MasonryGrid columns={{ xs: 2, sm: 2, md: 3, lg: 4 }}>
+              <MasonryGrid columns={{ xs: 1, sm: 2, md: 3, lg: 4 }} gap={{ xs: "12px", sm: "14px", md: "16px" }}>
                 {[...Array(4)].map((_, i) => (
                   <LoadingSkeleton key={i} height={340} />
                 ))}
               </MasonryGrid>
             ) : (
-              <MasonryGrid columns={{ xs: 2, sm: 2, md: 3, lg: 4 }}>
+              <MasonryGrid columns={{ xs: 1, sm: 2, md: 3, lg: 4 }} gap={{ xs: "12px", sm: "14px", md: "16px" }}>
                 {newProducts?.items.slice(0, 8).map((product) => (
                   <ProductCard key={product.id} product={product} variant="compact" size="medium" />
                 ))}
@@ -1020,7 +1020,7 @@ export function LandingPage() {
             <Grid size={{ xs: 12, md: 7 }}>
               <SectionLabel>AI-Powered</SectionLabel>
               <Typography variant="h2" sx={{ fontWeight: 900, color: DARK, letterSpacing: "-0.03em", mt: 1, mb: 2 }}>
-                Build Your Outfit with{" "}
+                The Outfit Builder with{" "}
                 <Box component="span" sx={{ background: `linear-gradient(135deg, ${GOLD_DARK}, #C9A96E)`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
                   AI Precision
                 </Box>
@@ -1044,7 +1044,7 @@ export function LandingPage() {
                     "&:hover": { bgcolor: GOLD, color: DARK, boxShadow: `0 8px 24px rgba(201,169,110,0.35)` },
                   }}
                 >
-                  Build Your Outfit Free →
+                  Try Outfit Builder Free →
                 </Button>
                 <Button
                   variant="outlined"
