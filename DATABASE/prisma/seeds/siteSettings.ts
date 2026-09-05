@@ -14,9 +14,9 @@ export async function seedSiteSettings(prisma: PrismaClient) {
     data: {
       siteName: "DressMe",
       tagline: "Your Style. Powered by AI. Inspired by You.",
-      logoUrl: "",
-      logoDarkUrl: "",
-      faviconUrl: "",
+      logoUrl: "https://res.cloudinary.com/mrjdesh0/image/upload/v1787774080/dressme/products/Light_logo_tuped0.png",
+      logoDarkUrl: "https://res.cloudinary.com/mrjdesh0/image/upload/v1787774089/dressme/products/Dark_logo_toakwo.png",
+      faviconUrl: "https://res.cloudinary.com/mrjdesh0/image/upload/v1787774123/dressme/products/Favicon_rpf38w.png",
       heroBannerUrl: "",
       supportEmail: "support@dressme.co.ke",
       supportPhone: "+254700000000",

@@ -348,7 +348,7 @@ export function LandingPage() {
                       transition: "all 0.25s ease",
                     }}
                   >
-                    AI Stylist →
+                    Build Your Outfit →
                   </Button>
                 </Stack>
 
@@ -558,7 +558,7 @@ export function LandingPage() {
           <Grid container>
             {[
               { icon: <CheckroomIcon />, text: "Model-Curated Outfits" },
-              { icon: <AutoAwesomeIcon />, text: "AI Personal Stylist" },
+              { icon: <AutoAwesomeIcon />, text: "Build Your Outfit (AI)" },
               { icon: <LocalShippingOutlinedIcon />, text: "48-Hour Delivery" },
               { icon: <StoreIcon />, text: "500+ Verified Brands" },
             ].map((item, i) => (
@@ -593,12 +593,12 @@ export function LandingPage() {
           <Stack spacing={5}>
             <Stack direction="row" justifyContent="space-between" alignItems="flex-end">
               <Box>
-                <SectionLabel>Trending Now</SectionLabel>
+                <SectionLabel>Trending in 2026</SectionLabel>
                 <Typography variant="h3" sx={{ fontWeight: 800, color: DARK, letterSpacing: "-0.02em" }}>
-                  What Everyone's Wearing
+                  Trending in 2026
                 </Typography>
                 <Typography sx={{ color: "#64748B", mt: 0.5 }}>
-                  The most-loved looks from our community right now
+                  The defining looks, cuts, and staples setting the pace this year in Nairobi
                 </Typography>
               </Box>
               <Button
@@ -612,15 +612,15 @@ export function LandingPage() {
             </Stack>
 
             {trendingLoading ? (
-              <MasonryGrid columns={{ xs: 2, sm: 2, md: 3, lg: 4 }}>
-                {[...Array(4)].map((_, i) => (
-                  <LoadingSkeleton key={i} height={340} />
+              <MasonryGrid columns={{ xs: 1, sm: 2, md: 3, lg: 3 }}>
+                {[...Array(6)].map((_, i) => (
+                  <LoadingSkeleton key={i} height={400} />
                 ))}
               </MasonryGrid>
             ) : (
-              <MasonryGrid columns={{ xs: 2, sm: 2, md: 3, lg: 4 }}>
-                {trendingProducts?.items.slice(0, 8).map((product) => (
-                  <ProductCard key={product.id} product={product} />
+              <MasonryGrid columns={{ xs: 1, sm: 2, md: 3, lg: 3 }}>
+                {trendingProducts?.items.slice(0, 6).map((product) => (
+                  <ProductCard key={product.id} product={product} variant="trending" size="large" />
                 ))}
               </MasonryGrid>
             )}
@@ -985,8 +985,8 @@ export function LandingPage() {
               </MasonryGrid>
             ) : (
               <MasonryGrid columns={{ xs: 2, sm: 2, md: 3, lg: 4 }}>
-                {newProducts?.items.slice(0, 4).map((product) => (
-                  <ProductCard key={product.id} product={product} />
+                {newProducts?.items.slice(0, 8).map((product) => (
+                  <ProductCard key={product.id} product={product} variant="compact" size="medium" />
                 ))}
               </MasonryGrid>
             )}
@@ -1020,11 +1020,10 @@ export function LandingPage() {
             <Grid size={{ xs: 12, md: 7 }}>
               <SectionLabel>AI-Powered</SectionLabel>
               <Typography variant="h2" sx={{ fontWeight: 900, color: DARK, letterSpacing: "-0.03em", mt: 1, mb: 2 }}>
-                Your Personal{" "}
+                Build Your Outfit with{" "}
                 <Box component="span" sx={{ background: `linear-gradient(135deg, ${GOLD_DARK}, #C9A96E)`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
-                  AI Stylist
-                </Box>{" "}
-                is Here
+                  AI Precision
+                </Box>
               </Typography>
               <Typography sx={{ color: "#475569", fontSize: "1.1rem", lineHeight: 1.7, mb: 4, maxWidth: 520 }}>
                 Tell us your occasion, body type, and style goals. We'll curate a complete outfit — head to toe — with matching pieces from our catalog ready to add to your cart instantly.
@@ -1045,7 +1044,7 @@ export function LandingPage() {
                     "&:hover": { bgcolor: GOLD, color: DARK, boxShadow: `0 8px 24px rgba(201,169,110,0.35)` },
                   }}
                 >
-                  Try AI Stylist Free →
+                  Build Your Outfit Free →
                 </Button>
                 <Button
                   variant="outlined"

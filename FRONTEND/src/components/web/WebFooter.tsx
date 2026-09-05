@@ -33,12 +33,15 @@ const FOOTER_LINKS = {
   ],
 };
 
+const DEFAULT_DARK_LOGO =
+  "https://res.cloudinary.com/mrjdesh0/image/upload/v1787774089/dressme/products/Dark_logo_toakwo.png";
+
 export function WebFooter() {
   const theme = useTheme();
   const { settings } = useSiteSettingsContext();
   const { user, isAuthenticated } = useAuth();
 
-  const logoSrc = settings?.logoDarkUrl ?? settings?.logoUrl ?? undefined;
+  const logoSrc = settings?.logoDarkUrl || settings?.logoUrl || DEFAULT_DARK_LOGO;
 
   return (
     <Box
@@ -58,32 +61,18 @@ export function WebFooter() {
             spacing={4}
           >
             <Box sx={{ maxWidth: { xs: "100%", md: 300 } }}>
-              {logoSrc ? (
-                <Box
-                  component="img"
-                  src={logoSrc}
-                  alt={settings?.siteName || "DressMe"}
-                  sx={{
-                    height: 44,
-                    maxWidth: 160,
-                    objectFit: "contain",
-                    display: "block",
-                    mb: 2,
-                    filter: settings?.logoDarkUrl ? "none" : "brightness(0) invert(1)",
-                  }}
-                />
-              ) : (
-                <Typography
-                  variant="h4"
-                  sx={{
-                    fontWeight: 700,
-                    mb: 2,
-                    color: "#00C896",
-                  }}
-                >
-                  {settings?.siteName || "DressMe"}
-                </Typography>
-              )}
+              <Box
+                component="img"
+                src={logoSrc}
+                alt={settings?.siteName || "DressMe"}
+                sx={{
+                  height: 44,
+                  maxWidth: 160,
+                  objectFit: "contain",
+                  display: "block",
+                  mb: 2,
+                }}
+              />
               <Typography
                 variant="body2"
                 sx={{ color: "rgba(255, 255, 255, 0.7)", lineHeight: 1.6 }}

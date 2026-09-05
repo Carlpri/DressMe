@@ -38,12 +38,16 @@ import { useSiteSettingsContext } from "../../contexts/SiteSettingsContext";
 import { useFavorites } from "../../hooks/useFavorites";
 import { useCart } from "../../hooks/useCart";
 
+// ─── Default Brand Assets ──────────────────────────────────────────────────
+const DEFAULT_LIGHT_LOGO =
+  "https://res.cloudinary.com/mrjdesh0/image/upload/v1787774080/dressme/products/Light_logo_tuped0.png";
+
 // ─── Desktop nav items ────────────────────────────────────────────────────────
 const DESKTOP_NAV = [
   { label: "Products", path: ROUTES.customerDashboard },
   { label: "Categories", path: ROUTES.categories },
   { label: "Brands", path: ROUTES.brands },
-  { label: "AI Stylist", path: ROUTES.aiStylist },
+  { label: "Build Your Outfit", path: ROUTES.aiStylist },
 ];
 
 // ─── Mobile drawer menu sections ─────────────────────────────────────────────
@@ -51,6 +55,7 @@ const MENU_NAV = [
   { label: "Products", path: ROUTES.customerDashboard, Icon: GridViewRoundedIcon },
   { label: "Categories", path: ROUTES.categories, Icon: StyleRoundedIcon },
   { label: "Brands", path: ROUTES.brands, Icon: StorefrontRoundedIcon },
+  { label: "Build Your Outfit", path: ROUTES.aiStylist, Icon: AutoAwesomeRoundedIcon },
 ];
 
 export function WebHeader() {
@@ -186,31 +191,17 @@ export function WebHeader() {
                   },
                 }}
               >
-                {settings?.logoUrl ? (
-                  <Box
-                    component="img"
-                    src={settings.logoUrl}
-                    alt={settings?.siteName || "DressMe"}
-                    sx={{
-                      height: { xs: 38, sm: 44, md: 54 },
-                      maxWidth: { xs: 120, sm: 160, md: 240 },
-                      objectFit: "contain",
-                      display: "block",
-                    }}
-                  />
-                ) : (
-                  <Typography
-                    variant="h5"
-                    sx={{
-                      fontWeight: 800,
-                      color: "#00C896",
-                      fontSize: { xs: "1.35rem", md: "1.75rem" },
-                      letterSpacing: "-0.02em",
-                    }}
-                  >
-                    {settings?.siteName || "DressMe"}
-                  </Typography>
-                )}
+                <Box
+                  component="img"
+                  src={settings?.logoUrl || DEFAULT_LIGHT_LOGO}
+                  alt={settings?.siteName || "DressMe"}
+                  sx={{
+                    height: { xs: 38, sm: 44, md: 54 },
+                    maxWidth: { xs: 130, sm: 170, md: 240 },
+                    objectFit: "contain",
+                    display: "block",
+                  }}
+                />
               </Link>
             </Box>
 
@@ -408,11 +399,11 @@ export function WebHeader() {
                   </Badge>
                 </IconButton>
 
-                {/* AI Stylist pill */}
+                {/* Build Your Outfit pill */}
                 <Box
                   component={RouterLink}
                   to={ROUTES.aiStylist}
-                  aria-label="AI Stylist"
+                  aria-label="Build Your Outfit"
                   sx={{
                     display: "flex",
                     alignItems: "center",
@@ -433,8 +424,8 @@ export function WebHeader() {
                   }}
                 >
                   <AutoAwesomeRoundedIcon sx={{ fontSize: 13 }} />
-                  <Typography sx={{ fontSize: "0.68rem", fontWeight: 800, letterSpacing: "0.04em", lineHeight: 1 }}>
-                    Stylist
+                  <Typography sx={{ fontSize: "0.68rem", fontWeight: 800, letterSpacing: "0.02em", lineHeight: 1 }}>
+                    Outfit
                   </Typography>
                 </Box>
 
