@@ -41,6 +41,7 @@ import {
   type AISearchResponseData,
 } from "../../services/ai.service";
 import { ProductCard } from "../../components/shared/ProductCard";
+import { MasonryGrid } from "../../components/shared/MasonryGrid";
 import { LoadingSkeleton } from "../../components/shared/LoadingSkeleton";
 import type { Product } from "../../types/product";
 
@@ -1162,13 +1163,11 @@ export function AIStylistPage() {
                       {searchResult.count === 1 ? "Product" : "Products"}
                     </Typography>
 
-                    <Grid container spacing={3}>
+                    <MasonryGrid columns={{ xs: 1, sm: 2, md: 3 }}>
                       {searchResult.products.map((product) => (
-                        <Grid size={{ xs: 12, sm: 6, md: 4 }} key={product.id}>
-                          <ProductCard product={product} />
-                        </Grid>
+                        <ProductCard key={product.id} product={product} />
                       ))}
-                    </Grid>
+                    </MasonryGrid>
                   </Box>
                 ) : (
                   <Alert severity="info" sx={{ borderRadius: 3, p: 2 }}>

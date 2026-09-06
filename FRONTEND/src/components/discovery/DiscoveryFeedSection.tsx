@@ -152,19 +152,12 @@ export function DiscoveryFeedSection({ id }: { id?: string }) {
             </MasonryGrid>
           ) : products.length > 0 ? (
             <MasonryGrid columns={{ xs: 2, sm: 2, md: 3, lg: 4 }} gap={{ xs: "12px", sm: "16px", md: "20px" }}>
-              {products.map((product, index) => {
-                // Vary aspect ratios dynamically for natural Pinterest rhythm
-                const aspectRatios: Array<"3/4" | "4/5" | "1/1"> = ["4/5", "3/4", "4/5", "1/1"];
-                const ratio = aspectRatios[index % aspectRatios.length];
-
-                return (
-                  <ProductDiscoveryCard
-                    key={product.id}
-                    product={product}
-                    aspectRatio={ratio}
-                  />
-                );
-              })}
+              {products.map((product) => (
+                <ProductDiscoveryCard
+                  key={product.id}
+                  product={product}
+                />
+              ))}
             </MasonryGrid>
           ) : (
             <EmptySearchState

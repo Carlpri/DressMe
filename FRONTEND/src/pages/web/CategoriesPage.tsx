@@ -200,13 +200,11 @@ export function CategoriesPage() {
           </Stack>
 
           {productsLoading ? (
-            <Grid container spacing={3}>
+            <MasonryGrid columns={{ xs: 2, sm: 2, md: 3, lg: 4 }}>
               {[...Array(8)].map((_, i) => (
-                <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={i}>
-                  <LoadingSkeleton height={400} />
-                </Grid>
+                <LoadingSkeleton key={i} height={i % 3 === 0 ? 420 : i % 2 === 0 ? 360 : 300} />
               ))}
-            </Grid>
+            </MasonryGrid>
           ) : products?.items.length === 0 ? (
             <Box sx={{ textAlign: "center", py: 8 }}>
               <Typography variant="h6" color="text.secondary">

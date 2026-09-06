@@ -4,14 +4,14 @@ import {
   Box,
   Button,
   Container,
-  Grid,
   Stack,
   Typography,
 } from "@mui/material";
 import EmojiEventsRoundedIcon from "@mui/icons-material/EmojiEventsRounded";
 import NorthEastRoundedIcon from "@mui/icons-material/NorthEastRounded";
 import { useProducts } from "../../hooks/useProducts";
-import { ProductDiscoveryCard } from "./ProductDiscoveryCard";
+import { ProductCard } from "../shared/ProductCard";
+import { MasonryGrid } from "../shared/MasonryGrid";
 import { LoadingSkeleton } from "../shared/LoadingSkeleton";
 import { ROUTES } from "../../constants/routes";
 
@@ -110,25 +110,21 @@ export function BestSellersSection() {
           </Stack>
 
           {isLoading ? (
-            <Grid container spacing={3}>
+            <MasonryGrid columns={{ xs: 2, sm: 2, md: 3, lg: 4 }}>
               {[...Array(4)].map((_, i) => (
-                <Grid size={{ xs: 6, sm: 6, md: 4, lg: 3 }} key={i}>
-                  <LoadingSkeleton height={380} />
-                </Grid>
+                <LoadingSkeleton key={i} height={i % 2 === 0 ? 420 : 360} />
               ))}
-            </Grid>
+            </MasonryGrid>
           ) : (
-            <Grid container spacing={{ xs: 2, sm: 2.5, md: 3 }}>
+            <MasonryGrid columns={{ xs: 2, sm: 2, md: 3, lg: 4 }}>
               {products.slice(0, 4).map((product) => (
-                <Grid size={{ xs: 6, sm: 6, md: 4, lg: 3 }} key={product.id}>
-                  <ProductDiscoveryCard
-                    product={product}
-                    badge={product.sales > 0 ? "Top Seller" : undefined}
-                    aspectRatio="4/5"
-                  />
-                </Grid>
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  badge={product.sales > 0 ? "Top Seller" : undefined}
+                />
               ))}
-            </Grid>
+            </MasonryGrid>
           )}
         </Stack>
       </Container>

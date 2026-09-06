@@ -4,14 +4,14 @@ import {
   Box,
   Button,
   Container,
-  Grid,
   Stack,
   Typography,
 } from "@mui/material";
 import NorthEastRoundedIcon from "@mui/icons-material/NorthEastRounded";
 import WhatshotRoundedIcon from "@mui/icons-material/WhatshotRounded";
 import { useProducts } from "../../hooks/useProducts";
-import { ProductDiscoveryCard } from "./ProductDiscoveryCard";
+import { ProductCard } from "../shared/ProductCard";
+import { MasonryGrid } from "../shared/MasonryGrid";
 import { LoadingSkeleton } from "../shared/LoadingSkeleton";
 import { ROUTES } from "../../constants/routes";
 
@@ -101,25 +101,17 @@ export function TrendingSection() {
 
           {/* Product Grid */}
           {isLoading ? (
-            <Grid container spacing={3}>
-              {[...Array(4)].map((_, i) => (
-                <Grid size={{ xs: 6, sm: 6, md: 4, lg: 3 }} key={i}>
-                  <LoadingSkeleton height={380} />
-                </Grid>
+            <MasonryGrid columns={{ xs: 2, sm: 2, md: 3, lg: 4 }}>
+              {[...Array(8)].map((_, i) => (
+                <LoadingSkeleton key={i} height={i % 3 === 0 ? 420 : i % 2 === 0 ? 360 : 300} />
               ))}
-            </Grid>
+            </MasonryGrid>
           ) : products.length > 0 ? (
-            <Grid container spacing={{ xs: 2, sm: 2.5, md: 3 }}>
+            <MasonryGrid columns={{ xs: 2, sm: 2, md: 3, lg: 4 }}>
               {products.slice(0, 8).map((product) => (
-                <Grid size={{ xs: 6, sm: 6, md: 4, lg: 3 }} key={product.id}>
-                  <ProductDiscoveryCard
-                    product={product}
-                    badge="Trending"
-                    aspectRatio="4/5"
-                  />
-                </Grid>
+                <ProductCard key={product.id} product={product} badge="Trending" />
               ))}
-            </Grid>
+            </MasonryGrid>
           ) : (
             <Box
               sx={{
