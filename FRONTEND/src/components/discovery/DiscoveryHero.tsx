@@ -11,14 +11,12 @@ import {
   Chip,
   InputAdornment,
   IconButton,
-  alpha,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import ClearRoundedIcon from "@mui/icons-material/ClearRounded";
+import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
 import AutoAwesomeRoundedIcon from "@mui/icons-material/AutoAwesomeRounded";
-import ArrowDownwardRoundedIcon from "@mui/icons-material/ArrowDownwardRounded";
 import NorthEastRoundedIcon from "@mui/icons-material/NorthEastRounded";
-import SparklesIcon from "@mui/icons-material/AutoAwesome";
 import { ROUTES } from "../../constants/routes";
 
 const DEEP_EMERALD = "#166534";
@@ -27,13 +25,39 @@ const CHARCOAL = "#111827";
 const WARM_BG = "#FAF8F5";
 
 const QUICK_TRENDS = [
-  "White sneakers under 3000",
   "Streetwear",
-  "Interview outfit",
-  "Date night look",
+  "Date night",
+  "White sneakers under 3000",
   "Campus fits",
-  "Red dinner dress",
-  "Black trousers",
+  "Africa wear",
+  "Smart casual",
+];
+
+const HERO_LOOKS = [
+  {
+    image: "/nairobi-streetwear.jpg",
+    title: "Nairobi Streetwear",
+    outfit: "Corduroy Jacket • Cargos • Airforce 1s",
+    query: "streetwear",
+  },
+  {
+    image: "/nairobi-datenight.jpg",
+    title: "Date Night",
+    outfit: "Vintage Cocktail Dress • Red-Bottoms",
+    query: "date",
+  },
+  {
+    image: "/nairobi-campus.jpg",
+    title: "Campus Casual",
+    outfit: "Relaxed Denim • Summer Top • Vans",
+    query: "campus",
+  },
+  {
+    image: "/nairobi-smartcasual.jpg",
+    title: "Afro-Tech",
+    outfit: "Textured Shirt • Tassel Loafers",
+    query: "smart casual",
+  },
 ];
 
 export function DiscoveryHero({ onExploreClick }: { onExploreClick?: () => void }) {
@@ -57,109 +81,144 @@ export function DiscoveryHero({ onExploreClick }: { onExploreClick?: () => void 
       sx={{
         position: "relative",
         bgcolor: WARM_BG,
-        pt: { xs: 5, md: 8 },
-        pb: { xs: 8, md: 12 },
+        pt: { xs: 5, md: 7 },
+        pb: { xs: 8, md: 10 },
         overflow: "hidden",
         borderBottom: "1px solid rgba(17, 24, 39, 0.06)",
       }}
     >
-      {/* Ambient background glows */}
+      {/* Ambient background glow */}
       <Box
         sx={{
           position: "absolute",
           inset: 0,
           background: `
-            radial-gradient(circle at 15% 20%, rgba(34, 197, 94, 0.07) 0%, transparent 50%),
-            radial-gradient(circle at 85% 65%, rgba(22, 101, 52, 0.08) 0%, transparent 55%)
+            radial-gradient(circle at 20% 20%, rgba(34, 197, 94, 0.08) 0%, transparent 50%),
+            radial-gradient(circle at 80% 60%, rgba(22, 101, 52, 0.09) 0%, transparent 55%)
           `,
           pointerEvents: "none",
         }}
       />
 
       <Container maxWidth="xl" sx={{ position: "relative", zIndex: 2 }}>
-        <Stack spacing={{ xs: 4, md: 6 }} alignItems="center" textAlign="center">
-          
-          {/* Eyebrow badge */}
-          <Stack
-            direction="row"
-            alignItems="center"
-            spacing={1}
+        <Stack spacing={{ xs: 4, md: 5 }} alignItems="center" textAlign="center">
+          {/* Minimalist Top Eyebrow */}
+          <Typography
             sx={{
-              px: 2,
-              py: 0.75,
-              borderRadius: "30px",
-              bgcolor: "rgba(22, 101, 52, 0.08)",
-              border: "1px solid rgba(22, 101, 52, 0.18)",
-              display: "inline-flex",
+              fontSize: "0.76rem",
+              fontWeight: 800,
+              letterSpacing: "0.14em",
+              color: DEEP_EMERALD,
+              textTransform: "uppercase",
             }}
           >
-            <SparklesIcon sx={{ fontSize: 16, color: DEEP_EMERALD }} />
-            <Typography
-              sx={{
-                fontSize: "0.78rem",
-                fontWeight: 800,
-                color: DEEP_EMERALD,
-                letterSpacing: "0.08em",
-                textTransform: "uppercase",
-              }}
-            >
-              FASHION DISCOVERY & INSPIRATION
-            </Typography>
-          </Stack>
+            AFRICAN FASHION-TECH DISCOVERY
+          </Typography>
 
-          {/* Headline */}
-          <Box sx={{ maxWidth: 880 }}>
+          {/* Minimalist Headline */}
+          <Box sx={{ maxWidth: 840 }}>
             <Typography
               variant="h1"
               sx={{
-                fontSize: { xs: "2.4rem", sm: "3.4rem", md: "4.4rem" },
+                fontSize: { xs: "3rem", sm: "4.2rem", md: "5.2rem" },
                 fontWeight: 900,
-                letterSpacing: "-0.035em",
-                lineHeight: { xs: 1.12, md: 1.06 },
+                letterSpacing: "-0.04em",
+                lineHeight: 1.02,
                 color: CHARCOAL,
               }}
             >
-              Discover Outfits.
-              <br />
-              <Box
-                component="span"
-                sx={{
-                  background: `linear-gradient(135deg, ${DEEP_EMERALD} 0%, ${EMERALD} 70%, #15803D 100%)`,
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                }}
-              >
-                Curate Your Look.
-              </Box>{" "}
-              Shop Nairobi's Best.
+              Find your style.
             </Typography>
+
+            {/* Single Short Supporting Sentence */}
             <Typography
               sx={{
-                mt: 2.5,
-                fontSize: { xs: "1rem", md: "1.2rem" },
+                mt: 2,
+                fontSize: { xs: "1.05rem", md: "1.25rem" },
                 color: "#475569",
-                lineHeight: 1.6,
-                maxWidth: 650,
+                lineHeight: 1.5,
+                maxWidth: 600,
                 mx: "auto",
+                fontWeight: 400,
               }}
             >
-              From campus streetwear to boardroom power looks and date nights. Search in plain English and discover model-curated pieces from verified Kenyan designers and vendors.
+              Curated looks, streetwear, and designer staples from Kenya's top fashion creators.
             </Typography>
           </Box>
 
+          {/* CTAs */}
+          <Stack
+            direction={{ xs: "column", sm: "row" }}
+            spacing={2}
+            alignItems="center"
+            justifyContent="center"
+          >
+            <Button
+              variant="contained"
+              size="large"
+              onClick={onExploreClick}
+              endIcon={<ArrowForwardRoundedIcon />}
+              sx={{
+                bgcolor: DEEP_EMERALD,
+                color: "#FFFFFF",
+                fontWeight: 800,
+                fontSize: "1rem",
+                px: 4,
+                py: 1.6,
+                borderRadius: "16px",
+                boxShadow: "0 8px 24px rgba(22, 101, 52, 0.3)",
+                "&:hover": {
+                  bgcolor: "#14532D",
+                  boxShadow: "0 12px 28px rgba(22, 101, 52, 0.4)",
+                  transform: "translateY(-1px)",
+                },
+                transition: "all 0.2s ease",
+              }}
+            >
+              Explore Fashion
+            </Button>
+
+            <Button
+              variant="outlined"
+              size="large"
+              onClick={() => navigate(ROUTES.aiStylist)}
+              startIcon={<AutoAwesomeRoundedIcon />}
+              sx={{
+                borderColor: "rgba(17, 24, 39, 0.2)",
+                color: CHARCOAL,
+                fontWeight: 700,
+                fontSize: "1rem",
+                px: 3.5,
+                py: 1.6,
+                borderRadius: "16px",
+                bgcolor: "#FFFFFF",
+                "&:hover": {
+                  borderColor: DEEP_EMERALD,
+                  color: DEEP_EMERALD,
+                  bgcolor: "rgba(22, 101, 52, 0.04)",
+                  transform: "translateY(-1px)",
+                },
+                transition: "all 0.2s ease",
+              }}
+            >
+              Find My Style
+            </Button>
+          </Stack>
+
           {/* ══════════════════════════════════════════════════════════════════
-              UNIVERSAL SEARCH BAR WITH EXPLICIT SEARCH BUTTON
+              UNIVERSAL SEARCH BAR WITH VISIBLE SEARCH BUTTON
           ══════════════════════════════════════════════════════════════════ */}
           <Box
             component="form"
             onSubmit={handleSearchSubmit}
             sx={{
               width: "100%",
-              maxWidth: 740,
+              maxWidth: 720,
               bgcolor: "#FFFFFF",
               borderRadius: { xs: "20px", sm: "24px" },
               p: { xs: 1, sm: 1.25 },
-              boxShadow: "0 12px 36px -8px rgba(17, 24, 39, 0.12), 0 0 0 1px rgba(17, 24, 39, 0.08)",
+              boxShadow:
+                "0 12px 36px -8px rgba(17, 24, 39, 0.12), 0 0 0 1px rgba(17, 24, 39, 0.08)",
               display: "flex",
               flexDirection: { xs: "column", sm: "row" },
               alignItems: "center",
@@ -172,7 +231,7 @@ export function DiscoveryHero({ onExploreClick }: { onExploreClick?: () => void 
           >
             <TextField
               fullWidth
-              placeholder="Search by occasion, style, color, or budget (e.g. 'white sneakers under 3000')..."
+              placeholder="Search looks, cargo pants, white sneakers under 3000..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               variant="standard"
@@ -180,7 +239,7 @@ export function DiscoveryHero({ onExploreClick }: { onExploreClick?: () => void 
                 disableUnderline: true,
                 startAdornment: (
                   <InputAdornment position="start" sx={{ pl: 1.5, mr: 1.5 }}>
-                    <SearchIcon sx={{ color: DEEP_EMERALD, fontSize: 26 }} />
+                    <SearchIcon sx={{ color: DEEP_EMERALD, fontSize: 24 }} />
                   </InputAdornment>
                 ),
                 endAdornment: searchQuery ? (
@@ -188,7 +247,7 @@ export function DiscoveryHero({ onExploreClick }: { onExploreClick?: () => void 
                     <IconButton
                       size="small"
                       onClick={() => setSearchQuery("")}
-                      aria-label="Clear search query"
+                      aria-label="Clear search"
                     >
                       <ClearRoundedIcon sx={{ fontSize: 18 }} />
                     </IconButton>
@@ -209,7 +268,6 @@ export function DiscoveryHero({ onExploreClick }: { onExploreClick?: () => void 
               }}
             />
 
-            {/* Clear, Prominent SEARCH BUTTON */}
             <Button
               type="submit"
               variant="contained"
@@ -220,17 +278,15 @@ export function DiscoveryHero({ onExploreClick }: { onExploreClick?: () => void 
                 color: "#FFFFFF",
                 fontWeight: 800,
                 fontSize: "1rem",
-                letterSpacing: "0.02em",
                 borderRadius: { xs: "14px", sm: "18px" },
                 px: { xs: 3, sm: 4 },
-                py: { xs: 1.4, sm: 1.6 },
+                py: { xs: 1.3, sm: 1.5 },
                 width: { xs: "100%", sm: "auto" },
-                minWidth: 140,
-                boxShadow: "0 6px 20px rgba(22, 101, 52, 0.35)",
+                minWidth: 130,
+                boxShadow: "0 6px 20px rgba(22, 101, 52, 0.3)",
                 whiteSpace: "nowrap",
                 "&:hover": {
                   bgcolor: "#14532D",
-                  boxShadow: "0 8px 24px rgba(22, 101, 52, 0.45)",
                 },
                 transition: "all 0.2s ease",
               }}
@@ -248,18 +304,6 @@ export function DiscoveryHero({ onExploreClick }: { onExploreClick?: () => void 
             gap={1}
             sx={{ maxWidth: 840 }}
           >
-            <Typography
-              sx={{
-                fontSize: "0.78rem",
-                fontWeight: 700,
-                color: "#64748B",
-                textTransform: "uppercase",
-                letterSpacing: "0.06em",
-                mr: 0.5,
-              }}
-            >
-              Popular:
-            </Typography>
             {QUICK_TRENDS.map((item) => (
               <Chip
                 key={item}
@@ -272,7 +316,7 @@ export function DiscoveryHero({ onExploreClick }: { onExploreClick?: () => void 
                   bgcolor: "#FFFFFF",
                   color: CHARCOAL,
                   fontWeight: 600,
-                  fontSize: "0.82rem",
+                  fontSize: "0.8rem",
                   border: "1px solid rgba(17, 24, 39, 0.1)",
                   borderRadius: "20px",
                   cursor: "pointer",
@@ -281,49 +325,106 @@ export function DiscoveryHero({ onExploreClick }: { onExploreClick?: () => void 
                     bgcolor: "rgba(22, 101, 52, 0.08)",
                     borderColor: DEEP_EMERALD,
                     color: DEEP_EMERALD,
-                    transform: "translateY(-2px)",
+                    transform: "translateY(-1px)",
                   },
                 }}
               />
             ))}
           </Stack>
 
-          {/* Secondary Action Link / Fast Jump */}
-          <Stack direction="row" spacing={3} alignItems="center" pt={1}>
-            <Button
-              variant="text"
-              endIcon={<ArrowDownwardRoundedIcon />}
-              onClick={onExploreClick}
-              sx={{
-                color: CHARCOAL,
-                fontWeight: 700,
-                fontSize: "0.9rem",
-                "&:hover": { color: DEEP_EMERALD, bgcolor: "transparent" },
-              }}
-            >
-              Scroll to Explore Feed
-            </Button>
-            <Button
-              variant="outlined"
-              endIcon={<AutoAwesomeRoundedIcon />}
-              onClick={() => navigate(ROUTES.aiStylist)}
-              sx={{
-                borderRadius: "14px",
-                borderColor: "rgba(22, 101, 52, 0.3)",
-                color: DEEP_EMERALD,
-                fontWeight: 700,
-                fontSize: "0.9rem",
-                px: 2.5,
-                py: 0.8,
-                "&:hover": {
-                  borderColor: DEEP_EMERALD,
-                  bgcolor: "rgba(22, 101, 52, 0.06)",
-                },
-              }}
-            >
-              AI Outfit Builder
-            </Button>
-          </Stack>
+          {/* ══════════════════════════════════════════════════════════════════
+              VISUAL EDITORIAL SHOWCASE (Authentic Kenyan Models in Site Outfits)
+          ══════════════════════════════════════════════════════════════════ */}
+          <Box sx={{ width: "100%", pt: 2 }}>
+            <Grid container spacing={2.5}>
+              {HERO_LOOKS.map((look, idx) => (
+                <Grid size={{ xs: 6, md: 3 }} key={idx}>
+                  <Box
+                    onClick={() => executeSearch(look.query)}
+                    sx={{
+                      position: "relative",
+                      height: { xs: 240, sm: 300, md: 360 },
+                      borderRadius: "22px",
+                      overflow: "hidden",
+                      cursor: "pointer",
+                      boxShadow: "0 8px 24px rgba(17, 24, 39, 0.08)",
+                      border: "1px solid rgba(17, 24, 39, 0.08)",
+                      transition: "all 0.35s cubic-bezier(0.16, 1, 0.3, 1)",
+                      "&:hover": {
+                        transform: "translateY(-6px)",
+                        boxShadow: "0 22px 45px rgba(22, 101, 52, 0.2), 0 0 0 2px #22C55E",
+                      },
+                      "&:hover .hero-img": {
+                        transform: "scale(1.06)",
+                      },
+                    }}
+                  >
+                    <Box
+                      component="img"
+                      className="hero-img"
+                      src={look.image}
+                      alt={look.title}
+                      sx={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "cover",
+                        display: "block",
+                        transition: "transform 0.6s cubic-bezier(0.16, 1, 0.3, 1)",
+                      }}
+                    />
+
+                    {/* Gradient */}
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        inset: 0,
+                        background:
+                          "linear-gradient(to top, rgba(17, 24, 39, 0.92) 0%, rgba(17, 24, 39, 0.2) 50%, transparent 80%)",
+                      }}
+                    />
+
+                    {/* Label Overlay */}
+                    <Box
+                      sx={{
+                        position: "absolute",
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        p: { xs: 1.75, sm: 2.25 },
+                        textAlign: "left",
+                        color: "#FFFFFF",
+                      }}
+                    >
+                      <Stack direction="row" alignItems="center" justifyContent="space-between">
+                        <Typography
+                          sx={{
+                            fontWeight: 800,
+                            fontSize: { xs: "0.95rem", sm: "1.1rem" },
+                            lineHeight: 1.2,
+                          }}
+                        >
+                          {look.title}
+                        </Typography>
+                        <NorthEastRoundedIcon sx={{ fontSize: 16, color: EMERALD }} />
+                      </Stack>
+                      <Typography
+                        sx={{
+                          fontSize: "0.72rem",
+                          color: "rgba(255, 255, 255, 0.75)",
+                          mt: 0.3,
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {look.outfit}
+                      </Typography>
+                    </Box>
+                  </Box>
+                </Grid>
+              ))}
+            </Grid>
+          </Box>
         </Stack>
       </Container>
     </Box>
