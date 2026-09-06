@@ -560,28 +560,82 @@ export class ProductRepository {
     }
 
     if (filters.search) {
-      and.push({
-        OR: [
-          {
-            name: {
-              contains: filters.search,
-              mode: "insensitive",
+      const searchTerms = filters.search
+        .trim()
+        .split(/\s+/)
+        .map((t) => t.trim())
+        .filter((t) => t.length > 0);
+
+      if (searchTerms.length === 1) {
+        const term = searchTerms[0];
+        and.push({
+          OR: [
+            { name: { contains: term, mode: "insensitive" } },
+            { description: { contains: term, mode: "insensitive" } },
+            { sku: { contains: term, mode: "insensitive" } },
+            { brand: { name: { contains: term, mode: "insensitive" } } },
+            {
+              ProductCategory: {
+                some: {
+                  Category: {
+                    name: { contains: term, mode: "insensitive" },
+                  },
+                },
+              },
             },
-          },
-          {
-            description: {
-              contains: filters.search,
-              mode: "insensitive",
+            {
+              variants: {
+                some: {
+                  OR: [
+                    { colorValue: { contains: term, mode: "insensitive" } },
+                    { sizeValue: { contains: term, mode: "insensitive" } },
+                  ],
+                },
+              },
             },
-          },
-          {
-            sku: {
-              contains: filters.search,
-              mode: "insensitive",
+            {
+              vendor: {
+                businessName: { contains: term, mode: "insensitive" },
+              },
             },
-          },
-        ],
-      });
+          ],
+        });
+      } else if (searchTerms.length > 1) {
+        and.push({
+          AND: searchTerms.map((term) => ({
+            OR: [
+              { name: { contains: term, mode: "insensitive" } },
+              { description: { contains: term, mode: "insensitive" } },
+              { sku: { contains: term, mode: "insensitive" } },
+              { brand: { name: { contains: term, mode: "insensitive" } } },
+              {
+                ProductCategory: {
+                  some: {
+                    Category: {
+                      name: { contains: term, mode: "insensitive" },
+                    },
+                  },
+                },
+              },
+              {
+                variants: {
+                  some: {
+                    OR: [
+                      { colorValue: { contains: term, mode: "insensitive" } },
+                      { sizeValue: { contains: term, mode: "insensitive" } },
+                    ],
+                  },
+                },
+              },
+              {
+                vendor: {
+                  businessName: { contains: term, mode: "insensitive" },
+                },
+              },
+            ],
+          })),
+        });
+      }
     }
 
     return {

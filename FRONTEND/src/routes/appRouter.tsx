@@ -7,6 +7,7 @@ import { WebLayout } from "../components/web/WebLayout";
 import { StudioLayout } from "../components/studio/StudioLayout";
 import { WebAuthPage } from "../components/web/WebAuthPage";
 import { LandingPage } from "../pages/web/LandingPage";
+import { DiscoveryLandingPage } from "../pages/web/DiscoveryLandingPage";
 import { ProductsPage } from "../pages/web/ProductsPage";
 import { ProductDetailsPage } from "../pages/web/ProductDetailsPage";
 import { CategoriesPage } from "../pages/web/CategoriesPage";
@@ -56,7 +57,8 @@ export const appRouter = createBrowserRouter([
     path: "/",
     element: <WebLayout />,
     children: [
-      { index: true, element: <LandingPage /> },
+      { index: true, element: <DiscoveryLandingPage /> },
+      { path: "home", element: <LandingPage /> },
       { path: "login", element: <WebAuthPage mode="login" /> },
       { path: "register", element: <WebAuthPage mode="register" /> },
       { path: "products", element: <ProductsPage /> },

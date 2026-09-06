@@ -1,5 +1,6 @@
 export const ROUTES = {
   landing: "/",
+  home: "/home",
   webLogin: "/login",
   webRegister: "/register",
   customerDashboard: "/products",

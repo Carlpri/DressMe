@@ -24,6 +24,7 @@ import { useBrands } from "../../hooks/useBrands";
 import { ProductCard } from "../../components/shared/ProductCard";
 import { MasonryGrid } from "../../components/shared/MasonryGrid";
 import { LoadingSkeleton } from "../../components/shared/LoadingSkeleton";
+import { EmptySearchState } from "../../components/discovery/EmptySearchState";
 import type { ProductFilters } from "../../types/product";
 
 const DEFAULT_CATEGORIES = [
@@ -258,7 +259,7 @@ export function ProductsPage() {
               flexWrap: { xs: "nowrap", md: "wrap" },
             }}
           >
-            {/* Search Pill Input */}
+            {/* Search Input with clearly visible Search Button */}
             <Box
               component="form"
               onSubmit={handleSearchSubmit}
@@ -267,36 +268,58 @@ export function ProductsPage() {
                 alignItems: "center",
                 bgcolor: "#F4F4F5",
                 borderRadius: "9999px",
-                height: { xs: 34, sm: 38 },
-                px: 1.5,
-                border: "1px solid rgba(0,0,0,0.06)",
+                height: { xs: 36, sm: 40 },
+                pl: 1.5,
+                pr: 0.5,
+                border: "1px solid rgba(0,0,0,0.1)",
                 flexShrink: 0,
-                width: { xs: 160, sm: 220, md: 240 },
+                width: { xs: "100%", sm: 280, md: 320 },
                 transition: "all 0.2s ease",
                 "&:focus-within": {
                   bgcolor: "#FFFFFF",
-                  borderColor: "#0D0D0D",
-                  boxShadow: "0 0 0 2px rgba(13,13,13,0.1)",
+                  borderColor: "#166534",
+                  boxShadow: "0 0 0 2px rgba(22,101,52,0.15)",
                 },
               }}
             >
-              <SearchIcon sx={{ color: "#71717A", fontSize: 18, mr: 0.75 }} />
+              <SearchIcon sx={{ color: "#166534", fontSize: 19, mr: 0.75 }} />
               <InputBase
-                placeholder="Search looks…"
+                placeholder="Search styles, occasions, colors…"
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
                 sx={{
-                  fontSize: { xs: "0.78rem", sm: "0.82rem" },
+                  fontSize: { xs: "0.8rem", sm: "0.85rem" },
                   fontWeight: 500,
                   color: "#0D0D0D",
                   width: "100%",
                 }}
               />
               {searchInput && (
-                <IconButton size="small" onClick={clearSearch} sx={{ p: 0.25, color: "#71717A" }}>
-                  <CloseIcon sx={{ fontSize: 14 }} />
+                <IconButton size="small" onClick={clearSearch} sx={{ p: 0.25, mr: 0.5, color: "#71717A" }}>
+                  <CloseIcon sx={{ fontSize: 15 }} />
                 </IconButton>
               )}
+              <Button
+                type="submit"
+                variant="contained"
+                size="small"
+                sx={{
+                  bgcolor: "#166534",
+                  color: "#FFFFFF",
+                  fontWeight: 700,
+                  fontSize: "0.75rem",
+                  borderRadius: "9999px",
+                  px: 1.5,
+                  minWidth: "auto",
+                  height: 28,
+                  boxShadow: "none",
+                  "&:hover": {
+                    bgcolor: "#14532D",
+                  },
+                }}
+              >
+                Search
+              </Button>
             </Box>
 
             {/* Gender Toggle Pills */}
@@ -427,30 +450,14 @@ export function ProductsPage() {
                 Failed to load products. Please check your connection.
               </Alert>
             ) : products?.items.length === 0 ? (
-              <Box sx={{ textAlign: "center", py: 10 }}>
-                <Typography variant="h5" sx={{ fontWeight: 800, color: "#0D0D0D" }}>
-                  No styles found
-                </Typography>
-                <Typography sx={{ color: "#71717A", mt: 1, fontSize: "0.95rem" }}>
-                  Try adjusting your filters or search keywords to see more looks.
-                </Typography>
-                <Button
-                  variant="contained"
-                  onClick={clearFilters}
-                  sx={{
-                    mt: 3,
-                    bgcolor: "#0D0D0D",
-                    color: "#FFF",
-                    borderRadius: "9999px",
-                    px: 3,
-                    fontWeight: 700,
-                    textTransform: "none",
-                    "&:hover": { bgcolor: "#262626" },
-                  }}
-                >
-                  Clear All Filters
-                </Button>
-              </Box>
+              <EmptySearchState
+                query={search}
+                onSuggestionClick={(sugg) => {
+                  setSearchInput(sugg);
+                  updateFilter("search", sugg);
+                }}
+                onReset={clearFilters}
+              />
             ) : (
               <>
                 <MasonryGrid

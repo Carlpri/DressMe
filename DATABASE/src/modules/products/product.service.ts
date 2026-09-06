@@ -321,22 +321,59 @@ export class ProductService {
 
 
   private parseFilters(query: Record<string, unknown>): ProductFilters {
+    let rawSearch = this.parseString(query.search);
+    let extractedPriceMax = this.parseNumber(query.priceMax);
+    let extractedGender = this.parseEnum(query.gender, Gender);
+
+    if (rawSearch) {
+      // 1. Natural Language Price Extraction: e.g. "under 3000", "below 5000", "under 3k", "< 2500"
+      const priceMatch = rawSearch.match(
+        /\b(?:under|below|less\s+than|<|max|budget\s+of)\s*(?:kes|ksh)?\s*(\d+(?:,\d+)?k?)\b/i
+      );
+      if (priceMatch) {
+        if (extractedPriceMax === undefined) {
+          let numStr = priceMatch[1].toLowerCase().replace(/,/g, "");
+          if (numStr.endsWith("k")) {
+            extractedPriceMax = parseFloat(numStr.slice(0, -1)) * 1000;
+          } else {
+            extractedPriceMax = parseFloat(numStr);
+          }
+        }
+        rawSearch = rawSearch.replace(priceMatch[0], " ").trim();
+      }
+
+      // 2. Natural Language Gender Extraction: e.g. "for men", "men's", "women's", "ladies"
+      if (!extractedGender) {
+        if (/\b(?:men's|mens|men|gentlemen|guy)\b/i.test(rawSearch)) {
+          extractedGender = Gender.MALE;
+        } else if (/\b(?:women's|womens|women|ladies|girl)\b/i.test(rawSearch)) {
+          extractedGender = Gender.FEMALE;
+        }
+      }
+
+      // Clean conversational filler words
+      rawSearch = rawSearch
+        .replace(/\b(?:something|wear|outfit|pieces?|looking\s+for|affordable|cheap|best)\b/gi, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+
     return {
       page: this.parsePositiveInt(query.page, 1),
       limit: Math.min(this.parsePositiveInt(query.limit, 20), 100),
       category: this.parseString(query.category),
       brand: this.parseString(query.brand),
-      gender: this.parseEnum(query.gender, Gender),
+      gender: extractedGender,
       status: this.parseEnum(query.status, ProductStatus),
       featured: this.parseBoolean(query.featured),
       isTrending: this.parseBoolean(query.isTrending),
       isNewArrival: this.parseBoolean(query.isNewArrival),
       isBestSeller: this.parseBoolean(query.isBestSeller),
       priceMin: this.parseNumber(query.priceMin),
-      priceMax: this.parseNumber(query.priceMax),
+      priceMax: extractedPriceMax,
       size: this.parseString(query.size),
       color: this.parseString(query.color),
-      search: this.parseString(query.search),
+      search: rawSearch || undefined,
       sort: this.parseSort(query.sort),
     };
   }

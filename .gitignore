@@ -4,3 +4,6 @@ build/
 .env
 .env.local
 .DS_Store
+*.mjs
+scratch_media.ts
+scratch/

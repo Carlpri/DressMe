@@ -31,6 +31,7 @@ import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
 import LoginRoundedIcon from "@mui/icons-material/LoginRounded";
 import PersonAddRoundedIcon from "@mui/icons-material/PersonAddRounded";
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
+import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 
 import { ROUTES } from "../../constants/routes";
 import { useAuth } from "../../hooks/useAuth";
@@ -44,6 +45,7 @@ const DEFAULT_LIGHT_LOGO =
 
 // ─── Desktop nav items ────────────────────────────────────────────────────────
 const DESKTOP_NAV = [
+  { label: "Discover", path: ROUTES.landing },
   { label: "Products", path: ROUTES.customerDashboard },
   { label: "Categories", path: ROUTES.categories },
   { label: "Brands", path: ROUTES.brands },
@@ -52,6 +54,7 @@ const DESKTOP_NAV = [
 
 // ─── Mobile drawer menu sections ─────────────────────────────────────────────
 const MENU_NAV = [
+  { label: "Discover", path: ROUTES.landing, Icon: AutoAwesomeRoundedIcon },
   { label: "Products", path: ROUTES.customerDashboard, Icon: GridViewRoundedIcon },
   { label: "Categories", path: ROUTES.categories, Icon: StyleRoundedIcon },
   { label: "Brands", path: ROUTES.brands, Icon: StorefrontRoundedIcon },
@@ -231,6 +234,21 @@ export function WebHeader() {
             {/* ── DESKTOP RIGHT ICONS (md+) ────────────────────────────────── */}
             {!isMobile && (
               <Stack direction="row" spacing={1.5} alignItems="center">
+                {/* Search Button */}
+                <IconButton
+                  component={RouterLink}
+                  to={`${ROUTES.customerDashboard}?focus=search`}
+                  size="small"
+                  sx={{
+                    ...iconBtnSx,
+                    width: 38,
+                    height: 38,
+                  }}
+                  aria-label="Search Catalog"
+                >
+                  <SearchRoundedIcon sx={{ fontSize: 20 }} />
+                </IconButton>
+
                 {isAuthenticated ? (
                   <>
                     <IconButton
@@ -341,6 +359,17 @@ export function WebHeader() {
             ════════════════════════════════════════════════════════════════ */}
             {isMobile && (
               <Stack direction="row" spacing={0.75} alignItems="center">
+
+                {/* Search */}
+                <IconButton
+                  component={RouterLink}
+                  to={`${ROUTES.customerDashboard}?focus=search`}
+                  aria-label="Search"
+                  size="small"
+                  sx={iconBtnSx}
+                >
+                  <SearchRoundedIcon sx={{ fontSize: 18, color: "#0D0D0D" }} />
+                </IconButton>
 
                 {/* Wishlist */}
                 <IconButton
