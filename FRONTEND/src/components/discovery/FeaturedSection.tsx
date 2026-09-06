@@ -10,6 +10,7 @@ import {
 import StarRoundedIcon from "@mui/icons-material/StarRounded";
 import NorthEastRoundedIcon from "@mui/icons-material/NorthEastRounded";
 import { useProducts } from "../../hooks/useProducts";
+import { useScrollReveal } from "../../hooks/useScrollReveal";
 import { ProductCard } from "../shared/ProductCard";
 import { MasonryGrid } from "../shared/MasonryGrid";
 import { LoadingSkeleton } from "../shared/LoadingSkeleton";
@@ -20,6 +21,7 @@ const CHARCOAL = "#111827";
 
 export function FeaturedSection() {
   const navigate = useNavigate();
+  const sectionRef = useScrollReveal<HTMLDivElement>({ threshold: 0.08, staggerMs: 60 });
 
   // Retrieve featured products from database
   const { data: featuredData, isLoading } = useProducts({
@@ -35,9 +37,9 @@ export function FeaturedSection() {
   }
 
   return (
-    <Box sx={{ py: { xs: 8, md: 12 }, bgcolor: "#FFFFFF" }}>
+    <Box ref={sectionRef} sx={{ py: { xs: 9, md: 14 }, bgcolor: "#FFFFFF" }}>
       <Container maxWidth="xl">
-        <Stack spacing={4}>
+        <Stack spacing={{ xs: 4, md: 5 }}>
           <Stack
             direction={{ xs: "column", sm: "row" }}
             justifyContent="space-between"
@@ -60,11 +62,12 @@ export function FeaturedSection() {
                 </Box>
                 <Typography
                   sx={{
-                    fontSize: "0.8rem",
+                    fontSize: "0.78rem",
                     fontWeight: 800,
-                    letterSpacing: "0.08em",
+                    letterSpacing: "0.14em",
                     color: DEEP_EMERALD,
                     textTransform: "uppercase",
+                    fontFamily: "'Plus Jakarta Sans', sans-serif",
                   }}
                 >
                   CURATOR'S SPOTLIGHT
@@ -72,9 +75,10 @@ export function FeaturedSection() {
               </Stack>
               <Typography
                 variant="h2"
+                className="font-display"
                 sx={{
-                  fontWeight: 900,
-                  fontSize: { xs: "1.8rem", sm: "2.3rem", md: "2.8rem" },
+                  fontWeight: 800,
+                  fontSize: { xs: "2rem", sm: "2.6rem", md: "3.1rem" },
                   color: CHARCOAL,
                   letterSpacing: "-0.03em",
                   lineHeight: 1.15,
@@ -82,7 +86,7 @@ export function FeaturedSection() {
               >
                 Featured on DressMe
               </Typography>
-              <Typography sx={{ color: "#64748B", mt: 0.5, fontSize: "0.95rem" }}>
+              <Typography sx={{ color: "#64748B", mt: 0.75, fontSize: "0.95rem" }}>
                 Handpicked, standout pieces recognized for quality craftsmanship and design excellence
               </Typography>
             </Box>
@@ -111,7 +115,9 @@ export function FeaturedSection() {
           ) : (
             <MasonryGrid columns={{ xs: 2, sm: 2, md: 3, lg: 4 }}>
               {products.slice(0, 4).map((product) => (
-                <ProductCard key={product.id} product={product} badge="Featured" />
+                <Box key={product.id} className="reveal-child">
+                  <ProductCard product={product} badge="Featured" />
+                </Box>
               ))}
             </MasonryGrid>
           )}

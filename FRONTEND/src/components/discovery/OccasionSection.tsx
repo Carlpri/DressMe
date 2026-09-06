@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import StyleRoundedIcon from "@mui/icons-material/StyleRounded";
 import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
+import { useScrollReveal } from "../../hooks/useScrollReveal";
 
 const DEEP_EMERALD = "#166534";
 const EMERALD = "#22C55E";
@@ -344,18 +345,20 @@ function OccasionCard({ occasion }: { occasion: OccasionItem }) {
 }
 
 export function OccasionSection() {
+  const sectionRef = useScrollReveal<HTMLDivElement>({ threshold: 0.08, staggerMs: 50 });
+
   return (
-    <Box sx={{ py: { xs: 8, md: 12 }, bgcolor: "#FFFFFF" }}>
+    <Box ref={sectionRef} sx={{ py: { xs: 9, md: 14 }, bgcolor: "#FFFFFF" }}>
       <Container maxWidth="xl">
-        <Stack spacing={5}>
+        <Stack spacing={{ xs: 5, md: 6 }}>
           {/* Header */}
-          <Box sx={{ textAlign: "center", maxWidth: 700, mx: "auto" }}>
+          <Box sx={{ textAlign: "center", maxWidth: 760, mx: "auto" }}>
             <Stack
               direction="row"
               alignItems="center"
               justifyContent="center"
               spacing={1}
-              mb={1}
+              mb={1.5}
             >
               <Box
                 sx={{
@@ -371,11 +374,12 @@ export function OccasionSection() {
               </Box>
               <Typography
                 sx={{
-                  fontSize: "0.8rem",
+                  fontSize: "0.78rem",
                   fontWeight: 800,
-                  letterSpacing: "0.08em",
+                  letterSpacing: "0.14em",
                   color: DEEP_EMERALD,
                   textTransform: "uppercase",
+                  fontFamily: "'Plus Jakarta Sans', sans-serif",
                 }}
               >
                 OCCASION CURATION
@@ -384,25 +388,26 @@ export function OccasionSection() {
 
             <Typography
               variant="h2"
+              className="font-display"
               sx={{
-                fontWeight: 900,
-                fontSize: { xs: "2rem", sm: "2.5rem", md: "3rem" },
+                fontWeight: 800,
+                fontSize: { xs: "2.1rem", sm: "2.8rem", md: "3.4rem" },
                 color: CHARCOAL,
                 letterSpacing: "-0.03em",
-                lineHeight: 1.15,
+                lineHeight: 1.12,
               }}
             >
               Find Your Look
             </Typography>
-            <Typography sx={{ color: "#64748B", mt: 1, fontSize: "1rem" }}>
+            <Typography sx={{ color: "#64748B", mt: 1.5, fontSize: { xs: "0.95rem", md: "1.05rem" }, lineHeight: 1.6 }}>
               Curated styling aesthetics tailored to every moment — with authentic outfits available right here on DressMe
             </Typography>
           </Box>
 
-          {/* Occasion Cards Grid */}
+          {/* Occasion Cards Grid with Staggered Entrance */}
           <Grid container spacing={{ xs: 2, sm: 2.5, md: 3 }}>
             {OCCASIONS.map((occasion) => (
-              <Grid size={{ xs: 6, sm: 4, md: 3 }} key={occasion.id}>
+              <Grid size={{ xs: 6, sm: 4, md: 3 }} key={occasion.id} className="reveal-child">
                 <OccasionCard occasion={occasion} />
               </Grid>
             ))}

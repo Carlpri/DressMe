@@ -81,8 +81,8 @@ export function DiscoveryHero({ onExploreClick }: { onExploreClick?: () => void 
       sx={{
         position: "relative",
         bgcolor: WARM_BG,
-        pt: { xs: 5, md: 7 },
-        pb: { xs: 8, md: 10 },
+        pt: { xs: 7, sm: 9, md: 12 },
+        pb: { xs: 11, sm: 13, md: 16 },
         overflow: "hidden",
         borderBottom: "1px solid rgba(17, 24, 39, 0.06)",
       }}
@@ -101,28 +101,31 @@ export function DiscoveryHero({ onExploreClick }: { onExploreClick?: () => void 
       />
 
       <Container maxWidth="xl" sx={{ position: "relative", zIndex: 2 }}>
-        <Stack spacing={{ xs: 4, md: 5 }} alignItems="center" textAlign="center">
+        <Stack spacing={{ xs: 4, md: 5.5 }} alignItems="center" textAlign="center">
           {/* Minimalist Top Eyebrow */}
           <Typography
+            className="animate-hero-eyebrow"
             sx={{
               fontSize: "0.76rem",
               fontWeight: 800,
-              letterSpacing: "0.14em",
+              letterSpacing: "0.16em",
               color: DEEP_EMERALD,
               textTransform: "uppercase",
+              fontFamily: "'Plus Jakarta Sans', sans-serif",
             }}
           >
             AFRICAN FASHION-TECH DISCOVERY
           </Typography>
 
           {/* Minimalist Headline */}
-          <Box sx={{ maxWidth: 840 }}>
+          <Box sx={{ maxWidth: 880 }}>
             <Typography
               variant="h1"
+              className="animate-hero-headline font-display"
               sx={{
-                fontSize: { xs: "3rem", sm: "4.2rem", md: "5.2rem" },
-                fontWeight: 900,
-                letterSpacing: "-0.04em",
+                fontSize: { xs: "3rem", sm: "4.4rem", md: "5.5rem" },
+                fontWeight: 800,
+                letterSpacing: "-0.035em",
                 lineHeight: 1.02,
                 color: CHARCOAL,
               }}
@@ -132,12 +135,13 @@ export function DiscoveryHero({ onExploreClick }: { onExploreClick?: () => void 
 
             {/* Single Short Supporting Sentence */}
             <Typography
+              className="animate-hero-subhead"
               sx={{
-                mt: 2,
+                mt: 2.5,
                 fontSize: { xs: "1.05rem", md: "1.25rem" },
                 color: "#475569",
-                lineHeight: 1.5,
-                maxWidth: 600,
+                lineHeight: 1.6,
+                maxWidth: 620,
                 mx: "auto",
                 fontWeight: 400,
               }}
@@ -148,6 +152,7 @@ export function DiscoveryHero({ onExploreClick }: { onExploreClick?: () => void 
 
           {/* CTAs */}
           <Stack
+            className="animate-hero-actions"
             direction={{ xs: "column", sm: "row" }}
             spacing={2}
             alignItems="center"
@@ -210,6 +215,7 @@ export function DiscoveryHero({ onExploreClick }: { onExploreClick?: () => void 
           ══════════════════════════════════════════════════════════════════ */}
           <Box
             component="form"
+            className="animate-hero-actions"
             onSubmit={handleSearchSubmit}
             sx={{
               width: "100%",
@@ -335,7 +341,7 @@ export function DiscoveryHero({ onExploreClick }: { onExploreClick?: () => void 
           {/* ══════════════════════════════════════════════════════════════════
               VISUAL EDITORIAL SHOWCASE (Authentic Kenyan Models in Site Outfits)
           ══════════════════════════════════════════════════════════════════ */}
-          <Box sx={{ width: "100%", pt: 2 }}>
+          <Box className="animate-hero-showcase" sx={{ width: "100%", pt: { xs: 2, md: 4 } }}>
             <Grid container spacing={2.5}>
               {HERO_LOOKS.map((look, idx) => (
                 <Grid size={{ xs: 6, md: 3 }} key={idx}>

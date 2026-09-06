@@ -10,6 +10,7 @@ import {
 import EmojiEventsRoundedIcon from "@mui/icons-material/EmojiEventsRounded";
 import NorthEastRoundedIcon from "@mui/icons-material/NorthEastRounded";
 import { useProducts } from "../../hooks/useProducts";
+import { useScrollReveal } from "../../hooks/useScrollReveal";
 import { ProductCard } from "../shared/ProductCard";
 import { MasonryGrid } from "../shared/MasonryGrid";
 import { LoadingSkeleton } from "../shared/LoadingSkeleton";
@@ -20,6 +21,7 @@ const CHARCOAL = "#111827";
 
 export function BestSellersSection() {
   const navigate = useNavigate();
+  const sectionRef = useScrollReveal<HTMLDivElement>({ threshold: 0.08, staggerMs: 60 });
 
   // Retrieve best seller products ranked by actual sales & popularity
   const { data: bestSellersData, isLoading } = useProducts({
@@ -36,15 +38,16 @@ export function BestSellersSection() {
 
   return (
     <Box
+      ref={sectionRef}
       sx={{
-        py: { xs: 8, md: 12 },
+        py: { xs: 9, md: 14 },
         bgcolor: "#FAF8F5",
         borderTop: "1px solid rgba(17, 24, 39, 0.06)",
         borderBottom: "1px solid rgba(17, 24, 39, 0.06)",
       }}
     >
       <Container maxWidth="xl">
-        <Stack spacing={4}>
+        <Stack spacing={{ xs: 4, md: 5 }}>
           <Stack
             direction={{ xs: "column", sm: "row" }}
             justifyContent="space-between"
@@ -67,11 +70,12 @@ export function BestSellersSection() {
                 </Box>
                 <Typography
                   sx={{
-                    fontSize: "0.8rem",
+                    fontSize: "0.78rem",
                     fontWeight: 800,
-                    letterSpacing: "0.08em",
+                    letterSpacing: "0.14em",
                     color: "#CA8A04",
                     textTransform: "uppercase",
+                    fontFamily: "'Plus Jakarta Sans', sans-serif",
                   }}
                 >
                   CUSTOMER FAVORITES
@@ -79,9 +83,10 @@ export function BestSellersSection() {
               </Stack>
               <Typography
                 variant="h2"
+                className="font-display"
                 sx={{
-                  fontWeight: 900,
-                  fontSize: { xs: "1.8rem", sm: "2.3rem", md: "2.8rem" },
+                  fontWeight: 800,
+                  fontSize: { xs: "2rem", sm: "2.6rem", md: "3.1rem" },
                   color: CHARCOAL,
                   letterSpacing: "-0.03em",
                   lineHeight: 1.15,
@@ -89,7 +94,7 @@ export function BestSellersSection() {
               >
                 Best Sellers
               </Typography>
-              <Typography sx={{ color: "#64748B", mt: 0.5, fontSize: "0.95rem" }}>
+              <Typography sx={{ color: "#64748B", mt: 0.75, fontSize: "0.95rem" }}>
                 The most-ordered wardrobe staples and crowd favorites with proven customer satisfaction
               </Typography>
             </Box>
@@ -118,11 +123,12 @@ export function BestSellersSection() {
           ) : (
             <MasonryGrid columns={{ xs: 2, sm: 2, md: 3, lg: 4 }}>
               {products.slice(0, 4).map((product) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  badge={product.sales > 0 ? "Top Seller" : undefined}
-                />
+                <Box key={product.id} className="reveal-child">
+                  <ProductCard
+                    product={product}
+                    badge={product.sales > 0 ? "Top Seller" : undefined}
+                  />
+                </Box>
               ))}
             </MasonryGrid>
           )}

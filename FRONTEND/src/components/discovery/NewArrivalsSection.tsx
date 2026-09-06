@@ -13,6 +13,7 @@ import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
 import NorthEastRoundedIcon from "@mui/icons-material/NorthEastRounded";
 import FiberNewRoundedIcon from "@mui/icons-material/FiberNewRounded";
 import { useProducts } from "../../hooks/useProducts";
+import { useScrollReveal } from "../../hooks/useScrollReveal";
 import { ProductDiscoveryCard } from "./ProductDiscoveryCard";
 import { LoadingSkeleton } from "../shared/LoadingSkeleton";
 import { ROUTES } from "../../constants/routes";
@@ -23,6 +24,7 @@ const CHARCOAL = "#111827";
 export function NewArrivalsSection() {
   const navigate = useNavigate();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useScrollReveal<HTMLDivElement>({ threshold: 0.08 });
 
   const { data: newArrivalsData, isLoading } = useProducts({
     limit: 10,
@@ -41,15 +43,16 @@ export function NewArrivalsSection() {
 
   return (
     <Box
+      ref={sectionRef}
       sx={{
-        py: { xs: 8, md: 12 },
+        py: { xs: 9, md: 14 },
         bgcolor: "#FAF8F5",
         borderTop: "1px solid rgba(17, 24, 39, 0.06)",
         borderBottom: "1px solid rgba(17, 24, 39, 0.06)",
       }}
     >
       <Container maxWidth="xl">
-        <Stack spacing={4}>
+        <Stack spacing={{ xs: 4, md: 5 }}>
           {/* Section Header */}
           <Stack
             direction="row"
@@ -73,11 +76,12 @@ export function NewArrivalsSection() {
                 </Box>
                 <Typography
                   sx={{
-                    fontSize: "0.8rem",
+                    fontSize: "0.78rem",
                     fontWeight: 800,
-                    letterSpacing: "0.08em",
+                    letterSpacing: "0.14em",
                     color: DEEP_EMERALD,
                     textTransform: "uppercase",
+                    fontFamily: "'Plus Jakarta Sans', sans-serif",
                   }}
                 >
                   FRESH DROPS
@@ -85,9 +89,10 @@ export function NewArrivalsSection() {
               </Stack>
               <Typography
                 variant="h2"
+                className="font-display"
                 sx={{
-                  fontWeight: 900,
-                  fontSize: { xs: "1.8rem", sm: "2.3rem", md: "2.8rem" },
+                  fontWeight: 800,
+                  fontSize: { xs: "2rem", sm: "2.6rem", md: "3.1rem" },
                   color: CHARCOAL,
                   letterSpacing: "-0.03em",
                   lineHeight: 1.15,
@@ -95,7 +100,7 @@ export function NewArrivalsSection() {
               >
                 New Arrivals
               </Typography>
-              <Typography sx={{ color: "#64748B", mt: 0.5, fontSize: "0.95rem" }}>
+              <Typography sx={{ color: "#64748B", mt: 0.75, fontSize: "0.95rem" }}>
                 Fresh releases just added to inventory from curated independent brands
               </Typography>
             </Box>

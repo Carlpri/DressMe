@@ -24,6 +24,7 @@ import { CategoryDiscoverySection } from "../../components/discovery/CategoryDis
 import { FeaturedSection } from "../../components/discovery/FeaturedSection";
 import { BestSellersSection } from "../../components/discovery/BestSellersSection";
 import { DiscoveryFeedSection } from "../../components/discovery/DiscoveryFeedSection";
+import { useScrollReveal } from "../../hooks/useScrollReveal";
 import { ROUTES } from "../../constants/routes";
 
 const DEEP_EMERALD = "#166534";
@@ -33,6 +34,8 @@ const CHARCOAL = "#111827";
 export function DiscoveryLandingPage() {
   const navigate = useNavigate();
   const feedRef = useRef<HTMLDivElement>(null);
+  const valuePropRef = useScrollReveal<HTMLDivElement>({ threshold: 0.1 });
+  const promoRef = useScrollReveal<HTMLDivElement>({ threshold: 0.1 });
 
   const scrollToFeed = () => {
     feedRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -45,10 +48,11 @@ export function DiscoveryLandingPage() {
 
       {/* 2. VALUE PROPOSITION STRIP */}
       <Box
+        ref={valuePropRef}
         sx={{
           bgcolor: "#FFFFFF",
           borderBottom: "1px solid rgba(17, 24, 39, 0.07)",
-          py: 2.5,
+          py: 3.5,
         }}
       >
         <Container maxWidth="xl">
@@ -132,8 +136,9 @@ export function DiscoveryLandingPage() {
 
       {/* 9. AI STYLIST DISCOVERY PROMO BANNER */}
       <Box
+        ref={promoRef}
         sx={{
-          py: { xs: 8, md: 10 },
+          py: { xs: 10, md: 14 },
           background: `linear-gradient(135deg, #0F3822 0%, #166534 60%, #15803D 100%)`,
           color: "#FFFFFF",
           position: "relative",
@@ -156,11 +161,12 @@ export function DiscoveryLandingPage() {
                   <AutoAwesomeIcon sx={{ color: EMERALD, fontSize: 20 }} />
                   <Typography
                     sx={{
-                      fontSize: "0.8rem",
+                      fontSize: "0.78rem",
                       fontWeight: 800,
                       color: EMERALD,
-                      letterSpacing: "0.08em",
+                      letterSpacing: "0.14em",
                       textTransform: "uppercase",
+                      fontFamily: "'Plus Jakarta Sans', sans-serif",
                     }}
                   >
                     AI STYLIST & OUTFIT BUILDER
@@ -168,11 +174,12 @@ export function DiscoveryLandingPage() {
                 </Stack>
                 <Typography
                   variant="h2"
+                  className="font-display"
                   sx={{
-                    fontWeight: 900,
-                    fontSize: { xs: "2rem", sm: "2.8rem", md: "3.2rem" },
+                    fontWeight: 800,
+                    fontSize: { xs: "2.2rem", sm: "3rem", md: "3.5rem" },
                     letterSpacing: "-0.03em",
-                    lineHeight: 1.15,
+                    lineHeight: 1.12,
                   }}
                 >
                   Can't decide what to wear?

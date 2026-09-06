@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import CategoryRoundedIcon from "@mui/icons-material/CategoryRounded";
 import { useCategories } from "../../hooks/useCategories";
+import { useScrollReveal } from "../../hooks/useScrollReveal";
 import { LoadingSkeleton } from "../shared/LoadingSkeleton";
 
 const DEEP_EMERALD = "#166534";
@@ -31,6 +32,7 @@ const DEFAULT_CATEGORY_IMAGES: Record<string, string> = {
 export function CategoryDiscoverySection() {
   const navigate = useNavigate();
   const { data: categories, isLoading } = useCategories();
+  const sectionRef = useScrollReveal<HTMLDivElement>({ threshold: 0.08, staggerMs: 50 });
 
   const handleCategoryClick = (slug: string) => {
     navigate(`/products?category=${encodeURIComponent(slug)}`);
@@ -38,23 +40,24 @@ export function CategoryDiscoverySection() {
 
   return (
     <Box
+      ref={sectionRef}
       sx={{
-        py: { xs: 8, md: 12 },
+        py: { xs: 9, md: 14 },
         bgcolor: "#FAF8F5",
         borderTop: "1px solid rgba(17, 24, 39, 0.06)",
         borderBottom: "1px solid rgba(17, 24, 39, 0.06)",
       }}
     >
       <Container maxWidth="xl">
-        <Stack spacing={5}>
+        <Stack spacing={{ xs: 5, md: 6 }}>
           {/* Header */}
-          <Box sx={{ textAlign: "center", maxWidth: 650, mx: "auto" }}>
+          <Box sx={{ textAlign: "center", maxWidth: 760, mx: "auto" }}>
             <Stack
               direction="row"
               alignItems="center"
               justifyContent="center"
               spacing={1}
-              mb={1}
+              mb={1.5}
             >
               <Box
                 sx={{
@@ -70,11 +73,12 @@ export function CategoryDiscoverySection() {
               </Box>
               <Typography
                 sx={{
-                  fontSize: "0.8rem",
+                  fontSize: "0.78rem",
                   fontWeight: 800,
-                  letterSpacing: "0.08em",
+                  letterSpacing: "0.14em",
                   color: DEEP_EMERALD,
                   textTransform: "uppercase",
+                  fontFamily: "'Plus Jakarta Sans', sans-serif",
                 }}
               >
                 BROWSE BY SILHOUETTE
@@ -82,17 +86,18 @@ export function CategoryDiscoverySection() {
             </Stack>
             <Typography
               variant="h2"
+              className="font-display"
               sx={{
-                fontWeight: 900,
-                fontSize: { xs: "2rem", sm: "2.5rem", md: "3rem" },
+                fontWeight: 800,
+                fontSize: { xs: "2.1rem", sm: "2.8rem", md: "3.4rem" },
                 color: CHARCOAL,
                 letterSpacing: "-0.03em",
-                lineHeight: 1.15,
+                lineHeight: 1.12,
               }}
             >
               Explore Categories
             </Typography>
-            <Typography sx={{ color: "#64748B", mt: 1, fontSize: "1rem" }}>
+            <Typography sx={{ color: "#64748B", mt: 1.5, fontSize: { xs: "0.95rem", md: "1.05rem" }, lineHeight: 1.6 }}>
               Dive into our complete catalog structured by design, style, and essential apparel types
             </Typography>
           </Box>
@@ -116,7 +121,7 @@ export function CategoryDiscoverySection() {
                   "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=600&q=80";
 
                 return (
-                  <Grid size={{ xs: 6, sm: 4, md: 3 }} key={cat.id}>
+                  <Grid size={{ xs: 6, sm: 4, md: 3 }} key={cat.id} className="reveal-child">
                     <Box
                       onClick={() => handleCategoryClick(cat.slug)}
                       sx={{

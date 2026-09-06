@@ -385,18 +385,19 @@ export function ProductCard({
         overflow: "hidden",
         cursor: "pointer",
         transition:
-          "transform 0.32s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.32s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease",
+          "transform 260ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 260ms cubic-bezier(0.16, 1, 0.3, 1), border-color 220ms ease",
         border: isHovered
           ? "1px solid rgba(22, 101, 52, 0.38)"
           : prominence.tier === "spotlight"
           ? "1px solid rgba(22, 101, 52, 0.2)"
           : "1px solid rgba(17, 24, 39, 0.08)",
         boxShadow: isHovered
-          ? "0 22px 45px -12px rgba(17, 24, 39, 0.15), 0 0 0 1px rgba(34, 197, 94, 0.35)"
+          ? "0 20px 40px -10px rgba(17, 24, 39, 0.14), 0 0 0 1px rgba(34, 197, 94, 0.3)"
           : prominence.tier === "spotlight"
           ? "0 4px 16px rgba(22, 101, 52, 0.06)"
           : "0 2px 10px rgba(0, 0, 0, 0.03)",
-        transform: isHovered ? "translateY(-5px)" : "none",
+        transform: isHovered ? "scale(1.02)" : "scale(1)",
+        willChange: "transform, box-shadow",
         display: "flex",
         flexDirection: "column",
         breakInside: "avoid",
@@ -421,6 +422,7 @@ export function ProductCard({
           src={activeImage}
           alt={product.name}
           loading="lazy"
+          decoding="async"
           onLoad={() => setImageLoaded(true)}
           sx={{
             width: "100%",
@@ -428,9 +430,10 @@ export function ProductCard({
             objectFit: "cover",
             display: "block",
             transition:
-              "transform 0.55s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease",
-            transform: isHovered ? "scale(1.06)" : "scale(1)",
+              "transform 260ms cubic-bezier(0.16, 1, 0.3, 1), opacity 260ms ease",
+            transform: isHovered ? "scale(1.05)" : "scale(1)",
             opacity: imageLoaded ? 1 : 0.6,
+            willChange: "transform",
           }}
         />
 

@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import {
   Box,
   Button,
-  Chip,
   Container,
   Stack,
   Typography,
@@ -11,6 +10,7 @@ import {
 import AutoAwesomeRoundedIcon from "@mui/icons-material/AutoAwesomeRounded";
 import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
 import { useProducts } from "../../hooks/useProducts";
+import { useScrollReveal } from "../../hooks/useScrollReveal";
 import { MasonryGrid } from "../shared/MasonryGrid";
 import { ProductDiscoveryCard } from "./ProductDiscoveryCard";
 import { LoadingSkeleton } from "../shared/LoadingSkeleton";
@@ -40,10 +40,11 @@ const FILTER_TABS: FilterTab[] = [
 export function DiscoveryFeedSection({ id }: { id?: string }) {
   const navigate = useNavigate();
   const [activeTabId, setActiveTabId] = useState("all");
+  const sectionRef = useScrollReveal<HTMLDivElement>({ threshold: 0.05, staggerMs: 60 });
 
   const activeTab = FILTER_TABS.find((t) => t.id === activeTabId) || FILTER_TABS[0];
 
-  const { data: feedData, isLoading, refetch } = useProducts({
+  const { data: feedData, isLoading } = useProducts({
     ...activeTab.filters,
     limit: 16,
     status: "ACTIVE",
@@ -53,17 +54,17 @@ export function DiscoveryFeedSection({ id }: { id?: string }) {
   const products = feedData?.items ?? [];
 
   return (
-    <Box id={id} sx={{ py: { xs: 8, md: 14 }, bgcolor: "#FFFFFF" }}>
+    <Box ref={sectionRef} id={id} sx={{ py: { xs: 10, md: 16 }, bgcolor: "#FFFFFF" }}>
       <Container maxWidth="xl">
-        <Stack spacing={5}>
+        <Stack spacing={{ xs: 5, md: 6 }}>
           {/* Header */}
-          <Box sx={{ textAlign: "center", maxWidth: 720, mx: "auto" }}>
+          <Box sx={{ textAlign: "center", maxWidth: 760, mx: "auto" }}>
             <Stack
               direction="row"
               alignItems="center"
               justifyContent="center"
               spacing={1}
-              mb={1}
+              mb={1.5}
             >
               <Box
                 sx={{
@@ -79,11 +80,12 @@ export function DiscoveryFeedSection({ id }: { id?: string }) {
               </Box>
               <Typography
                 sx={{
-                  fontSize: "0.8rem",
+                  fontSize: "0.78rem",
                   fontWeight: 800,
-                  letterSpacing: "0.08em",
+                  letterSpacing: "0.14em",
                   color: DEEP_EMERALD,
                   textTransform: "uppercase",
+                  fontFamily: "'Plus Jakarta Sans', sans-serif",
                 }}
               >
                 VISUAL INSPIRATION FEED
@@ -91,59 +93,77 @@ export function DiscoveryFeedSection({ id }: { id?: string }) {
             </Stack>
             <Typography
               variant="h2"
+              className="font-display"
               sx={{
-                fontWeight: 900,
-                fontSize: { xs: "2rem", sm: "2.5rem", md: "3rem" },
+                fontWeight: 800,
+                fontSize: { xs: "2.1rem", sm: "2.8rem", md: "3.4rem" },
                 color: CHARCOAL,
                 letterSpacing: "-0.03em",
-                lineHeight: 1.15,
+                lineHeight: 1.1,
               }}
             >
               Explore the Discovery Stream
             </Typography>
-            <Typography sx={{ color: "#64748B", mt: 1, fontSize: "1rem" }}>
+            <Typography sx={{ color: "#64748B", mt: 1.5, fontSize: { xs: "0.95rem", md: "1.05rem" }, lineHeight: 1.6 }}>
               A curated masonry flow of ready-to-wear pieces, outfits, and fashion drops
             </Typography>
           </Box>
 
-          {/* Filter Pills */}
-          <Stack
-            direction="row"
-            justifyContent="center"
-            flexWrap="wrap"
-            gap={1}
-            sx={{ px: 1 }}
+          {/* Smooth Segmented Filter Pills */}
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              px: 1,
+            }}
           >
-            {FILTER_TABS.map((tab) => {
-              const active = tab.id === activeTabId;
-              return (
-                <Chip
-                  key={tab.id}
-                  label={tab.label}
-                  onClick={() => setActiveTabId(tab.id)}
-                  sx={{
-                    px: 1.5,
-                    py: 2.2,
-                    borderRadius: "24px",
-                    fontWeight: 700,
-                    fontSize: "0.88rem",
-                    cursor: "pointer",
-                    transition: "all 0.2s ease",
-                    bgcolor: active ? CHARCOAL : "#F1F5F9",
-                    color: active ? "#FFFFFF" : "#475569",
-                    border: "1px solid",
-                    borderColor: active ? CHARCOAL : "transparent",
-                    "&:hover": {
-                      bgcolor: active ? CHARCOAL : "#E2E8F0",
-                      transform: "translateY(-1px)",
-                    },
-                  }}
-                />
-              );
-            })}
-          </Stack>
+            <Box
+              sx={{
+                display: "inline-flex",
+                flexWrap: "wrap",
+                justifyContent: "center",
+                gap: 1,
+                p: 0.75,
+                bgcolor: "#F8FAFC",
+                borderRadius: "9999px",
+                border: "1px solid rgba(17, 24, 39, 0.08)",
+                maxWidth: "100%",
+              }}
+            >
+              {FILTER_TABS.map((tab) => {
+                const active = tab.id === activeTabId;
+                return (
+                  <Button
+                    key={tab.id}
+                    onClick={() => setActiveTabId(tab.id)}
+                    sx={{
+                      px: { xs: 2, sm: 2.5 },
+                      py: 1.1,
+                      borderRadius: "9999px",
+                      fontWeight: 700,
+                      fontSize: { xs: "0.82rem", sm: "0.88rem" },
+                      textTransform: "none",
+                      letterSpacing: "0.01em",
+                      cursor: "pointer",
+                      transition: "all 260ms cubic-bezier(0.16, 1, 0.3, 1)",
+                      bgcolor: active ? CHARCOAL : "transparent",
+                      color: active ? "#FFFFFF" : "#475569",
+                      boxShadow: active ? "0 4px 14px rgba(17, 24, 39, 0.18)" : "none",
+                      transform: active ? "scale(1.02)" : "scale(1)",
+                      "&:hover": {
+                        bgcolor: active ? CHARCOAL : "rgba(17, 24, 39, 0.05)",
+                        color: active ? "#FFFFFF" : CHARCOAL,
+                      },
+                    }}
+                  >
+                    {tab.label}
+                  </Button>
+                );
+              })}
+            </Box>
+          </Box>
 
-          {/* Masonry Discovery Grid */}
+          {/* Masonry Discovery Grid with Staggered Reveals */}
           {isLoading ? (
             <MasonryGrid columns={{ xs: 2, sm: 2, md: 3, lg: 4 }} gap={{ xs: "12px", sm: "16px", md: "20px" }}>
               {[...Array(8)].map((_, i) => (
@@ -153,10 +173,9 @@ export function DiscoveryFeedSection({ id }: { id?: string }) {
           ) : products.length > 0 ? (
             <MasonryGrid columns={{ xs: 2, sm: 2, md: 3, lg: 4 }} gap={{ xs: "12px", sm: "16px", md: "20px" }}>
               {products.map((product) => (
-                <ProductDiscoveryCard
-                  key={product.id}
-                  product={product}
-                />
+                <Box key={product.id} className="reveal-child">
+                  <ProductDiscoveryCard product={product} />
+                </Box>
               ))}
             </MasonryGrid>
           ) : (

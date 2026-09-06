@@ -10,6 +10,7 @@ import {
 import NorthEastRoundedIcon from "@mui/icons-material/NorthEastRounded";
 import WhatshotRoundedIcon from "@mui/icons-material/WhatshotRounded";
 import { useProducts } from "../../hooks/useProducts";
+import { useScrollReveal } from "../../hooks/useScrollReveal";
 import { ProductCard } from "../shared/ProductCard";
 import { MasonryGrid } from "../shared/MasonryGrid";
 import { LoadingSkeleton } from "../shared/LoadingSkeleton";
@@ -20,6 +21,7 @@ const CHARCOAL = "#111827";
 
 export function TrendingSection() {
   const navigate = useNavigate();
+  const sectionRef = useScrollReveal<HTMLDivElement>({ threshold: 0.08, staggerMs: 60 });
 
   // Retrieve trending products from database
   const { data: trendingData, isLoading } = useProducts({
@@ -31,9 +33,9 @@ export function TrendingSection() {
   const products = trendingData?.items ?? [];
 
   return (
-    <Box sx={{ py: { xs: 8, md: 12 }, bgcolor: "#FFFFFF" }}>
+    <Box ref={sectionRef} sx={{ py: { xs: 9, md: 14 }, bgcolor: "#FFFFFF" }}>
       <Container maxWidth="xl">
-        <Stack spacing={4}>
+        <Stack spacing={{ xs: 4, md: 5 }}>
           {/* Section Header */}
           <Stack
             direction={{ xs: "column", sm: "row" }}
@@ -57,11 +59,12 @@ export function TrendingSection() {
                 </Box>
                 <Typography
                   sx={{
-                    fontSize: "0.8rem",
+                    fontSize: "0.78rem",
                     fontWeight: 800,
-                    letterSpacing: "0.08em",
+                    letterSpacing: "0.14em",
                     color: "#EF4444",
                     textTransform: "uppercase",
+                    fontFamily: "'Plus Jakarta Sans', sans-serif",
                   }}
                 >
                   HOTTEST RIGHT NOW
@@ -69,9 +72,10 @@ export function TrendingSection() {
               </Stack>
               <Typography
                 variant="h2"
+                className="font-display"
                 sx={{
-                  fontWeight: 900,
-                  fontSize: { xs: "1.8rem", sm: "2.3rem", md: "2.8rem" },
+                  fontWeight: 800,
+                  fontSize: { xs: "2rem", sm: "2.6rem", md: "3.1rem" },
                   color: CHARCOAL,
                   letterSpacing: "-0.03em",
                   lineHeight: 1.15,
@@ -79,7 +83,7 @@ export function TrendingSection() {
               >
                 Trending in 2026
               </Typography>
-              <Typography sx={{ color: "#64748B", mt: 0.5, fontSize: "0.95rem" }}>
+              <Typography sx={{ color: "#64748B", mt: 0.75, fontSize: "0.95rem" }}>
                 What fashion tastemakers and shoppers are loving most across Kenya this season
               </Typography>
             </Box>
@@ -109,7 +113,9 @@ export function TrendingSection() {
           ) : products.length > 0 ? (
             <MasonryGrid columns={{ xs: 2, sm: 2, md: 3, lg: 4 }}>
               {products.slice(0, 8).map((product) => (
-                <ProductCard key={product.id} product={product} badge="Trending" />
+                <Box key={product.id} className="reveal-child">
+                  <ProductCard product={product} badge="Trending" />
+                </Box>
               ))}
             </MasonryGrid>
           ) : (

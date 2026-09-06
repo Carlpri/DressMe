@@ -1,0 +1,98 @@
+/* ── Global Typography & Animation Utilities ────────────────────────────── */
+
+:root {
+  --font-display: "Playfair Display", Georgia, serif;
+  --font-body: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --color-emerald-deep: #166534;
+  --color-emerald-dark: #0F3822;
+  --color-emerald-light: #22C55E;
+  --color-charcoal: #111827;
+  --color-bone: #FAF8F5;
+  --ease-out-editorial: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--color-charcoal);
+  background-color: #FFFFFF;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* ── Editorial Heading Class ────────────────────────────────────────────── */
+.font-display {
+  font-family: var(--font-display) !important;
+}
+
+.font-body {
+  font-family: var(--font-body) !important;
+}
+
+/* ── Scroll Reveal System (Transform & Opacity only) ────────────────────── */
+.reveal-init {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 360ms var(--ease-out-editorial), transform 360ms var(--ease-out-editorial);
+  will-change: opacity, transform;
+}
+
+.reveal-visible {
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+}
+
+/* ── Hero Entrance Keyframes ────────────────────────────────────────────── */
+@keyframes heroEntranceFade {
+  0% {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-hero-eyebrow {
+  animation: heroEntranceFade 340ms var(--ease-out-editorial) 40ms both;
+}
+
+.animate-hero-headline {
+  animation: heroEntranceFade 380ms var(--ease-out-editorial) 120ms both;
+}
+
+.animate-hero-subhead {
+  animation: heroEntranceFade 380ms var(--ease-out-editorial) 200ms both;
+}
+
+.animate-hero-actions {
+  animation: heroEntranceFade 380ms var(--ease-out-editorial) 280ms both;
+}
+
+.animate-hero-showcase {
+  animation: heroEntranceFade 400ms var(--ease-out-editorial) 340ms both;
+}
+
+/* ── Strict Reduced Motion Respect ───────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .reveal-init {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
