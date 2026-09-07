@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import CloseIcon from "@mui/icons-material/Close";
-import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
+import CheckroomRoundedIcon from "@mui/icons-material/CheckroomRounded";
 import { ROUTES } from "../../constants/routes";
 import { useProducts } from "../../hooks/useProducts";
 import { useCategories } from "../../hooks/useCategories";
@@ -610,7 +610,7 @@ export function ProductsPage() {
           "&:active": { transform: "scale(0.97)" },
         }}
       >
-        <AutoAwesomeIcon sx={{ fontSize: { xs: 18, sm: 20 }, color: "#FFFFFF" }} />
+        <CheckroomRoundedIcon sx={{ fontSize: { xs: 20, sm: 22 }, color: "#FFFFFF" }} />
         <Typography
           sx={{
             fontWeight: 800,

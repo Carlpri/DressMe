@@ -23,6 +23,7 @@ import FavoriteBorderRoundedIcon from "@mui/icons-material/FavoriteBorderRounded
 import FavoriteRoundedIcon from "@mui/icons-material/FavoriteRounded";
 import ShoppingBagOutlinedIcon from "@mui/icons-material/ShoppingBagOutlined";
 import AutoAwesomeRoundedIcon from "@mui/icons-material/AutoAwesomeRounded";
+import CheckroomRoundedIcon from "@mui/icons-material/CheckroomRounded";
 import GridViewRoundedIcon from "@mui/icons-material/GridViewRounded";
 import StorefrontRoundedIcon from "@mui/icons-material/StorefrontRounded";
 import StyleRoundedIcon from "@mui/icons-material/StyleRounded";
@@ -452,7 +453,7 @@ export function WebHeader() {
                     "&:active": { transform: "scale(0.95)" },
                   }}
                 >
-                  <AutoAwesomeRoundedIcon sx={{ fontSize: 13, color: "#00C896" }} />
+                  <CheckroomRoundedIcon sx={{ fontSize: 15, color: "#00C896" }} />
                   <Typography sx={{ fontSize: "0.68rem", fontWeight: 800, letterSpacing: "0.02em", lineHeight: 1 }}>
                     Create
                   </Typography>
