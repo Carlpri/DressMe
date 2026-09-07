@@ -40,6 +40,8 @@ import {
   ListItemIcon,
   ListItemText,
   Container,
+  TableContainer,
+  Pagination,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
@@ -52,6 +54,7 @@ import StorefrontIcon from "@mui/icons-material/Storefront";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Link as RouterLink, Outlet, useLocation, useNavigate } from "react-router-dom";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import { apiClient } from "../../api/client";
 import { MediaPickerModal } from "../../components/admin/MediaPickerModal";
 import { ImageUploader } from "../../components/admin/ImageUploader";
@@ -109,7 +112,7 @@ function VendorSidebar({
 }: SidebarProps) {
   const navItems: { label: string; tab: ActiveTab; icon: React.ReactNode }[] = [
     { label: "Dashboard", tab: "dashboard", icon: <DashboardIcon /> },
-    { label: "My Products", tab: "products", icon: <ShoppingBagIcon /> },
+    { label: "Products", tab: "products", icon: <ShoppingBagIcon /> },
   ];
 
   const drawerContent = (
@@ -162,12 +165,13 @@ function VendorSidebar({
       {/* Quick Add Product Button in Sidebar */}
       <Box sx={{ px: 2, pb: 1, flexShrink: 0 }}>
         <Button
+          component={RouterLink}
+          to="/studio/vendor/products"
           fullWidth
           variant="contained"
           color="primary"
           startIcon={<AddIcon />}
           onClick={() => {
-            onTabChange("products");
             onMobileClose();
           }}
           sx={{
@@ -200,10 +204,9 @@ function VendorSidebar({
           return (
             <ListItem key={item.tab} disablePadding sx={{ mb: 0.5 }}>
               <ListItemButton
-                onClick={() => {
-                  onTabChange(item.tab);
-                  onMobileClose();
-                }}
+                component={RouterLink}
+                to={item.tab === "products" ? "/studio/vendor/products" : "/studio/vendor"}
+                onClick={onMobileClose}
                 sx={{
                   borderRadius: 2,
                   py: 1,
@@ -493,6 +496,7 @@ function VendorProductsTab({
 }) {
   const queryClient = useQueryClient();
   const formatCurrency = useFormatCurrency();
+  const isMobile = useMediaQuery("(max-width:899px)");
 
   // Dialog state
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -502,6 +506,11 @@ function VendorProductsTab({
   const [uploadingCount, setUploadingCount] = useState(0);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [successSnackbar, setSuccessSnackbar] = useState({ open: false, message: "" });
+  const [deletingProduct, setDeletingProduct] = useState<any | null>(null);
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("");
+  const [page, setPage] = useState(1);
 
   const isUploading = uploadingCount > 0;
   const handleUploadingChange = (uploading: boolean) => {
@@ -530,19 +539,28 @@ function VendorProductsTab({
   ]);
 
   // Data queries
-  const { data: products = [], isLoading: productsLoading } = useQuery<any[]>({
-    queryKey: ["vendor-products", vendorId],
+  const { data: productResult, isLoading: productsLoading, isError: productsError, refetch: refetchProducts } = useQuery<any>({
+    queryKey: ["vendor-products", vendorId, user?.role, search, statusFilter, categoryFilter, page],
     queryFn: async () => {
-      const url = vendorId
-        ? `/products?limit=200&vendorId=${vendorId}`
-        : "/products?limit=200";
+      const params = new URLSearchParams({ page: String(page), limit: "20", sort: "newest" });
+      if (search.trim()) params.set("search", search.trim());
+      if (statusFilter) params.set("status", statusFilter);
+      if (categoryFilter) params.set("category", categoryFilter);
+      const url = user?.role === "VENDOR"
+        ? `/vendor/products?${params.toString()}`
+        : `/products?${params.toString()}${vendorId ? `&vendorId=${encodeURIComponent(vendorId)}` : ""}`;
       const res = await apiClient.get(url);
-      const items: any[] = res.data?.data?.items || [];
-      return vendorId
-        ? items.filter((p: any) => p.vendorId === vendorId)
-        : items;
+      return res.data?.data || { items: [], total: 0, totalPages: 0, summary: {} };
     },
+    enabled: user?.role === "VENDOR" || !!vendorId,
   });
+  const products = productResult?.items ?? [];
+  const summary = productResult?.summary ?? {
+    total: productResult?.total ?? 0,
+    active: products.filter((p: any) => p.status === "ACTIVE").length,
+    drafts: products.filter((p: any) => p.status === "DRAFT").length,
+    outOfStock: products.filter((p: any) => (p.stock ?? 0) <= 0).length,
+  };
 
   const { data: categories = [] } = useQuery<any[]>({
     queryKey: ["categories-all"],
@@ -790,7 +808,7 @@ function VendorProductsTab({
             My Products
           </Typography>
           <Typography color="text.secondary">
-            Manage your catalog — images, variants, pricing, and stock.
+            Manage the products you have listed on DressMe.
           </Typography>
         </Box>
         <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpenCreate}>
@@ -798,11 +816,50 @@ function VendorProductsTab({
         </Button>
       </Box>
 
+      <Grid container spacing={2}>
+        {[
+          ["Total Products", summary.total, "#166534"],
+          ["Active Products", summary.active, "#16A34A"],
+          ["Inactive / Draft", summary.drafts, "#D97706"],
+          ["Out of Stock", summary.outOfStock, "#DC2626"],
+        ].map(([label, value, color]) => (
+          <Grid key={label as string} size={{ xs: 6, md: 3 }}>
+            <Card variant="outlined" sx={{ borderRadius: 2, boxShadow: "none" }}>
+              <CardContent sx={{ py: 2 }}>
+                <Typography variant="h5" fontWeight={800} sx={{ color }}>{value}</Typography>
+                <Typography variant="body2" color="text.secondary">{label}</Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+
+      <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
+        <TextField fullWidth size="small" label="Search products..." value={search} onChange={(event) => { setSearch(event.target.value); setPage(1); }} />
+        <FormControl size="small" sx={{ minWidth: 180 }}>
+          <InputLabel>Status</InputLabel>
+          <Select value={statusFilter} label="Status" onChange={(event) => { setStatusFilter(event.target.value); setPage(1); }}>
+            <MenuItem value="">All statuses</MenuItem><MenuItem value="ACTIVE">Active</MenuItem><MenuItem value="DRAFT">Draft</MenuItem><MenuItem value="HIDDEN">Hidden</MenuItem><MenuItem value="ARCHIVED">Archived</MenuItem>
+          </Select>
+        </FormControl>
+        <FormControl size="small" sx={{ minWidth: 180 }}>
+          <InputLabel>Category</InputLabel>
+          <Select value={categoryFilter} label="Category" onChange={(event) => { setCategoryFilter(event.target.value); setPage(1); }}>
+            <MenuItem value="">All categories</MenuItem>
+            {categories.map((category: any) => <MenuItem key={category.id} value={category.id}>{category.name}</MenuItem>)}
+          </Select>
+        </FormControl>
+      </Stack>
+
       {/* Products table */}
       {productsLoading ? (
         <Box display="flex" justifyContent="center" py={8}>
           <CircularProgress />
         </Box>
+      ) : productsError ? (
+        <Alert severity="error" action={<Button color="inherit" size="small" onClick={() => refetchProducts()}>Retry</Button>}>
+          We couldn't load your products. Please try again.
+        </Alert>
       ) : products.length === 0 ? (
         <Paper
           variant="outlined"
@@ -821,7 +878,8 @@ function VendorProductsTab({
         </Paper>
       ) : (
         <Paper variant="outlined" sx={{ overflow: "hidden", borderRadius: 3 }}>
-          <Table>
+          <TableContainer>
+          <Table sx={{ minWidth: isMobile ? 760 : undefined }}>
             <TableHead sx={{ bgcolor: "#F8FAFC" }}>
               <TableRow>
                 <TableCell>Product</TableCell>
@@ -834,7 +892,7 @@ function VendorProductsTab({
               </TableRow>
             </TableHead>
             <TableBody>
-              {products.map((prod) => {
+              {products.map((prod: any) => {
                 const img = prod.images?.find((i: any) => i.isPrimary) || prod.images?.[0];
                 return (
                   <TableRow key={prod.id} hover>
@@ -923,7 +981,7 @@ function VendorProductsTab({
                       <IconButton
                         size="small"
                         color="error"
-                        onClick={() => deleteProductMutation.mutate(prod.id)}
+                        onClick={() => setDeletingProduct(prod)}
                       >
                         <DeleteIcon fontSize="small" />
                       </IconButton>
@@ -933,8 +991,25 @@ function VendorProductsTab({
               })}
             </TableBody>
           </Table>
+          </TableContainer>
+          {(productResult?.totalPages ?? 0) > 1 && (
+            <Stack alignItems="center" p={2}>
+              <Pagination count={productResult.totalPages} page={page} onChange={(_, value) => setPage(value)} color="primary" />
+            </Stack>
+          )}
         </Paper>
       )}
+
+      <Dialog open={!!deletingProduct} onClose={() => setDeletingProduct(null)}>
+        <DialogTitle>Delete Product?</DialogTitle>
+        <DialogContent>
+          <Typography>Are you sure you want to remove {deletingProduct?.name}? This action may affect how the product appears on DressMe.</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeletingProduct(null)}>Cancel</Button>
+          <Button color="error" variant="contained" onClick={() => { if (deletingProduct) deleteProductMutation.mutate(deletingProduct.id); setDeletingProduct(null); }} disabled={deleteProductMutation.isPending}>Delete Product</Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Create / Edit Dialog */}
       <Dialog open={dialogOpen} onClose={handleCloseDialog} maxWidth="md" fullWidth>
@@ -1415,7 +1490,10 @@ function VendorProductsTab({
 export function VendorDashboardPage() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<ActiveTab>("dashboard");
+  const location = useLocation();
+  const [activeTab, setActiveTab] = useState<ActiveTab>(
+    location.pathname.endsWith("/products") ? "products" : "dashboard"
+  );
   const [mobileOpen, setMobileOpen] = useState(false);
   const formatCurrency = useFormatCurrency();
 
@@ -1458,6 +1536,10 @@ export function VendorDashboardPage() {
       : vendorProfile?.businessName || user?.name || "My Store";
 
   const vendorLogo = vendorProfile?.logo;
+
+  useEffect(() => {
+    setActiveTab(location.pathname.endsWith("/products") ? "products" : "dashboard");
+  }, [location.pathname]);
 
   return (
     <Box sx={{ display: "flex", minHeight: "100vh", bgcolor: "#F8FAFC" }}>
@@ -1521,7 +1603,7 @@ export function VendorDashboardPage() {
             <VendorOverviewTab
               products={allProducts}
               formatCurrency={formatCurrency}
-              onCreateProduct={() => setActiveTab("products")}
+              onCreateProduct={() => navigate("/studio/vendor/products")}
             />
           )}
           {activeTab === "products" && (

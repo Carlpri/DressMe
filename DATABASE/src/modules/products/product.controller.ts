@@ -31,6 +31,20 @@ export class ProductController {
     );
   });
 
+  getVendorProducts = asyncHandler(async (req, res) => {
+    const products = await productService.getForVendor(
+      req.user.userId,
+      req.query
+    );
+
+    ApiResponse.success(
+      res,
+      200,
+      "Vendor products retrieved successfully.",
+      products
+    );
+  });
+
   getProduct = asyncHandler(async (req, res) => {
     const product = await productService.getBySlug(
       req.params.slug as string

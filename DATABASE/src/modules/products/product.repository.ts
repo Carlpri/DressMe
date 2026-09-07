@@ -130,6 +130,35 @@ export class ProductRepository {
     };
   }
 
+  async findAllForVendor(vendorId: string, filters: ProductFilters) {
+    const where = this.buildWhere({ ...filters, vendorId });
+    const orderBy = this.buildOrderBy(filters.sort);
+    const skip = (filters.page - 1) * filters.limit;
+
+    const [items, total, active, drafts, outOfStock] = await prisma.$transaction([
+      prisma.product.findMany({
+        where,
+        include: productInclude,
+        orderBy,
+        skip,
+        take: filters.limit,
+      }),
+      prisma.product.count({ where }),
+      prisma.product.count({ where: { AND: [where, { status: ProductStatus.ACTIVE }] } }),
+      prisma.product.count({ where: { AND: [where, { status: ProductStatus.DRAFT }] } }),
+      prisma.product.count({ where: { AND: [where, { stock: { lte: 0 } }] } }),
+    ]);
+
+    return {
+      items: items.map((item) => this.normalizeProduct(item)),
+      page: filters.page,
+      limit: filters.limit,
+      total,
+      totalPages: Math.ceil(total / filters.limit),
+      summary: { total, active, drafts, outOfStock },
+    };
+  }
+
   async findById(id: string) {
     const product = await prisma.product.findUnique({
       where: { id },

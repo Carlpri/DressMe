@@ -208,7 +208,10 @@ export const appRouter = createBrowserRouter([
       {
         path: "vendor",
         element: <ProtectedRoute allowedRoles={["VENDOR", "ADMIN"]} />,
-        children: [{ index: true, element: <S><VendorDashboardPage /></S> }]
+        children: [
+          { index: true, element: <S><VendorDashboardPage /></S> },
+          { path: "products", element: <S><VendorDashboardPage /></S> },
+        ]
       },
       {
         path: "admin",

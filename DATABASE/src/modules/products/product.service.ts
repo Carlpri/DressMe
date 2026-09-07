@@ -66,6 +66,19 @@ export class ProductService {
     return this.repository.findAll(this.parseFilters(query));
   }
 
+  async getForVendor(userId: string, query: Record<string, unknown>) {
+    const vendor = await this.repository.findVendorByUserId(userId);
+
+    if (!vendor) {
+      throw new ApiError(403, "Create a vendor profile before managing products.");
+    }
+
+    return this.repository.findAllForVendor(
+      vendor.id,
+      this.parseFilters(query)
+    );
+  }
+
   async getBySlug(slug: string) {
     const product = await this.repository.findActiveBySlug(slug);
 
