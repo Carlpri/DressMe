@@ -31,7 +31,7 @@ export const portalTheme = createTheme({
   typography: {
     fontFamily: "'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
     h1: {
-      fontFamily: "'Playfair Display', Georgia, serif",
+      fontFamily: "'Bodoni Moda', 'Playfair Display', 'Cormorant Garamond', Georgia, serif",
       fontWeight: 800,
       fontSize: "clamp(2.75rem, 5.5vw, 4.75rem)",
       lineHeight: 1.05,
@@ -39,7 +39,7 @@ export const portalTheme = createTheme({
       color: "#111827",
     },
     h2: {
-      fontFamily: "'Playfair Display', Georgia, serif",
+      fontFamily: "'Bodoni Moda', 'Playfair Display', 'Cormorant Garamond', Georgia, serif",
       fontWeight: 800,
       fontSize: "clamp(2rem, 3.8vw, 3rem)",
       lineHeight: 1.15,
@@ -47,7 +47,7 @@ export const portalTheme = createTheme({
       color: "#111827",
     },
     h3: {
-      fontFamily: "'Playfair Display', Georgia, serif",
+      fontFamily: "'Bodoni Moda', 'Playfair Display', 'Cormorant Garamond', Georgia, serif",
       fontWeight: 700,
       fontSize: "1.75rem",
       lineHeight: 1.25,

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   Box,
   Container,
@@ -82,6 +82,7 @@ const parseOutfitIntelligence = (desc: string) => {
 
 export function ProductDetailsPage() {
   const { slug } = useParams<{ slug: string }>();
+  const navigate = useNavigate();
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedVariant, setSelectedVariant] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
@@ -641,9 +642,31 @@ export function ProductDetailsPage() {
                         {product.vendor.isVerified && "✓ Verified Vendor"}
                       </Typography>
                     </Box>
-                    {product.vendor.isVerified && (
-                      <Chip label="Verified" color="success" size="small" />
-                    )}
+                    <Stack direction="row" spacing={1} alignItems="center">
+                      {product.vendor.isVerified && (
+                        <Chip label="Verified" color="success" size="small" />
+                      )}
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        onClick={() =>
+                          navigate(
+                            `/products?vendorId=${encodeURIComponent(product.vendor.id || product.vendor.businessName)}&vendorName=${encodeURIComponent(product.vendor.businessName)}`
+                          )
+                        }
+                        sx={{
+                          borderRadius: "20px",
+                          fontSize: "0.75rem",
+                          fontWeight: 700,
+                          textTransform: "none",
+                          borderColor: "rgba(17, 24, 39, 0.2)",
+                          color: "#111827",
+                          "&:hover": { borderColor: "#166534", color: "#166534", bgcolor: "rgba(22, 101, 52, 0.05)" },
+                        }}
+                      >
+                        Visit Store
+                      </Button>
+                    </Stack>
                   </Stack>
                 </CardContent>
               </Card>

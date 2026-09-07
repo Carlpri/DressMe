@@ -67,37 +67,59 @@ export function AdminLayout() {
   };
 
   const drawerContent = (
-    <Box sx={{ display: "flex", flexDirection: "column", height: "100%", bgcolor: "#0F172A", color: "white" }}>
-      <Box sx={{ p: 3, display: "flex", alignItems: "center", gap: 1.5 }}>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100%",
+        bgcolor: "#0F172A",
+        color: "white",
+        overflow: "hidden",
+      }}
+    >
+      {/* Brand Header */}
+      <Box sx={{ p: 2.5, display: "flex", alignItems: "center", gap: 1.5, flexShrink: 0 }}>
         <Box
           sx={{
-            width: 40,
-            height: 40,
+            width: 38,
+            height: 38,
             borderRadius: 2,
             bgcolor: "primary.main",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             fontWeight: 800,
-            fontSize: "1.2rem",
+            fontSize: "1.15rem",
             color: "white",
+            boxShadow: "0 2px 8px rgba(22, 101, 52, 0.4)",
           }}
         >
           D
         </Box>
         <Box>
-          <Typography variant="h6" sx={{ fontWeight: 800, color: "white", lineHeight: 1.2 }}>
+          <Typography variant="subtitle1" sx={{ fontWeight: 800, color: "white", lineHeight: 1.2, letterSpacing: "-0.01em" }}>
             DressMe
           </Typography>
-          <Typography variant="caption" sx={{ color: "slate.400", opacity: 0.7 }}>
+          <Typography variant="caption" sx={{ color: "#94A3B8", fontWeight: 600, textTransform: "uppercase", fontSize: "0.65rem", letterSpacing: "0.08em" }}>
             Admin Control Panel
           </Typography>
         </Box>
       </Box>
 
-      <Divider sx={{ borderColor: "rgba(255,255,255,0.1)" }} />
+      <Divider sx={{ borderColor: "rgba(255,255,255,0.08)", flexShrink: 0 }} />
 
-      <List sx={{ px: 2, py: 2, flexGrow: 1 }}>
+      {/* Scrollable Navigation List */}
+      <List
+        sx={{
+          px: 1.5,
+          py: 1.5,
+          flex: "1 1 auto",
+          overflowY: "auto",
+          minHeight: 0,
+          "&::-webkit-scrollbar": { width: 4 },
+          "&::-webkit-scrollbar-thumb": { bgcolor: "rgba(255,255,255,0.15)", borderRadius: 2 },
+        }}
+      >
         {NAV_ITEMS.map((item) => {
           const isActive =
             item.path === "/admin"
@@ -105,80 +127,129 @@ export function AdminLayout() {
               : location.pathname.startsWith(item.path);
 
           return (
-            <ListItem key={item.path} disablePadding sx={{ mb: 0.5 }}>
+            <ListItem key={item.path} disablePadding sx={{ mb: 0.3 }}>
               <ListItemButton
                 component={RouterLink}
                 to={item.path}
                 onClick={() => setMobileOpen(false)}
                 sx={{
                   borderRadius: 2,
+                  py: 0.9,
+                  px: 1.5,
                   bgcolor: isActive ? "primary.main" : "transparent",
-                  color: isActive ? "white" : "#94A3B8",
+                  color: isActive ? "#FFFFFF" : "#CBD5E1",
+                  boxShadow: isActive ? "0 2px 8px rgba(22, 101, 52, 0.35)" : "none",
+                  transition: "all 0.18s ease",
                   "&:hover": {
-                    bgcolor: isActive ? "primary.main" : "rgba(255, 255, 255, 0.05)",
-                    color: "white",
+                    bgcolor: isActive ? "primary.main" : "rgba(255, 255, 255, 0.08)",
+                    color: "#FFFFFF",
                   },
                 }}
               >
-                <ListItemIcon sx={{ color: "inherit", minWidth: 40 }}>{item.icon}</ListItemIcon>
-                <ListItemText primary={item.label} primaryTypographyProps={{ fontWeight: isActive ? 600 : 400 }} />
+                <ListItemIcon sx={{ color: isActive ? "#FFFFFF" : "#94A3B8", minWidth: 36 }}>
+                  {item.icon}
+                </ListItemIcon>
+                <ListItemText
+                  primary={item.label}
+                  primaryTypographyProps={{
+                    fontSize: "0.86rem",
+                    fontWeight: isActive ? 700 : 500,
+                  }}
+                />
               </ListItemButton>
             </ListItem>
           );
         })}
       </List>
 
-      <Divider sx={{ borderColor: "rgba(255,255,255,0.1)" }} />
+      <Divider sx={{ borderColor: "rgba(255,255,255,0.08)", flexShrink: 0 }} />
 
-      <Box sx={{ p: 2 }}>
-        <Button
-          component={RouterLink}
-          to="/studio/vendor"
-          fullWidth
-          variant="outlined"
-          startIcon={<StorefrontIcon />}
-          sx={{
-            color: "#94A3B8",
-            borderColor: "rgba(255,255,255,0.2)",
-            mb: 1,
-            "&:hover": { borderColor: "white", color: "white" },
-          }}
-        >
-          Vendor Portal
-        </Button>
-        <Button
-          component={RouterLink}
-          to="/studio"
-          fullWidth
-          variant="outlined"
-          startIcon={<CodeIcon />}
-          sx={{
-            color: "#94A3B8",
-            borderColor: "rgba(255,255,255,0.2)",
-            mb: 1,
-            "&:hover": { borderColor: "white", color: "white" },
-          }}
-        >
-          Developer Studio
-        </Button>
+      {/* Pinned Bottom Quick Action Dock - Always Visible */}
+      <Box
+        sx={{
+          p: 1.8,
+          flexShrink: 0,
+          bgcolor: "#090E17",
+          borderTop: "1px solid rgba(255,255,255,0.08)",
+          display: "flex",
+          flexDirection: "column",
+          gap: 0.8,
+        }}
+      >
         <Button
           component={RouterLink}
           to="/"
           fullWidth
+          size="small"
           variant="contained"
-          color="secondary"
-          startIcon={<StorefrontIcon />}
-          sx={{ mb: 1 }}
+          color="primary"
+          startIcon={<StorefrontIcon sx={{ fontSize: 18 }} />}
+          sx={{
+            fontWeight: 700,
+            fontSize: "0.82rem",
+            py: 0.9,
+            borderRadius: 2,
+            boxShadow: "0 2px 8px rgba(22, 101, 52, 0.4)",
+          }}
         >
           View Storefront
         </Button>
+        <Stack direction="row" spacing={1}>
+          <Button
+            component={RouterLink}
+            to="/studio/vendor"
+            fullWidth
+            size="small"
+            variant="outlined"
+            sx={{
+              color: "#E2E8F0",
+              borderColor: "rgba(255,255,255,0.22)",
+              fontSize: "0.75rem",
+              fontWeight: 600,
+              py: 0.7,
+              borderRadius: 2,
+              bgcolor: "rgba(255,255,255,0.04)",
+              "&:hover": { borderColor: "#FFFFFF", bgcolor: "rgba(255,255,255,0.1)", color: "#FFFFFF" },
+            }}
+          >
+            Vendor Portal
+          </Button>
+          <Button
+            component={RouterLink}
+            to="/studio"
+            fullWidth
+            size="small"
+            variant="outlined"
+            sx={{
+              color: "#E2E8F0",
+              borderColor: "rgba(255,255,255,0.22)",
+              fontSize: "0.75rem",
+              fontWeight: 600,
+              py: 0.7,
+              borderRadius: 2,
+              bgcolor: "rgba(255,255,255,0.04)",
+              "&:hover": { borderColor: "#FFFFFF", bgcolor: "rgba(255,255,255,0.1)", color: "#FFFFFF" },
+            }}
+          >
+            Studio
+          </Button>
+        </Stack>
         <Button
           onClick={handleLogout}
           fullWidth
+          size="small"
           color="error"
-          startIcon={<LogoutIcon />}
+          startIcon={<LogoutIcon sx={{ fontSize: 16 }} />}
+          sx={{
+            fontWeight: 600,
+            fontSize: "0.78rem",
+            py: 0.6,
+            borderRadius: 2,
+            color: "#F87171",
+            "&:hover": { bgcolor: "rgba(239, 68, 68, 0.12)", color: "#EF4444" },
+          }}
         >
-          Logout
+          Sign Out
         </Button>
       </Box>
     </Box>

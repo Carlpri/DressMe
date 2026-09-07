@@ -33,6 +33,15 @@ export class ProductService {
     await this.ensureRelationsExist(data.categoryIds, data.brandId);
     if (isDev) console.log("[PRODUCT_CREATE_CATEGORIES]", { categoryIds: data.categoryIds, brandId: data.brandId });
 
+    // Enforce: only ADMIN can set promotional badges and product status
+    if (role !== Role.ADMIN) {
+      data.featured = false;
+      data.isTrending = false;
+      data.isNewArrival = false;
+      data.isBestSeller = false;
+      data.status = ProductStatus.DRAFT;
+    }
+
     await this.ensureSkuAvailable(data.sku);
     await this.ensureVariantSkusAvailable(data.variants);
     await this.ensureVariantRelationsExist(data.variants);
@@ -80,6 +89,15 @@ export class ProductService {
     }
 
     await this.ensureCanManageProduct(userId, role, product.vendorId);
+
+    // Enforce: only ADMIN can update promotional badges and product status
+    if (role !== Role.ADMIN) {
+      delete data.featured;
+      delete data.isTrending;
+      delete data.isNewArrival;
+      delete data.isBestSeller;
+      delete data.status;
+    }
 
     if (data.brandId || data.categoryIds) {
       await this.ensureRelationsExist(

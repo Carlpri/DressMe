@@ -77,6 +77,7 @@ export interface ProductFilters {
   size?: string;
   color?: string;
   search?: string;
+  vendorId?: string;
   sort?: "newest" | "oldest" | "price_asc" | "price_desc" | "popular" | "rating";
 }
 

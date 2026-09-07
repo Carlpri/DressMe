@@ -786,19 +786,47 @@ export function ProductCard({
             </Typography>
 
             {showVendor && product.vendor?.businessName && (
-              <Typography
-                sx={{
-                  fontSize: "0.68rem",
-                  fontWeight: 500,
-                  color: "#64748B",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  whiteSpace: "nowrap",
-                  maxWidth: 110,
+              <Box
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate(
+                    `/products?vendorId=${encodeURIComponent(product.vendor.id || product.vendor.businessName)}&vendorName=${encodeURIComponent(product.vendor.businessName)}`
+                  );
                 }}
+                sx={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  fontSize: "0.68rem",
+                  fontWeight: 600,
+                  color: "#64748B",
+                  maxWidth: 120,
+                  cursor: "pointer",
+                  px: 0.6,
+                  py: 0.15,
+                  borderRadius: "6px",
+                  bgcolor: "rgba(17, 24, 39, 0.04)",
+                  transition: "all 0.18s ease",
+                  "&:hover": {
+                    color: DEEP_EMERALD,
+                    bgcolor: "rgba(22, 101, 52, 0.09)",
+                    transform: "translateY(-0.5px)",
+                  },
+                }}
+                title={`View all products from ${product.vendor.businessName}`}
               >
-                {product.vendor.businessName}
-              </Typography>
+                <Typography
+                  component="span"
+                  sx={{
+                    fontSize: "inherit",
+                    fontWeight: "inherit",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {product.vendor.businessName}
+                </Typography>
+              </Box>
             )}
           </Stack>
 

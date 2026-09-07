@@ -59,6 +59,8 @@ export function ProductsPage() {
   const search = searchParams.get("search") || "";
   const category = searchParams.get("category") || "";
   const brand = searchParams.get("brand") || "";
+  const vendorId = searchParams.get("vendorId") || "";
+  const vendorName = searchParams.get("vendorName") || "";
   const gender = (searchParams.get("gender") as ProductFilters["gender"]) || undefined;
   const sort = (searchParams.get("sort") as ProductFilters["sort"]) || "newest";
   const featured = searchParams.get("featured") === "true";
@@ -71,6 +73,7 @@ export function ProductsPage() {
     search: search || undefined,
     category: category || undefined,
     brand: brand || undefined,
+    vendorId: vendorId || undefined,
     gender,
     sort,
     featured: featured || undefined,
@@ -111,12 +114,90 @@ export function ProductsPage() {
     setSearchParams("");
   };
 
-  const activeFilterCount = [search, category, brand, gender, featured].filter(Boolean).length;
+  const activeFilterCount = [search, category, brand, vendorId, gender, featured].filter(Boolean).length;
 
   return (
     <Box sx={{ bgcolor: "#FFFFFF", minHeight: "100vh", color: "#0D0D0D" }}>
       <Container maxWidth="xl" sx={{ px: { xs: 1.5, sm: 2.5, md: 4 }, py: { xs: 2, sm: 3, md: 4 } }}>
         <Stack spacing={{ xs: 2, sm: 2.5, md: 3 }}>
+          {/* Store / Vendor Banner */}
+          {(vendorId || vendorName) && (
+            <Box
+              sx={{
+                p: { xs: 2.5, sm: 3.5 },
+                borderRadius: "20px",
+                bgcolor: "#FAF8F5",
+                border: "1px solid rgba(17, 24, 39, 0.08)",
+                display: "flex",
+                flexDirection: { xs: "column", sm: "row" },
+                alignItems: { sm: "center" },
+                justifyContent: "space-between",
+                gap: 2,
+                boxShadow: "0 4px 16px rgba(17, 24, 39, 0.04)",
+              }}
+            >
+              <Box>
+                <Stack direction="row" alignItems="center" spacing={1} mb={0.8}>
+                  <Chip
+                    label="Official Store"
+                    size="small"
+                    sx={{
+                      bgcolor: "#166534",
+                      color: "#FFFFFF",
+                      fontWeight: 800,
+                      fontSize: "0.68rem",
+                      letterSpacing: "0.04em",
+                    }}
+                  />
+                  <Typography
+                    variant="caption"
+                    sx={{ color: "#64748B", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" }}
+                  >
+                    Curated Storefront
+                  </Typography>
+                </Stack>
+                <Typography
+                  variant="h2"
+                  sx={{
+                    fontFamily: "'Bodoni Moda', 'Playfair Display', Georgia, serif",
+                    fontWeight: 800,
+                    fontSize: { xs: "1.75rem", sm: "2.4rem" },
+                    color: "#111827",
+                    lineHeight: 1.1,
+                  }}
+                >
+                  {vendorName || "Store Collection"}
+                </Typography>
+                <Typography variant="body2" sx={{ color: "#475569", mt: 0.5 }}>
+                  Viewing all authentic products stocked & shipped directly by {vendorName || "this store"}.
+                </Typography>
+              </Box>
+              <Button
+                variant="outlined"
+                size="small"
+                onClick={() => {
+                  updateFilter("vendorId", "");
+                  updateFilter("vendorName", "");
+                }}
+                startIcon={<CloseIcon />}
+                sx={{
+                  borderRadius: "20px",
+                  borderColor: "rgba(17, 24, 39, 0.2)",
+                  color: "#111827",
+                  fontWeight: 700,
+                  fontSize: "0.82rem",
+                  px: 2.5,
+                  py: 0.8,
+                  alignSelf: { xs: "flex-start", sm: "center" },
+                  whiteSpace: "nowrap",
+                  "&:hover": { borderColor: "#111827", bgcolor: "rgba(17, 24, 39, 0.06)" },
+                }}
+              >
+                Clear Store Filter
+              </Button>
+            </Box>
+          )}
+
           {/* ══════════════════════════════════════════════════════════════════
               HEADER & ACTIVE COUNTS (Minimalist)
           ══════════════════════════════════════════════════════════════════ */}
@@ -131,13 +212,16 @@ export function ProductsPage() {
               <Typography
                 variant="h1"
                 sx={{
+                  fontFamily: "'Bodoni Moda', 'Playfair Display', Georgia, serif",
                   fontWeight: 900,
-                  fontSize: { xs: "1.4rem", sm: "1.8rem", md: "2.2rem" },
+                  fontSize: { xs: "1.5rem", sm: "1.9rem", md: "2.3rem" },
                   letterSpacing: "-0.03em",
                   lineHeight: 1.1,
                 }}
               >
-                {category
+                {vendorName
+                  ? `${vendorName}`
+                  : category
                   ? categories?.find((c) => c.slug === category)?.name || "Category"
                   : featured
                   ? "Featured Looks"

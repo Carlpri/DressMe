@@ -509,7 +509,13 @@ export class ProductRepository {
     }
 
     if (filters.vendorId) {
-      and.push({ vendorId: filters.vendorId });
+      and.push({
+        OR: [
+          { vendorId: filters.vendorId },
+          { vendor: { id: filters.vendorId } },
+          { vendor: { businessName: { equals: filters.vendorId, mode: "insensitive" } } },
+        ],
+      });
     }
 
     if (filters.category) {

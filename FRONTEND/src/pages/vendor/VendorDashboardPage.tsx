@@ -120,10 +120,11 @@ function VendorSidebar({
         height: "100%",
         bgcolor: "#0F172A",
         color: "white",
+        overflow: "hidden",
       }}
     >
       {/* Brand */}
-      <Box sx={{ p: 3, display: "flex", alignItems: "center", gap: 1.5 }}>
+      <Box sx={{ p: 2.5, display: "flex", alignItems: "center", gap: 1.5, flexShrink: 0 }}>
         <Avatar
           src={vendorLogo}
           sx={{
@@ -133,23 +134,67 @@ function VendorSidebar({
             bgcolor: "primary.main",
             fontSize: "1.1rem",
             fontWeight: 800,
+            boxShadow: "0 2px 8px rgba(22, 101, 52, 0.4)",
           }}
         >
           {vendorName?.[0]?.toUpperCase() ?? "V"}
         </Avatar>
-        <Box>
-          <Typography variant="subtitle1" sx={{ fontWeight: 800, color: "white", lineHeight: 1.2 }}>
+        <Box sx={{ minWidth: 0, flex: 1 }}>
+          <Typography
+            variant="subtitle1"
+            sx={{
+              fontWeight: 800,
+              color: "white",
+              lineHeight: 1.2,
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
+          >
             {vendorName || "My Store"}
           </Typography>
-          <Typography variant="caption" sx={{ opacity: 0.55, color: "#94A3B8" }}>
+          <Typography variant="caption" sx={{ color: "#94A3B8", fontWeight: 600, fontSize: "0.68rem", textTransform: "uppercase", letterSpacing: "0.08em" }}>
             Vendor Portal
           </Typography>
         </Box>
       </Box>
 
-      <Divider sx={{ borderColor: "rgba(255,255,255,0.1)" }} />
+      {/* Quick Add Product Button in Sidebar */}
+      <Box sx={{ px: 2, pb: 1, flexShrink: 0 }}>
+        <Button
+          fullWidth
+          variant="contained"
+          color="primary"
+          startIcon={<AddIcon />}
+          onClick={() => {
+            onTabChange("products");
+            onMobileClose();
+          }}
+          sx={{
+            py: 1,
+            borderRadius: 2,
+            fontWeight: 700,
+            fontSize: "0.82rem",
+            boxShadow: "0 2px 8px rgba(22, 101, 52, 0.4)",
+          }}
+        >
+          + Add Product
+        </Button>
+      </Box>
 
-      <List sx={{ px: 2, py: 2, flexGrow: 1 }}>
+      <Divider sx={{ borderColor: "rgba(255,255,255,0.08)", flexShrink: 0 }} />
+
+      <List
+        sx={{
+          px: 1.5,
+          py: 1.5,
+          flex: "1 1 auto",
+          overflowY: "auto",
+          minHeight: 0,
+          "&::-webkit-scrollbar": { width: 4 },
+          "&::-webkit-scrollbar-thumb": { bgcolor: "rgba(255,255,255,0.15)", borderRadius: 2 },
+        }}
+      >
         {navItems.map((item) => {
           const isActive = activeTab === item.tab;
           return (
@@ -161,18 +206,22 @@ function VendorSidebar({
                 }}
                 sx={{
                   borderRadius: 2,
+                  py: 1,
+                  px: 1.5,
                   bgcolor: isActive ? "primary.main" : "transparent",
-                  color: isActive ? "white" : "#94A3B8",
+                  color: isActive ? "white" : "#CBD5E1",
+                  boxShadow: isActive ? "0 2px 8px rgba(22, 101, 52, 0.35)" : "none",
+                  transition: "all 0.18s ease",
                   "&:hover": {
-                    bgcolor: isActive ? "primary.main" : "rgba(255,255,255,0.05)",
+                    bgcolor: isActive ? "primary.main" : "rgba(255,255,255,0.08)",
                     color: "white",
                   },
                 }}
               >
-                <ListItemIcon sx={{ color: "inherit", minWidth: 40 }}>{item.icon}</ListItemIcon>
+                <ListItemIcon sx={{ color: isActive ? "white" : "#94A3B8", minWidth: 36 }}>{item.icon}</ListItemIcon>
                 <ListItemText
                   primary={item.label}
-                  primaryTypographyProps={{ fontWeight: isActive ? 600 : 400 }}
+                  primaryTypographyProps={{ fontWeight: isActive ? 700 : 500, fontSize: "0.88rem" }}
                 />
               </ListItemButton>
             </ListItem>
@@ -180,21 +229,56 @@ function VendorSidebar({
         })}
       </List>
 
-      <Divider sx={{ borderColor: "rgba(255,255,255,0.1)" }} />
+      <Divider sx={{ borderColor: "rgba(255,255,255,0.08)", flexShrink: 0 }} />
 
-      <Box sx={{ p: 2, display: "flex", flexDirection: "column", gap: 1 }}>
+      {/* Pinned Bottom Actions */}
+      <Box
+        sx={{
+          p: 2,
+          flexShrink: 0,
+          bgcolor: "#090E17",
+          borderTop: "1px solid rgba(255,255,255,0.08)",
+          display: "flex",
+          flexDirection: "column",
+          gap: 1,
+        }}
+      >
         <Button
           component={RouterLink}
           to="/"
           fullWidth
-          variant="contained"
-          color="secondary"
-          startIcon={<StorefrontIcon />}
+          size="small"
+          variant="outlined"
+          startIcon={<StorefrontIcon sx={{ fontSize: 18 }} />}
+          sx={{
+            color: "#E2E8F0",
+            borderColor: "rgba(255,255,255,0.25)",
+            fontWeight: 600,
+            fontSize: "0.8rem",
+            py: 0.8,
+            borderRadius: 2,
+            bgcolor: "rgba(255,255,255,0.04)",
+            "&:hover": { borderColor: "#FFFFFF", bgcolor: "rgba(255,255,255,0.1)", color: "#FFFFFF" },
+          }}
         >
           View Storefront
         </Button>
-        <Button onClick={onLogout} fullWidth color="error" startIcon={<LogoutIcon />}>
-          Logout
+        <Button
+          onClick={onLogout}
+          fullWidth
+          size="small"
+          color="error"
+          startIcon={<LogoutIcon sx={{ fontSize: 16 }} />}
+          sx={{
+            fontWeight: 600,
+            fontSize: "0.78rem",
+            py: 0.6,
+            borderRadius: 2,
+            color: "#F87171",
+            "&:hover": { bgcolor: "rgba(239, 68, 68, 0.12)", color: "#EF4444" },
+          }}
+        >
+          Sign Out
         </Button>
       </Box>
     </Box>
@@ -1181,44 +1265,80 @@ function VendorProductsTab({
               </Button>
             </Grid>
 
-            {/* Flags & Status */}
+            {/* Flags & Status — ADMIN ONLY */}
             <Grid size={{ xs: 12 }}>
-              <Typography variant="subtitle1" fontWeight={700} mb={1}>
-                Promotional Badges & Status
-              </Typography>
-              <Stack direction="row" spacing={2} flexWrap="wrap">
-                <FormControlLabel
-                  control={<Checkbox checked={featured} onChange={(e) => setFeatured(e.target.checked)} />}
-                  label="Featured"
-                />
-                <FormControlLabel
-                  control={<Checkbox checked={isTrending} onChange={(e) => setIsTrending(e.target.checked)} />}
-                  label="Trending"
-                />
-                <FormControlLabel
-                  control={<Checkbox checked={isNewArrival} onChange={(e) => setIsNewArrival(e.target.checked)} />}
-                  label="New Arrival"
-                />
-                <FormControlLabel
-                  control={<Checkbox checked={isBestSeller} onChange={(e) => setIsBestSeller(e.target.checked)} />}
-                  label="Best Seller"
-                />
-              </Stack>
-              <Box mt={2}>
-                <FormControl fullWidth size="small">
-                  <InputLabel>Product Status</InputLabel>
-                  <Select
-                    value={status}
-                    label="Product Status"
-                    onChange={(e) => setStatus(e.target.value as any)}
-                  >
-                    <MenuItem value="ACTIVE">ACTIVE (Visible in Storefront)</MenuItem>
-                    <MenuItem value="DRAFT">DRAFT</MenuItem>
-                    <MenuItem value="HIDDEN">HIDDEN</MenuItem>
-                    <MenuItem value="ARCHIVED">ARCHIVED</MenuItem>
-                  </Select>
-                </FormControl>
-              </Box>
+              {user?.role === "ADMIN" ? (
+                <Box sx={{ p: 2, bgcolor: "#F8FAFC", borderRadius: 2, border: "1px solid #E2E8F0" }}>
+                  <Typography variant="subtitle2" fontWeight={800} color="primary.main" mb={1}>
+                    Admin Controls: Promotional Badges & Status
+                  </Typography>
+                  <Stack direction="row" spacing={2} flexWrap="wrap">
+                    <FormControlLabel
+                      control={<Checkbox checked={featured} onChange={(e) => setFeatured(e.target.checked)} />}
+                      label="Featured"
+                    />
+                    <FormControlLabel
+                      control={<Checkbox checked={isTrending} onChange={(e) => setIsTrending(e.target.checked)} />}
+                      label="Trending"
+                    />
+                    <FormControlLabel
+                      control={<Checkbox checked={isNewArrival} onChange={(e) => setIsNewArrival(e.target.checked)} />}
+                      label="New Arrival"
+                    />
+                    <FormControlLabel
+                      control={<Checkbox checked={isBestSeller} onChange={(e) => setIsBestSeller(e.target.checked)} />}
+                      label="Best Seller"
+                    />
+                  </Stack>
+                  <Box mt={1.5}>
+                    <FormControl fullWidth size="small">
+                      <InputLabel>Product Status</InputLabel>
+                      <Select
+                        value={status}
+                        label="Product Status"
+                        onChange={(e) => setStatus(e.target.value as any)}
+                      >
+                        <MenuItem value="ACTIVE">ACTIVE (Visible in Storefront)</MenuItem>
+                        <MenuItem value="DRAFT">DRAFT (Hidden / Pending Review)</MenuItem>
+                        <MenuItem value="HIDDEN">HIDDEN</MenuItem>
+                        <MenuItem value="ARCHIVED">ARCHIVED</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Box>
+                </Box>
+              ) : (
+                <Paper
+                  variant="outlined"
+                  sx={{
+                    p: 2,
+                    borderRadius: 2,
+                    bgcolor: "rgba(22, 101, 52, 0.03)",
+                    borderColor: "rgba(22, 101, 52, 0.15)",
+                  }}
+                >
+                  <Stack direction="row" justifyContent="space-between" alignItems="center" flexWrap="wrap" gap={1}>
+                    <Box>
+                      <Typography variant="subtitle2" fontWeight={700} color="text.primary">
+                        Listing Status & Promotion
+                      </Typography>
+                      <Typography variant="caption" color="text.secondary">
+                        Promotional badges (Featured, Trending, Best Seller, New Arrival) and storefront activation status are curated exclusively by the DressMe Admin team.
+                      </Typography>
+                    </Box>
+                    <Stack direction="row" spacing={0.8} alignItems="center">
+                      <Chip
+                        label={editingProduct ? editingProduct.status : "DRAFT (Pending Review)"}
+                        size="small"
+                        color={editingProduct?.status === "ACTIVE" ? "success" : "warning"}
+                        sx={{ fontWeight: 700, fontSize: "0.72rem" }}
+                      />
+                      {editingProduct?.featured && <Chip label="Featured" size="small" color="primary" />}
+                      {editingProduct?.isTrending && <Chip label="Trending" size="small" color="secondary" />}
+                      {editingProduct?.isBestSeller && <Chip label="Best Seller" size="small" color="warning" />}
+                    </Stack>
+                  </Stack>
+                </Paper>
+              )}
             </Grid>
           </Grid>
 
