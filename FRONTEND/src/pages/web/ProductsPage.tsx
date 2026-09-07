@@ -16,6 +16,7 @@ import {
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import CloseIcon from "@mui/icons-material/Close";
+import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import CheckroomRoundedIcon from "@mui/icons-material/CheckroomRounded";
 import { ROUTES } from "../../constants/routes";
 import { useProducts } from "../../hooks/useProducts";
