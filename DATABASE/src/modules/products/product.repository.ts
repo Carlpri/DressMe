@@ -508,6 +508,10 @@ export class ProductRepository {
       and.push({ isBestSeller: filters.isBestSeller });
     }
 
+    if (filters.vendorId) {
+      and.push({ vendorId: filters.vendorId });
+    }
+
     if (filters.category) {
       and.push({
         ProductCategory: {

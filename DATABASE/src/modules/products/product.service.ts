@@ -374,6 +374,7 @@ export class ProductService {
       size: this.parseString(query.size),
       color: this.parseString(query.color),
       search: rawSearch || undefined,
+      vendorId: this.parseString(query.vendorId),
       sort: this.parseSort(query.sort),
     };
   }

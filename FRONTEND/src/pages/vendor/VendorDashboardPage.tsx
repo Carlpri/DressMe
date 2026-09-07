@@ -449,12 +449,14 @@ function VendorProductsTab({
   const { data: products = [], isLoading: productsLoading } = useQuery<any[]>({
     queryKey: ["vendor-products", vendorId],
     queryFn: async () => {
-      const url =
-        user?.role === "ADMIN" && vendorId
-          ? `/products?limit=200&vendorId=${vendorId}`
-          : "/products?limit=200";
+      const url = vendorId
+        ? `/products?limit=200&vendorId=${vendorId}`
+        : "/products?limit=200";
       const res = await apiClient.get(url);
-      return res.data.data.items;
+      const items: any[] = res.data?.data?.items || [];
+      return vendorId
+        ? items.filter((p: any) => p.vendorId === vendorId)
+        : items;
     },
   });
 
@@ -1312,8 +1314,15 @@ export function VendorDashboardPage() {
   const { data: allProducts = [] } = useQuery<any[]>({
     queryKey: ["vendor-products", vendorProfile?.id],
     queryFn: async () => {
-      const res = await apiClient.get("/products?limit=200");
-      return res.data.data.items;
+      const effectiveVendorId = user?.role === "VENDOR" ? vendorProfile?.id : null;
+      const url = effectiveVendorId
+        ? `/products?limit=200&vendorId=${effectiveVendorId}`
+        : "/products?limit=200";
+      const res = await apiClient.get(url);
+      const items: any[] = res.data?.data?.items || [];
+      return effectiveVendorId
+        ? items.filter((p: any) => p.vendorId === effectiveVendorId)
+        : items;
     },
     enabled: !!user,
   });

@@ -157,6 +157,7 @@ export const productFilterSchema = z.object({
     size: z.string().trim().optional(),
     color: z.string().trim().optional(),
     search: z.string().trim().min(1).optional(),
+    vendorId: z.string().trim().min(1).optional(),
     sort: z
       .enum(["newest", "oldest", "price_asc", "price_desc", "popular", "rating"])
       .default("newest"),
