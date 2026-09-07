@@ -29,6 +29,13 @@ router.get(
   controller.getMyOrders
 );
 
+// ⚠️ Must be before /:id — otherwise Express matches "vendor" as the :id param
+router.get(
+  "/vendor/orders",
+  authorize(Role.VENDOR, Role.ADMIN),
+  controller.getVendorOrders
+);
+
 router.get(
   "/:id",
   validate(orderIdParamSchema),
@@ -59,12 +66,6 @@ router.patch(
   authorize(Role.ADMIN),
   validate(orderIdParamSchema.merge(updatePaymentStatusSchema)),
   controller.updatePaymentStatus
-);
-
-router.get(
-  "/vendor",
-  authorize(Role.VENDOR),
-  controller.getVendorOrders
 );
 
 export default router;
