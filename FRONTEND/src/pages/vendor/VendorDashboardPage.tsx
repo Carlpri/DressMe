@@ -580,12 +580,12 @@ function VendorProductsTab({
       if (statusFilter) params.set("status", statusFilter);
       if (categoryFilter) params.set("category", categoryFilter);
       const url = user?.role === "VENDOR"
-        ? `/vendor/products?${params.toString()}`
+        ? `/products?${params.toString()}&vendorId=${encodeURIComponent(vendorId || "")}`
         : `/products?${params.toString()}${vendorId ? `&vendorId=${encodeURIComponent(vendorId)}` : ""}`;
       const res = await apiClient.get(url);
       return res.data?.data || { items: [], total: 0, totalPages: 0, summary: {} };
     },
-    enabled: user?.role === "VENDOR" || !!vendorId,
+    enabled: !!user && (user.role === "ADMIN" || !!vendorId),
   });
   const products = productResult?.items ?? [];
   const summary = productResult?.summary ?? {
@@ -1545,14 +1545,14 @@ export function VendorDashboardPage() {
   const { data: allProducts = [] } = useQuery<any[]>({
     queryKey: ["vendor-products", vendorProfile?.id],
     queryFn: async () => {
-      const url = user?.role === "VENDOR"
-        ? "/vendor/products?limit=200"
+      const url = vendorProfile?.id
+        ? `/products?limit=200&vendorId=${encodeURIComponent(vendorProfile.id)}`
         : "/products?limit=200";
       const res = await apiClient.get(url);
       const items: any[] = res.data?.data?.items || [];
       return items;
     },
-    enabled: !!user,
+    enabled: !!user && (user.role === "ADMIN" || !!vendorProfile?.id),
   });
 
   const { data: vendorSummary } = useQuery<any>({

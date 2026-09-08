@@ -12,7 +12,7 @@ const controller = new ProductController();
 router.get(
   "/",
   authenticate,
-  authorize(Role.VENDOR),
+  authorize(Role.VENDOR, Role.ADMIN),
   validate(productFilterSchema),
   controller.getVendorProducts
 );
