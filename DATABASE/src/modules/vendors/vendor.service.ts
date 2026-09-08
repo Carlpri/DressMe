@@ -33,6 +33,10 @@ export class VendorService {
     return this.repository.findAll();
   }
 
+  async getDashboardSummary(userId: string) {
+    return this.repository.findDashboardSummary(userId);
+  }
+
   async getById(id: string) {
     const vendor = await this.repository.findById(id);
 

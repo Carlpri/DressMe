@@ -231,3 +231,24 @@ export function useRemoveFromCart() {
     },
   });
 }
+
+export function useClearCart() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async () => {
+      if (isUserAuthenticated()) {
+        try {
+          await apiClient.delete("/cart");
+        } catch (err) {
+          console.warn("Failed to clear backend cart, clearing local cart instead:", err);
+        }
+      }
+      saveGuestCart({ id: "guest-cart", items: [] });
+    },
+    onSuccess: () => {
+      queryClient.setQueryData<Cart>(["cart"], { id: "guest-cart", items: [] });
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
+    },
+  });
+}

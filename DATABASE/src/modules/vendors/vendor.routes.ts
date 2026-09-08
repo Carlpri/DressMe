@@ -27,6 +27,13 @@ router.get(
 );
 
 router.get(
+  "/me/dashboard",
+  authenticate,
+  authorize(Role.VENDOR, Role.ADMIN),
+  controller.getDashboardSummary
+);
+
+router.get(
   "/:id",
   controller.getVendor
 );

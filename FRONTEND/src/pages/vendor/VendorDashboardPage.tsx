@@ -1545,17 +1545,21 @@ export function VendorDashboardPage() {
   const { data: allProducts = [] } = useQuery<any[]>({
     queryKey: ["vendor-products", vendorProfile?.id],
     queryFn: async () => {
-      const effectiveVendorId = user?.role === "VENDOR" ? vendorProfile?.id : null;
-      const url = effectiveVendorId
-        ? `/products?limit=200&vendorId=${effectiveVendorId}`
+      const url = user?.role === "VENDOR"
+        ? "/vendor/products?limit=200"
         : "/products?limit=200";
       const res = await apiClient.get(url);
       const items: any[] = res.data?.data?.items || [];
-      return effectiveVendorId
-        ? items.filter((p: any) => p.vendorId === effectiveVendorId)
-        : items;
+      return items;
     },
     enabled: !!user,
+  });
+
+  const { data: vendorSummary } = useQuery<any>({
+    queryKey: ["vendor-dashboard-summary", user?.id],
+    queryFn: async () => (await apiClient.get("/vendors/me/dashboard")).data.data,
+    enabled: user?.role === "VENDOR",
+    refetchInterval: 30_000,
   });
 
   const { data: myOutfits = [] } = useQuery<any[]>({
@@ -1575,6 +1579,12 @@ export function VendorDashboardPage() {
     queryFn: async () => (await apiClient.get("/favourites")).data.data,
     enabled: !!user,
   });
+
+  const dashboardSummary = vendorSummary ?? {
+    outfits: myOutfits.length,
+    reviews: myReviews.length,
+    savedItems: savedItems.length,
+  };
 
   const handleLogout = () => {
     logout();
@@ -1654,9 +1664,9 @@ export function VendorDashboardPage() {
           {activeTab === "dashboard" && (
             <VendorOverviewTab
               products={allProducts}
-              outfitCount={myOutfits.length}
-              reviewCount={myReviews.length}
-              savedCount={savedItems.length}
+              outfitCount={dashboardSummary.outfits}
+              reviewCount={dashboardSummary.reviews}
+              savedCount={dashboardSummary.savedItems}
               formatCurrency={formatCurrency}
               onCreateProduct={() => navigate("/studio/vendor/products")}
             />

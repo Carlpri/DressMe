@@ -58,6 +58,29 @@ export class VendorRepository {
     });
   }
 
+  async findDashboardSummary(userId: string) {
+    const vendor = await prisma.vendor.findUnique({
+      where: { userId },
+      select: { id: true },
+    });
+
+    if (!vendor) return null;
+
+    const productFilter = { vendorId: vendor.id };
+    const [products, activeProducts, drafts, lowStock, outfits, reviews, savedItems] =
+      await prisma.$transaction([
+        prisma.product.count({ where: productFilter }),
+        prisma.product.count({ where: { ...productFilter, status: "ACTIVE" } }),
+        prisma.product.count({ where: { ...productFilter, status: "DRAFT" } }),
+        prisma.product.count({ where: { ...productFilter, status: "ACTIVE", stock: { lte: 5 } } }),
+        prisma.outfit.count({ where: { creatorId: userId } }),
+        prisma.review.count({ where: { product: productFilter } }),
+        prisma.favoriteProduct.count({ where: { product: productFilter } }),
+      ]);
+
+    return { products, activeProducts, drafts, lowStock, outfits, reviews, savedItems };
+  }
+
   async update(id: string, data: UpdateVendorDto) {
     // Only pass fields that were explicitly provided (not undefined).
     const patch: Record<string, unknown> = {};

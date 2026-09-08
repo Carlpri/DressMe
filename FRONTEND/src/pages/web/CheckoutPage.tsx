@@ -20,7 +20,7 @@ import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 import ShieldOutlinedIcon from "@mui/icons-material/ShieldOutlined";
 import LocalShippingOutlinedIcon from "@mui/icons-material/LocalShippingOutlined";
-import { useCart } from "../../hooks/useCart";
+import { useCart, useClearCart } from "../../hooks/useCart";
 import { useAddresses } from "../../hooks/useAddresses";
 import { useAuth } from "../../hooks/useAuth";
 import { LoadingSkeleton } from "../../components/shared/LoadingSkeleton";
@@ -36,6 +36,7 @@ export function CheckoutPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { data: cart, isLoading: cartLoading } = useCart();
+  const clearCart = useClearCart();
   const { data: addresses, isLoading: addressesLoading } = useAddresses();
   const { settings } = useSiteSettingsContext();
   const formatCurrency = useFormatCurrency();
@@ -95,6 +96,7 @@ export function CheckoutPage() {
     }
 
     window.open(url, "_blank", "noopener,noreferrer");
+    clearCart.mutate();
   };
 
   if (cartLoading || addressesLoading) {

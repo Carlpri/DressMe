@@ -33,13 +33,14 @@ export class ProductService {
     await this.ensureRelationsExist(data.categoryIds, data.brandId);
     if (isDev) console.log("[PRODUCT_CREATE_CATEGORIES]", { categoryIds: data.categoryIds, brandId: data.brandId });
 
-    // Enforce: only ADMIN can set promotional badges and product status
+    // Vendor listings are immediately available and appear in New Arrivals.
+    // Promotional merchandising flags remain admin-controlled.
     if (role !== Role.ADMIN) {
       data.featured = false;
       data.isTrending = false;
-      data.isNewArrival = false;
       data.isBestSeller = false;
-      data.status = ProductStatus.DRAFT;
+      data.isNewArrival = true;
+      data.status = ProductStatus.ACTIVE;
     }
 
     await this.ensureSkuAvailable(data.sku);

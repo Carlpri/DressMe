@@ -35,6 +35,11 @@ export class VendorController {
     );
   });
 
+  getDashboardSummary = asyncHandler(async (req, res) => {
+    const summary = await vendorService.getDashboardSummary(req.user.userId);
+    ApiResponse.success(res, 200, "Vendor dashboard summary retrieved successfully.", summary);
+  });
+
   getVendor = asyncHandler(async (req, res) => {
     const vendor = await vendorService.getById(
       req.params.id as string

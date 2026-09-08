@@ -83,7 +83,17 @@ describe("ProductService", () => {
       const result = await service.create(userId, role, validProductDto);
 
       expect(result).toBeDefined();
-      expect(repository.create).toHaveBeenCalled();
+      expect(repository.create).toHaveBeenCalledWith(
+        "vendor1",
+        "test-product",
+        expect.objectContaining({
+          status: ProductStatus.ACTIVE,
+          isNewArrival: true,
+          featured: false,
+          isTrending: false,
+          isBestSeller: false,
+        })
+      );
     });
 
     it("should create a product with valid data for admin user", async () => {
