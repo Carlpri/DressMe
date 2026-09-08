@@ -156,7 +156,7 @@ function VendorSidebar({
           >
             {vendorName || "My Store"}
           </Typography>
-          <Typography variant="caption" sx={{ color: "#94A3B8", fontWeight: 600, fontSize: "0.68rem", textTransform: "uppercase", letterSpacing: "0.08em" }}>
+          <Typography variant="caption" sx={{ color: "#94A3B8", fontWeight: 600, fontSize: { xs: "0.76rem", sm: "0.68rem" }, textTransform: "uppercase", letterSpacing: "0.08em" }}>
             Vendor Portal
           </Typography>
         </Box>
@@ -178,7 +178,7 @@ function VendorSidebar({
             py: 1,
             borderRadius: 2,
             fontWeight: 700,
-            fontSize: "0.82rem",
+            fontSize: { xs: "0.92rem", sm: "0.82rem" },
             boxShadow: "0 2px 8px rgba(22, 101, 52, 0.4)",
           }}
         >
@@ -226,7 +226,7 @@ function VendorSidebar({
                   primary={item.label}
                   primaryTypographyProps={{
                     fontWeight: isActive ? 700 : 500,
-                    fontSize: "0.88rem",
+                    fontSize: { xs: "0.98rem", sm: "0.88rem" },
                     color: isActive ? "#FFFFFF" : "#CBD5E1",
                   }}
                 />
@@ -261,7 +261,7 @@ function VendorSidebar({
             color: "#E2E8F0",
             borderColor: "rgba(255,255,255,0.25)",
             fontWeight: 600,
-            fontSize: "0.8rem",
+            fontSize: { xs: "0.86rem", sm: "0.8rem" },
             py: 0.8,
             borderRadius: 2,
             bgcolor: "rgba(255,255,255,0.04)",
@@ -278,7 +278,7 @@ function VendorSidebar({
           startIcon={<LogoutIcon sx={{ fontSize: 16 }} />}
           sx={{
             fontWeight: 600,
-            fontSize: "0.78rem",
+            fontSize: { xs: "0.84rem", sm: "0.78rem" },
             py: 0.6,
             borderRadius: 2,
             color: "#F87171",
@@ -352,10 +352,10 @@ function VendorOverviewTab({
     <Stack spacing={{ xs: 3, md: 4 }}>
       <Box display="flex" justifyContent="space-between" alignItems={{ xs: "stretch", sm: "center" }} gap={2} flexDirection={{ xs: "column", sm: "row" }}>
         <Box>
-          <Typography variant="h4" sx={{ fontWeight: 800, fontSize: { xs: "1.7rem", sm: "2.125rem" } }}>
+          <Typography variant="h4" sx={{ fontWeight: 800, fontSize: { xs: "1.9rem", sm: "2.125rem" }, lineHeight: 1.15 }}>
             Vendor Dashboard
           </Typography>
-          <Typography color="text.secondary">
+          <Typography color="text.secondary" sx={{ fontSize: { xs: "0.95rem", sm: "1rem" }, lineHeight: 1.5 }}>
             Manage your product listings, inventory, and store performance.
           </Typography>
         </Box>
@@ -380,7 +380,7 @@ function VendorOverviewTab({
                 <Typography variant="h3" sx={{ fontWeight: 800, color: stat.color }}>
                   {stat.value}
                 </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, fontSize: { xs: "0.9rem", sm: "0.875rem" } }}>
                   {stat.label}
                 </Typography>
               </CardContent>
@@ -401,7 +401,7 @@ function VendorOverviewTab({
                 <Typography variant="h3" sx={{ fontWeight: 800, color: stat.color }}>
                   {stat.value}
                 </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5, fontSize: { xs: "0.9rem", sm: "0.875rem" } }}>
                   {stat.label}
                 </Typography>
               </CardContent>
@@ -434,7 +434,7 @@ function VendorOverviewTab({
         ) : (
           <Paper variant="outlined" sx={{ overflow: "hidden", borderRadius: 3 }}>
             <TableContainer sx={{ overflowX: "auto" }}>
-            <Table size="small" sx={{ minWidth: 520 }}>
+              <Table size="small" sx={{ minWidth: 520, "& .MuiTableCell-root": { fontSize: { xs: "0.86rem", sm: "0.875rem" }, px: { xs: 1.25, sm: 2 } } }}>
               <TableHead sx={{ bgcolor: "#F8FAFC" }}>
                 <TableRow>
                   <TableCell>Product</TableCell>
@@ -858,9 +858,9 @@ function VendorProductsTab({
         ].map(([label, value, color]) => (
           <Grid key={label as string} size={{ xs: 6, md: 3 }}>
             <Card variant="outlined" sx={{ borderRadius: 2, boxShadow: "none" }}>
-              <CardContent sx={{ py: { xs: 1.5, sm: 2 }, px: { xs: 1.5, sm: 2 } }}>
-                <Typography variant="h5" fontWeight={800} sx={{ color }}>{value}</Typography>
-                <Typography variant="body2" color="text.secondary">{label}</Typography>
+              <CardContent sx={{ py: { xs: 2, sm: 2 }, px: { xs: 1.5, sm: 2 } }}>
+                <Typography variant="h5" fontWeight={800} sx={{ color, fontSize: { xs: "1.65rem", sm: "1.5rem" } }}>{value}</Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ fontSize: { xs: "0.88rem", sm: "0.875rem" }, lineHeight: 1.3 }}>{label}</Typography>
               </CardContent>
             </Card>
           </Grid>
@@ -912,11 +912,13 @@ function VendorProductsTab({
       ) : (
         <Paper variant="outlined" sx={{ overflow: "hidden", borderRadius: 3 }}>
           <TableContainer>
-          <Table sx={{ minWidth: isMobile ? 760 : undefined }}>
+          <Table sx={{ minWidth: isMobile ? 760 : undefined, "& .MuiTableCell-root": { fontSize: { xs: "0.86rem", sm: "0.875rem" }, px: { xs: 1.25, sm: 2 } } }}>
             <TableHead sx={{ bgcolor: "#F8FAFC" }}>
               <TableRow>
                 <TableCell>Product</TableCell>
                 <TableCell>SKU</TableCell>
+                <TableCell>Category / Brand</TableCell>
+                <TableCell>Price</TableCell>
                 <TableCell>Category / Brand</TableCell>
                 <TableCell>Price</TableCell>
                 <TableCell>Stock</TableCell>
@@ -1626,7 +1628,7 @@ export function VendorDashboardPage() {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: 700, fontSize: { xs: "0.98rem", sm: "1.25rem" } }}>
+          <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: 700, fontSize: { xs: "1.05rem", sm: "1.25rem" }, lineHeight: 1.2 }}>
             DressMe — Vendor Portal
           </Typography>
           <Chip
@@ -1634,7 +1636,7 @@ export function VendorDashboardPage() {
             color="primary"
             variant="outlined"
             size="small"
-            sx={{ maxWidth: { xs: 100, sm: 180 }, "& .MuiChip-label": { overflow: "hidden", textOverflow: "ellipsis" } }}
+            sx={{ maxWidth: { xs: 125, sm: 180 }, minHeight: 32, "& .MuiChip-label": { overflow: "hidden", textOverflow: "ellipsis", fontSize: { xs: "0.82rem", sm: "0.8125rem" } } }}
           />
         </Toolbar>
       </AppBar>
