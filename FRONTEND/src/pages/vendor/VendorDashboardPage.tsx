@@ -319,10 +319,16 @@ function VendorSidebar({
 
 function VendorOverviewTab({
   products,
+  outfitCount,
+  reviewCount,
+  savedCount,
   formatCurrency,
   onCreateProduct,
 }: {
   products: any[];
+  outfitCount: number;
+  reviewCount: number;
+  savedCount: number;
   formatCurrency: (n: number) => string;
   onCreateProduct: () => void;
 }) {
@@ -366,6 +372,27 @@ function VendorOverviewTab({
                 boxShadow: "none",
               }}
             >
+              <CardContent sx={{ p: { xs: 2, sm: 2.5 } }}>
+                <Typography variant="h3" sx={{ fontWeight: 800, color: stat.color }}>
+                  {stat.value}
+                </Typography>
+                <Typography variant="body2" color="text.secondary" sx={{ mt: 0.5 }}>
+                  {stat.label}
+                </Typography>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+
+      <Grid container spacing={{ xs: 2, md: 3 }}>
+        {[
+          { label: "My Outfits", value: outfitCount, color: "#0EA5E9" },
+          { label: "My Reviews", value: reviewCount, color: "#F97316" },
+          { label: "Saved Items", value: savedCount, color: "#DB2777" },
+        ].map((stat) => (
+          <Grid key={stat.label} size={{ xs: 12, sm: 4 }}>
+            <Card sx={{ borderRadius: 3, border: "1px solid", borderColor: "divider", boxShadow: "none" }}>
               <CardContent sx={{ p: { xs: 2, sm: 2.5 } }}>
                 <Typography variant="h3" sx={{ fontWeight: 800, color: stat.color }}>
                   {stat.value}
@@ -1527,6 +1554,24 @@ export function VendorDashboardPage() {
     enabled: !!user,
   });
 
+  const { data: myOutfits = [] } = useQuery<any[]>({
+    queryKey: ["vendor-dashboard-my-outfits", user?.id],
+    queryFn: async () => (await apiClient.get("/outfits/my")).data.data,
+    enabled: !!user,
+  });
+
+  const { data: myReviews = [] } = useQuery<any[]>({
+    queryKey: ["vendor-dashboard-my-reviews", user?.id],
+    queryFn: async () => (await apiClient.get("/reviews/my")).data.data,
+    enabled: !!user,
+  });
+
+  const { data: savedItems = [] } = useQuery<any[]>({
+    queryKey: ["vendor-dashboard-saved-items", user?.id],
+    queryFn: async () => (await apiClient.get("/favourites")).data.data,
+    enabled: !!user,
+  });
+
   const handleLogout = () => {
     logout();
     navigate("/studio/login", { replace: true });
@@ -1605,6 +1650,9 @@ export function VendorDashboardPage() {
           {activeTab === "dashboard" && (
             <VendorOverviewTab
               products={allProducts}
+              outfitCount={myOutfits.length}
+              reviewCount={myReviews.length}
+              savedCount={savedItems.length}
               formatCurrency={formatCurrency}
               onCreateProduct={() => navigate("/studio/vendor/products")}
             />
