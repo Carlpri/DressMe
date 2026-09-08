@@ -60,6 +60,26 @@ body {
   }
 }
 
+@keyframes heroCardReveal {
+  0% {
+    opacity: 0;
+    transform: translateY(24px) rotateX(3deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) rotateX(0);
+  }
+}
+
+@keyframes heroCardPulse {
+  0%, 100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
 .animate-hero-eyebrow {
   animation: heroEntranceFade 340ms var(--ease-out-editorial) 40ms both;
 }
@@ -78,6 +98,13 @@ body {
 
 .animate-hero-showcase {
   animation: heroEntranceFade 400ms var(--ease-out-editorial) 340ms both;
+}
+
+.animate-hero-showcase > .MuiGrid-root > .MuiGrid-root {
+  animation-duration: 700ms;
+  animation-timing-function: var(--ease-out-editorial);
+  animation-fill-mode: both;
+  perspective: 900px;
 }
 
 /* ── Strict Reduced Motion Respect ───────────────────────────────────────── */

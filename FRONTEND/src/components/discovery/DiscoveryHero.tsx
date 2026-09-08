@@ -18,6 +18,7 @@ import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
 import AutoAwesomeRoundedIcon from "@mui/icons-material/AutoAwesomeRounded";
 import NorthEastRoundedIcon from "@mui/icons-material/NorthEastRounded";
 import { ROUTES } from "../../constants/routes";
+import { useProducts } from "../../hooks/useProducts";
 
 const DEEP_EMERALD = "#166534";
 const EMERALD = "#22C55E";
@@ -33,36 +34,15 @@ const QUICK_TRENDS = [
   "Smart casual",
 ];
 
-const HERO_LOOKS = [
-  {
-    image: "/nairobi-streetwear.jpg",
-    title: "Nairobi Streetwear",
-    outfit: "Corduroy Jacket • Cargos • Airforce 1s",
-    query: "streetwear",
-  },
-  {
-    image: "/nairobi-datenight.jpg",
-    title: "Date Night",
-    outfit: "Vintage Cocktail Dress • Red-Bottoms",
-    query: "date",
-  },
-  {
-    image: "/nairobi-campus.jpg",
-    title: "Campus Casual",
-    outfit: "Relaxed Denim • Summer Top • Vans",
-    query: "campus",
-  },
-  {
-    image: "/nairobi-smartcasual.jpg",
-    title: "Afro-Tech",
-    outfit: "Textured Shirt • Tassel Loafers",
-    query: "smart casual",
-  },
-];
-
 export function DiscoveryHero({ onExploreClick }: { onExploreClick?: () => void }) {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
+  const { data: productData, isLoading: productsLoading } = useProducts({
+    limit: 4,
+    sort: "popular",
+    status: "ACTIVE",
+  });
+  const heroProducts = productData?.items ?? [];
 
   const executeSearch = (query: string) => {
     const q = query.trim();
@@ -343,10 +323,15 @@ export function DiscoveryHero({ onExploreClick }: { onExploreClick?: () => void 
           ══════════════════════════════════════════════════════════════════ */}
           <Box className="animate-hero-showcase" sx={{ width: "100%", pt: { xs: 2, md: 4 } }}>
             <Grid container spacing={2.5}>
-              {HERO_LOOKS.map((look, idx) => (
-                <Grid size={{ xs: 6, md: 3 }} key={idx}>
+              {Array.from({ length: productsLoading ? 4 : heroProducts.length }).map((_, idx) => {
+                const product = productsLoading ? undefined : heroProducts[idx];
+                const image = product?.images?.find((item) => item.isPrimary) ?? product?.images?.[0];
+                const title = product?.name ?? "Discovering the latest drop";
+
+                return (
+                <Grid size={{ xs: 6, md: 3 }} key={product?.id ?? idx}>
                   <Box
-                    onClick={() => executeSearch(look.query)}
+                    onClick={() => product ? navigate(`/products/${product.slug}`) : undefined}
                     sx={{
                       position: "relative",
                       height: { xs: 240, sm: 300, md: 360 },
@@ -363,13 +348,15 @@ export function DiscoveryHero({ onExploreClick }: { onExploreClick?: () => void 
                       "&:hover .hero-img": {
                         transform: "scale(1.06)",
                       },
+                      animationDelay: `${idx * 90}ms`,
+                      animationName: productsLoading ? "heroCardPulse" : "heroCardReveal",
                     }}
                   >
                     <Box
                       component="img"
                       className="hero-img"
-                      src={look.image}
-                      alt={look.title}
+                      src={image?.imageUrl || undefined}
+                      alt={image?.altText || title}
                       sx={{
                         width: "100%",
                         height: "100%",
@@ -409,7 +396,7 @@ export function DiscoveryHero({ onExploreClick }: { onExploreClick?: () => void 
                             lineHeight: 1.2,
                           }}
                         >
-                          {look.title}
+                          {title}
                         </Typography>
                         <NorthEastRoundedIcon sx={{ fontSize: 16, color: EMERALD }} />
                       </Stack>
@@ -423,12 +410,13 @@ export function DiscoveryHero({ onExploreClick }: { onExploreClick?: () => void 
                           whiteSpace: "nowrap",
                         }}
                       >
-                        {look.outfit}
+                        {product ? `${product.brand?.name ?? "DressMe"} • ${product.categories?.[0]?.name ?? "Featured piece"}` : "Loading catalog styles"}
                       </Typography>
                     </Box>
                   </Box>
                 </Grid>
-              ))}
+                );
+              })}
             </Grid>
           </Box>
         </Stack>

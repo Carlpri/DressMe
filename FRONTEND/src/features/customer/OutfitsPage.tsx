@@ -3,9 +3,24 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Alert, Button, Checkbox, FormControlLabel, Paper, Stack, TextField, Typography, Container } from "@mui/material";
 import axios from "axios";
 import { apiClient } from "../../api/client";
+import { OutfitCard } from "../../components/shared/OutfitCard";
 
-type Product = { id: string; name: string };
-type Outfit = { id: string; title: string; style: string; description: string; items: Array<{ product: Product }> };
+type Product = {
+  id: string;
+  name: string;
+  slug: string;
+  price: number;
+  images: Array<{ imageUrl: string; isPrimary: boolean }>;
+};
+type Outfit = {
+  id: string;
+  title: string;
+  style: string;
+  description: string;
+  coverImage?: string;
+  occasion?: string;
+  items: Array<{ id: string; product: Product }>;
+};
 
 const errorText = (e: unknown) => axios.isAxiosError(e) ? e.response?.data?.message ?? "Request failed" : "Request failed";
 
@@ -36,7 +51,13 @@ export function OutfitsPage() {
   });
 
   const create = useMutation({
-    mutationFn: () => apiClient.post("/outfits", { title, description, style, productIds: ids }),
+    mutationFn: () => {
+      const coverImage = products.data
+        ?.filter((product) => ids.includes(product.id))
+        .map((product) => product.images?.find((image) => image.isPrimary) || product.images?.[0])
+        .find(Boolean)?.imageUrl;
+      return apiClient.post("/outfits", { title, description, style, productIds: ids, coverImage });
+    },
     onSuccess: () => {
       setTitle("");
       setDescription("");
@@ -99,18 +120,11 @@ export function OutfitsPage() {
           </Stack>
         </Paper>
 
-        {mine.data?.map((outfit) => (
-          <Paper variant="outlined" key={outfit.id} sx={{ p: 2 }}>
-            <Stack direction="row" justifyContent="space-between" alignItems="center">
-              <Typography>
-                {outfit.title} · {outfit.style} — {outfit.items.map((item) => item.product.name).join(", ")}
-              </Typography>
-              <Button color="error" onClick={() => remove.mutate(outfit.id)}>
-                Delete
-              </Button>
-            </Stack>
-          </Paper>
-        ))}
+        <Stack spacing={2}>
+          {mine.data?.map((outfit) => (
+            <OutfitCard key={outfit.id} outfit={outfit} onDelete={(id) => remove.mutate(id)} />
+          ))}
+        </Stack>
 
         {error && <Alert severity="error">{error}</Alert>}
       </Stack>

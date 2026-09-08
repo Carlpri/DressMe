@@ -224,7 +224,11 @@ function VendorSidebar({
                 <ListItemIcon sx={{ color: isActive ? "white" : "#94A3B8", minWidth: 36 }}>{item.icon}</ListItemIcon>
                 <ListItemText
                   primary={item.label}
-                  primaryTypographyProps={{ fontWeight: isActive ? 700 : 500, fontSize: "0.88rem" }}
+                  primaryTypographyProps={{
+                    fontWeight: isActive ? 700 : 500,
+                    fontSize: "0.88rem",
+                    color: isActive ? "#FFFFFF" : "#CBD5E1",
+                  }}
                 />
               </ListItemButton>
             </ListItem>

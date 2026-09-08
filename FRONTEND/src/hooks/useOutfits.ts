@@ -15,12 +15,13 @@ export interface OutfitItem {
 export interface Outfit {
   id: string;
   title: string;
+  coverImage?: string;
   description?: string;
   style: string;
   occasion?: string;
   season?: string;
   items: OutfitItem[];
-  createdAt: string;
+  createdAt?: string;
 }
 
 export function useOutfits() {
@@ -33,6 +34,16 @@ export function useOutfits() {
   });
 }
 
+export function usePublicOutfits() {
+  return useQuery({
+    queryKey: ["public-outfits"],
+    queryFn: async () => {
+      const response = await apiClient.get<{ data: Outfit[] }>("/outfits");
+      return response.data.data;
+    },
+  });
+}
+
 export function useCreateOutfit() {
   const queryClient = useQueryClient();
   return useMutation({
@@ -40,6 +51,7 @@ export function useCreateOutfit() {
       title: string;
       description?: string;
       style: string;
+      coverImage?: string;
       occasion?: string;
       season?: string;
       productIds: string[];

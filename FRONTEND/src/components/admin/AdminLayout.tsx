@@ -154,6 +154,7 @@ export function AdminLayout() {
                   primaryTypographyProps={{
                     fontSize: "0.86rem",
                     fontWeight: isActive ? 700 : 500,
+                    color: isActive ? "#FFFFFF" : "#CBD5E1",
                   }}
                 />
               </ListItemButton>

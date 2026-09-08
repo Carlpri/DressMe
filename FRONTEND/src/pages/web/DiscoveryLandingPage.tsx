@@ -24,6 +24,7 @@ import { CategoryDiscoverySection } from "../../components/discovery/CategoryDis
 import { FeaturedSection } from "../../components/discovery/FeaturedSection";
 import { BestSellersSection } from "../../components/discovery/BestSellersSection";
 import { DiscoveryFeedSection } from "../../components/discovery/DiscoveryFeedSection";
+import { CommunityOutfitsSection } from "../../components/discovery/CommunityOutfitsSection";
 import { useScrollReveal } from "../../hooks/useScrollReveal";
 import { ROUTES } from "../../constants/routes";
 
@@ -45,6 +46,8 @@ export function DiscoveryLandingPage() {
     <Box sx={{ bgcolor: "#FFFFFF", color: CHARCOAL, minHeight: "100vh" }}>
       {/* 1. DISCOVERY HERO WITH VISIBLE SEARCH BUTTON */}
       <DiscoveryHero onExploreClick={scrollToFeed} />
+
+      <CommunityOutfitsSection />
 
       {/* 2. VALUE PROPOSITION STRIP */}
       <Box

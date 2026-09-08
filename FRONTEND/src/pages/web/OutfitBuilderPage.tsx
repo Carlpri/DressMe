@@ -31,6 +31,7 @@ import { useProducts } from "../../hooks/useProducts";
 import { ProductCard } from "../../components/shared/ProductCard";
 import { LoadingSkeleton } from "../../components/shared/LoadingSkeleton";
 import type { Outfit } from "../../hooks/useOutfits";
+import { OutfitCard } from "../../components/shared/OutfitCard";
 
 const STYLE_OPTIONS = [
   "Casual",
@@ -99,10 +100,16 @@ export function OutfitBuilderPage() {
   };
 
   const handleSaveOutfit = () => {
+    const coverImage = allProducts?.items
+      .filter((product) => selectedProducts.includes(product.id))
+      .map((product) => product.images?.find((image) => image.isPrimary) || product.images?.[0])
+      .find(Boolean)?.imageUrl;
+
     createOutfit.mutate(
       {
         ...formData,
         productIds: selectedProducts,
+        coverImage,
       },
       {
         onSuccess: () => {
@@ -287,74 +294,7 @@ export function OutfitBuilderPage() {
             <Grid container spacing={3}>
               {outfits.map((outfit) => (
                 <Grid size={{ xs: 12, sm: 6, md: 4 }} key={outfit.id}>
-                  <Card variant="outlined">
-                    <CardContent>
-                      <Stack spacing={2}>
-                        <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
-                          <Stack direction="row" spacing={1} alignItems="center">
-                            <CheckroomIcon color="primary" fontSize="small" />
-                            <Typography variant="h6" sx={{ fontWeight: 700 }}>
-                              {outfit.title}
-                            </Typography>
-                          </Stack>
-                          <IconButton
-                            size="small"
-                            onClick={() => handleDeleteOutfit(outfit.id)}
-                          >
-                            <DeleteIcon fontSize="small" />
-                          </IconButton>
-                        </Stack>
-
-                        <Stack direction="row" spacing={1} flexWrap="wrap">
-                          <Chip label={outfit.style} size="small" />
-                          {outfit.occasion && (
-                            <Chip label={outfit.occasion} size="small" variant="outlined" />
-                          )}
-                        </Stack>
-
-                        {outfit.description && (
-                          <Typography variant="body2" color="text.secondary">
-                            {outfit.description}
-                          </Typography>
-                        )}
-
-                        <Box>
-                          <Typography variant="caption" color="text.secondary">
-                            {outfit.items.length} items
-                          </Typography>
-                        </Box>
-
-                        <Grid container spacing={1}>
-                          {outfit.items.slice(0, 4).map((item) => (
-                            <Grid size={3} key={item.id}>
-                              <Box
-                                sx={{
-                                  width: "100%",
-                                  aspectRatio: 1,
-                                  borderRadius: 1,
-                                  overflow: "hidden",
-                                  bgcolor: "#F8FAFC",
-                                }}
-                              >
-                                {item.product.images?.[0] && (
-                                  <Box
-                                    component="img"
-                                    src={item.product.images[0].imageUrl}
-                                    alt={item.product.name}
-                                    sx={{
-                                      width: "100%",
-                                      height: "100%",
-                                      objectFit: "cover",
-                                    }}
-                                  />
-                                )}
-                              </Box>
-                            </Grid>
-                          ))}
-                        </Grid>
-                      </Stack>
-                    </CardContent>
-                  </Card>
+                  <OutfitCard outfit={outfit} onDelete={handleDeleteOutfit} />
                 </Grid>
               ))}
             </Grid>
