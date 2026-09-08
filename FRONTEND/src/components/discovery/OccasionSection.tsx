@@ -33,7 +33,7 @@ const OCCASIONS: OccasionItem[] = [
     tagline: "Corduroy jackets, cargo pants & Airforce kicks",
     catalogOutfit: "Corduroy Jacket • Baggy Cargos • AF1s",
     searchQuery: "streetwear",
-    image: "/nairobi-streetwear.jpg",
+    image: "/hero-african-models.jpg",
     isSpotlight: true,
   },
   {
@@ -42,7 +42,7 @@ const OCCASIONS: OccasionItem[] = [
     tagline: "Vintage tea dress, red-bottom heels & studded purse",
     catalogOutfit: "Tea Cocktail Dress • Designer Heels • Star Necklace",
     searchQuery: "date",
-    image: "/nairobi-datenight.jpg",
+    image: "/Kenyan%20Fashion%20designers%20Put%20Kenya%20on%20the%20NYFW%202024%20Map.jpg",
     isSpotlight: true,
   },
   {
@@ -51,7 +51,7 @@ const OCCASIONS: OccasionItem[] = [
     tagline: "Blue denim, summer tops & Vans sneakers",
     catalogOutfit: "Relaxed Jeans • Graphic Tops • Vans Sneakers",
     searchQuery: "campus",
-    image: "/nairobi-campus.jpg",
+    image: "/aesthetic%20man's%20clothes%20%F0%9F%94%A5_%20tap%20on%20the%20link%20to%20get%20more%20info__.jpg",
     isSpotlight: true,
   },
   {
@@ -60,7 +60,7 @@ const OCCASIONS: OccasionItem[] = [
     tagline: "Textured collar shirts, dress pants & tassel loafers",
     catalogOutfit: "Short-Sleeve Textured Shirt • Tassel Loafers",
     searchQuery: "smart casual",
-    image: "/nairobi-smartcasual.jpg",
+    image: "/African%20Print%20Shirt%20for%20Men,%20Ankara%20Short%20Sleeve%20Shirt,%20Patchwork%20Top.jpg",
     isSpotlight: true,
   },
   {
@@ -69,7 +69,7 @@ const OCCASIONS: OccasionItem[] = [
     tagline: "Tailored ivory kaftan suit with gold embroidery",
     catalogOutfit: "African Men Suit • Gold Embroidery • Leather Sandals",
     searchQuery: "Africa wear",
-    image: "/nairobi-africanmodern.jpg",
+    image: "/Pre%20order%20Sizes%20(S,M,L,XL%D8%8C2XL)%20Price_155%20thousand%20Height%20_%2097%20cm%20Delivery%20service%20to%20all%20parts%20of___.jpg",
     isSpotlight: true,
   },
   {
@@ -78,7 +78,7 @@ const OCCASIONS: OccasionItem[] = [
     tagline: "Sharp blazers & crisp corporate tailoring",
     catalogOutfit: "Tailored Shirts • Dress Trousers",
     searchQuery: "office",
-    image: "/nairobi-smartcasual.jpg",
+    image: "/African%20Print%20Shirt%20for%20Men,%20Ankara%20Short%20Sleeve%20Shirt,%20Patchwork%20Top.jpg",
   },
   {
     id: "weekend",
@@ -86,7 +86,7 @@ const OCCASIONS: OccasionItem[] = [
     tagline: "Effortless chill fits for spontaneous road trips",
     catalogOutfit: "Birko-Flor Sandals • Casual Shirts • Sunnies",
     searchQuery: "weekend",
-    image: "/nairobi-campus.jpg",
+    image: "/aesthetic%20man's%20clothes%20%F0%9F%94%A5_%20tap%20on%20the%20link%20to%20get%20more%20info__.jpg",
   },
   {
     id: "wedding",
@@ -94,7 +94,7 @@ const OCCASIONS: OccasionItem[] = [
     tagline: "Distinguished guest elegance & bespoke attire",
     catalogOutfit: "Cocktail Gowns • African Celebration Suits",
     searchQuery: "wedding",
-    image: "/nairobi-africanmodern.jpg",
+    image: "/Kenyan%20Fashion%20designers%20Put%20Kenya%20on%20the%20NYFW%202024%20Map.jpg",
   },
 ];
 

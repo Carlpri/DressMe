@@ -44,17 +44,17 @@ const BORDER_LIGHT = "rgba(0, 0, 0, 0.07)";
    Pure CSS perspective + rotateY — no canvas, no lib, zero bundle cost.     */
 const HERO_SLIDES = [
   {
-    img: "https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=600&q=80",
+    img: "/hero-african-models.jpg",
     label: "Editorial",
     caption: "Curated Looks",
   },
   {
-    img: "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=600&q=80",
+    img: "/Kenyan%20Fashion%20designers%20Put%20Kenya%20on%20the%20NYFW%202024%20Map.jpg",
     label: "Trending",
     caption: "What's Hot Now",
   },
   {
-    img: "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=600&q=80",
+    img: "/African%20Print%20Shirt%20for%20Men,%20Ankara%20Short%20Sleeve%20Shirt,%20Patchwork%20Top.jpg",
     label: "New Arrival",
     caption: "Just Dropped",
   },

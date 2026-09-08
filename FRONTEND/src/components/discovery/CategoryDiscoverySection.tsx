@@ -17,16 +17,16 @@ const CHARCOAL = "#111827";
 
 // Curated default high-res category imagery if category image is not stored
 const DEFAULT_CATEGORY_IMAGES: Record<string, string> = {
-  dresses: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=600&q=80",
-  shirts: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=600&q=80",
-  pants: "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=600&q=80",
-  skirts: "https://images.unsplash.com/photo-1583496661160-fb5886a0aaaa?w=600&q=80",
-  jackets: "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=600&q=80",
-  accessories: "https://images.unsplash.com/photo-1611652022419-a9419f74343d?w=600&q=80",
-  footwear: "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=600&q=80",
-  intimates: "https://images.unsplash.com/photo-1517445312882-bc9910d016b7?w=600&q=80",
-  streetwear: "https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?w=600&q=80",
-  sneakers: "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=600&q=80",
+  dresses: "/Kenyan%20Fashion%20designers%20Put%20Kenya%20on%20the%20NYFW%202024%20Map.jpg",
+  shirts: "/African%20Print%20Shirt%20for%20Men,%20Ankara%20Short%20Sleeve%20Shirt,%20Patchwork%20Top.jpg",
+  pants: "/aesthetic%20man's%20clothes%20%F0%9F%94%A5_%20tap%20on%20the%20link%20to%20get%20more%20info__.jpg",
+  skirts: "/hero-african-models.jpg",
+  jackets: "/211174979397891.jpg",
+  accessories: "/123075002304666543.jpg",
+  footwear: "/1150458667340015777.jpg",
+  intimates: "/13159023906690280.jpg",
+  streetwear: "/hero-african-models.jpg",
+  sneakers: "/1106759677211158787.jpg",
 };
 
 export function CategoryDiscoverySection() {
@@ -118,7 +118,7 @@ export function CategoryDiscoverySection() {
                   cat.image ||
                   DEFAULT_CATEGORY_IMAGES[cat.slug] ||
                   DEFAULT_CATEGORY_IMAGES[cat.name.toLowerCase()] ||
-                  "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=600&q=80";
+                  "/hero-african-models.jpg";
 
                 return (
                   <Grid size={{ xs: 6, sm: 4, md: 3 }} key={cat.id} className="reveal-child">
