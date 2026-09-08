@@ -2,8 +2,8 @@ import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Box,
+  Button,
   Container,
-  Grid,
   Stack,
   Typography,
   Chip,
@@ -345,6 +345,7 @@ function OccasionCard({ occasion }: { occasion: OccasionItem }) {
 }
 
 export function OccasionSection() {
+  const navigate = useNavigate();
   const sectionRef = useScrollReveal<HTMLDivElement>({ threshold: 0.08, staggerMs: 50 });
 
   return (
@@ -400,18 +401,39 @@ export function OccasionSection() {
               Find Your Look
             </Typography>
             <Typography sx={{ color: "#64748B", mt: 1.5, fontSize: { xs: "0.95rem", md: "1.05rem" }, lineHeight: 1.6 }}>
-              Curated styling aesthetics tailored to every moment — with authentic outfits available right here on DressMe
+              Looks for every moment, built from real DressMe pieces.
             </Typography>
+            <Button
+              variant="text"
+              endIcon={<ArrowForwardRoundedIcon />}
+              onClick={() => navigate("/products")}
+              sx={{ mt: 1, color: DEEP_EMERALD, fontWeight: 800, textTransform: "none" }}
+            >
+              View more looks
+            </Button>
           </Box>
 
-          {/* Occasion Cards Grid with Staggered Entrance */}
-          <Grid container spacing={{ xs: 2, sm: 2.5, md: 3 }}>
+          {/* Horizontal occasion rail */}
+          <Box
+            sx={{
+              display: "flex",
+              gap: { xs: 1.5, sm: 2.5 },
+              overflowX: "auto",
+              mx: { xs: -2, md: 0 },
+              px: { xs: 2, md: 0 },
+              pb: 2,
+              scrollSnapType: "x mandatory",
+              scrollbarWidth: "none",
+              "&::-webkit-scrollbar": { display: "none" },
+              "& > *": { flex: "0 0 clamp(250px, 29vw, 340px)", scrollSnapAlign: "start" },
+            }}
+          >
             {OCCASIONS.map((occasion) => (
-              <Grid size={{ xs: 6, sm: 4, md: 3 }} key={occasion.id} className="reveal-child">
+              <Box key={occasion.id} className="reveal-child">
                 <OccasionCard occasion={occasion} />
-              </Grid>
+              </Box>
             ))}
-          </Grid>
+          </Box>
         </Stack>
       </Container>
     </Box>

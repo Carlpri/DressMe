@@ -12,8 +12,7 @@ import NorthEastRoundedIcon from "@mui/icons-material/NorthEastRounded";
 import { useProducts } from "../../hooks/useProducts";
 import { useScrollReveal } from "../../hooks/useScrollReveal";
 import { ProductCard } from "../shared/ProductCard";
-import { MasonryGrid } from "../shared/MasonryGrid";
-import { LoadingSkeleton } from "../shared/LoadingSkeleton";
+import { HorizontalProductRail } from "./HorizontalProductRail";
 import { ROUTES } from "../../constants/routes";
 
 const DEEP_EMERALD = "#166534";
@@ -94,7 +93,7 @@ export function FeaturedSection() {
             <Button
               variant="text"
               endIcon={<NorthEastRoundedIcon />}
-              onClick={() => navigate(`${ROUTES.customerDashboard}?featured=true`)}
+              onClick={() => navigate("/products?featured=true")}
               sx={{
                 color: DEEP_EMERALD,
                 fontWeight: 700,
@@ -102,25 +101,11 @@ export function FeaturedSection() {
                 "&:hover": { bgcolor: "rgba(22, 101, 52, 0.06)" },
               }}
             >
-              View All Featured
+              View more
             </Button>
           </Stack>
 
-          {isLoading ? (
-            <MasonryGrid columns={{ xs: 2, sm: 2, md: 3, lg: 4 }}>
-              {[...Array(4)].map((_, i) => (
-                <LoadingSkeleton key={i} height={i % 2 === 0 ? 420 : 360} />
-              ))}
-            </MasonryGrid>
-          ) : (
-            <MasonryGrid columns={{ xs: 2, sm: 2, md: 3, lg: 4 }}>
-              {products.slice(0, 4).map((product) => (
-                <Box key={product.id} className="reveal-child">
-                  <ProductCard product={product} badge="Featured" />
-                </Box>
-              ))}
-            </MasonryGrid>
-          )}
+          <HorizontalProductRail products={products.slice(0, 8)} isLoading={isLoading} badge="Featured" />
         </Stack>
       </Container>
     </Box>

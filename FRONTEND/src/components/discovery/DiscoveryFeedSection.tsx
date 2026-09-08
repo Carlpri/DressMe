@@ -11,7 +11,7 @@ import AutoAwesomeRoundedIcon from "@mui/icons-material/AutoAwesomeRounded";
 import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
 import { useProducts } from "../../hooks/useProducts";
 import { useScrollReveal } from "../../hooks/useScrollReveal";
-import { MasonryGrid } from "../shared/MasonryGrid";
+import { HorizontalProductRail } from "./HorizontalProductRail";
 import { ProductDiscoveryCard } from "./ProductDiscoveryCard";
 import { LoadingSkeleton } from "../shared/LoadingSkeleton";
 import { EmptySearchState } from "./EmptySearchState";
@@ -105,7 +105,7 @@ export function DiscoveryFeedSection({ id }: { id?: string }) {
               Explore the Discovery Stream
             </Typography>
             <Typography sx={{ color: "#64748B", mt: 1.5, fontSize: { xs: "0.95rem", md: "1.05rem" }, lineHeight: 1.6 }}>
-              A curated masonry flow of ready-to-wear pieces, outfits, and fashion drops
+              A moving edit of ready-to-wear pieces and fashion drops.
             </Typography>
           </Box>
 
@@ -163,21 +163,12 @@ export function DiscoveryFeedSection({ id }: { id?: string }) {
             </Box>
           </Box>
 
-          {/* Masonry Discovery Grid with Staggered Reveals */}
-          {isLoading ? (
-            <MasonryGrid columns={{ xs: 2, sm: 2, md: 3, lg: 4 }} gap={{ xs: "12px", sm: "16px", md: "20px" }}>
-              {[...Array(8)].map((_, i) => (
-                <LoadingSkeleton key={i} height={i % 2 === 0 ? 380 : 440} />
-              ))}
-            </MasonryGrid>
-          ) : products.length > 0 ? (
-            <MasonryGrid columns={{ xs: 2, sm: 2, md: 3, lg: 4 }} gap={{ xs: "12px", sm: "16px", md: "20px" }}>
-              {products.map((product) => (
-                <Box key={product.id} className="reveal-child">
-                  <ProductDiscoveryCard product={product} />
-                </Box>
-              ))}
-            </MasonryGrid>
+          {isLoading || products.length > 0 ? (
+            <HorizontalProductRail
+              products={products}
+              isLoading={isLoading}
+              renderCard={(product) => <ProductDiscoveryCard product={product} />}
+            />
           ) : (
             <EmptySearchState
               query={activeTab.label}

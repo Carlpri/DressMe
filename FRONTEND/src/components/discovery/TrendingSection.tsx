@@ -12,8 +12,7 @@ import WhatshotRoundedIcon from "@mui/icons-material/WhatshotRounded";
 import { useProducts } from "../../hooks/useProducts";
 import { useScrollReveal } from "../../hooks/useScrollReveal";
 import { ProductCard } from "../shared/ProductCard";
-import { MasonryGrid } from "../shared/MasonryGrid";
-import { LoadingSkeleton } from "../shared/LoadingSkeleton";
+import { HorizontalProductRail } from "./HorizontalProductRail";
 import { ROUTES } from "../../constants/routes";
 
 const DEEP_EMERALD = "#166534";
@@ -91,7 +90,7 @@ export function TrendingSection() {
             <Button
               variant="text"
               endIcon={<NorthEastRoundedIcon />}
-              onClick={() => navigate(`${ROUTES.customerDashboard}?sort=popular`)}
+              onClick={() => navigate("/products?sort=popular")}
               sx={{
                 color: DEEP_EMERALD,
                 fontWeight: 700,
@@ -99,25 +98,13 @@ export function TrendingSection() {
                 "&:hover": { bgcolor: "rgba(22, 101, 52, 0.06)" },
               }}
             >
-              View All Trending
+              View more
             </Button>
           </Stack>
 
           {/* Product Grid */}
-          {isLoading ? (
-            <MasonryGrid columns={{ xs: 2, sm: 2, md: 3, lg: 4 }}>
-              {[...Array(8)].map((_, i) => (
-                <LoadingSkeleton key={i} height={i % 3 === 0 ? 420 : i % 2 === 0 ? 360 : 300} />
-              ))}
-            </MasonryGrid>
-          ) : products.length > 0 ? (
-            <MasonryGrid columns={{ xs: 2, sm: 2, md: 3, lg: 4 }}>
-              {products.slice(0, 8).map((product) => (
-                <Box key={product.id} className="reveal-child">
-                  <ProductCard product={product} badge="Trending" />
-                </Box>
-              ))}
-            </MasonryGrid>
+          {isLoading || products.length > 0 ? (
+            <HorizontalProductRail products={products.slice(0, 8)} isLoading={isLoading} badge="Trending" />
           ) : (
             <Box
               sx={{
