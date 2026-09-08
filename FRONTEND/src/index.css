@@ -80,6 +80,15 @@ body {
   }
 }
 
+@keyframes heroVideoZoom {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.07);
+  }
+}
+
 .animate-hero-eyebrow {
   animation: heroEntranceFade 340ms var(--ease-out-editorial) 40ms both;
 }
