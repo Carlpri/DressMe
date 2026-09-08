@@ -73,7 +73,9 @@ export function DiscoveryHero({ onExploreClick }: { onExploreClick?: () => void 
             height: "100%",
             objectFit: "cover",
             display: "block",
-            opacity: 0.98,
+            opacity: 1,
+            filter: "contrast(1.08) saturate(1.06) brightness(1.02)",
+            imageRendering: "high-quality",
             animation: reducedMotion ? "none" : "heroVideoZoom 18s ease-in-out infinite",
           }}
         />
@@ -86,14 +88,21 @@ export function DiscoveryHero({ onExploreClick }: { onExploreClick?: () => void 
           inset: 0,
           zIndex: -1,
           background: {
-            xs: "linear-gradient(180deg, rgba(7, 12, 9, 0.12) 25%, rgba(7, 12, 9, 0.78) 100%)",
-            md: "linear-gradient(90deg, rgba(7, 12, 9, 0.72) 0%, rgba(7, 12, 9, 0.2) 56%, rgba(7, 12, 9, 0.1) 100%)",
+            xs: "linear-gradient(180deg, rgba(7, 12, 9, 0.18) 12%, rgba(7, 12, 9, 0.42) 46%, rgba(7, 12, 9, 0.92) 100%)",
+            md: "linear-gradient(90deg, rgba(7, 12, 9, 0.9) 0%, rgba(7, 12, 9, 0.64) 38%, rgba(7, 12, 9, 0.18) 72%, rgba(7, 12, 9, 0.08) 100%)",
           },
         }}
       />
 
       <Container maxWidth="xl" sx={{ pb: { xs: 5, sm: 7, md: 10 }, position: "relative" }}>
-        <Stack spacing={{ xs: 2, md: 2.5 }} sx={{ maxWidth: { xs: 440, md: 690 }, color: "#FFFFFF" }}>
+        <Stack
+          spacing={{ xs: 2, md: 2.5 }}
+          sx={{
+            maxWidth: { xs: 440, md: 690 },
+            color: "#FFFFFF",
+            textShadow: "0 2px 18px rgba(0, 0, 0, 0.42)",
+          }}
+        >
           <MotionBox
             variants={textVariants}
             initial="hidden"
@@ -105,7 +114,7 @@ export function DiscoveryHero({ onExploreClick }: { onExploreClick?: () => void 
               letterSpacing: "0.2em",
               lineHeight: 1.4,
               textTransform: "uppercase",
-              color: "rgba(255,255,255,0.78)",
+              color: "rgba(255,255,255,0.92)",
             }}
           >
             AFRICAN FASHION-TECH DISCOVERY
@@ -131,7 +140,7 @@ export function DiscoveryHero({ onExploreClick }: { onExploreClick?: () => void 
             <Typography
               sx={{
                 maxWidth: 500,
-                color: "rgba(255,255,255,0.84)",
+                color: "rgba(255,255,255,0.94)",
                 fontSize: { xs: "0.98rem", md: "1.1rem" },
                 lineHeight: 1.55,
               }}
@@ -141,7 +150,12 @@ export function DiscoveryHero({ onExploreClick }: { onExploreClick?: () => void 
           </MotionBox>
 
           <MotionBox variants={textVariants} initial="hidden" animate="visible" custom={0.44}>
-            <Stack direction="row" spacing={1.5} alignItems="center" sx={{ pt: 1 }}>
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              spacing={1.5}
+              alignItems={{ xs: "stretch", sm: "center" }}
+              sx={{ pt: 1, width: { xs: "100%", sm: "auto" } }}
+            >
               <Button
                 variant="contained"
                 onClick={onExploreClick}
@@ -153,8 +167,10 @@ export function DiscoveryHero({ onExploreClick }: { onExploreClick?: () => void 
                   bgcolor: "#FFFFFF",
                   color: "#132018",
                   fontWeight: 800,
-                  boxShadow: "none",
-                  "&:hover": { bgcolor: "#E8F5E9", boxShadow: "none" },
+                  textShadow: "none",
+                  minHeight: 52,
+                  boxShadow: "0 8px 24px rgba(0, 0, 0, 0.24)",
+                  "&:hover": { bgcolor: "#E8F5E9", boxShadow: "0 10px 28px rgba(0, 0, 0, 0.3)" },
                 }}
               >
                 Explore fashion
@@ -166,6 +182,8 @@ export function DiscoveryHero({ onExploreClick }: { onExploreClick?: () => void 
                 sx={{
                   color: "#FFFFFF",
                   fontWeight: 700,
+                  textShadow: "0 2px 12px rgba(0, 0, 0, 0.5)",
+                  minHeight: 48,
                   "&:hover": { bgcolor: "rgba(255,255,255,0.12)" },
                 }}
               >

@@ -44,6 +44,10 @@ import { ProductCard } from "../../components/shared/ProductCard";
 import { MasonryGrid } from "../../components/shared/MasonryGrid";
 import { LoadingSkeleton } from "../../components/shared/LoadingSkeleton";
 import type { Product } from "../../types/product";
+import { usePublicSiteSettings } from "../../hooks/useSiteSettings";
+
+const DEFAULT_DRESSME_FAVICON =
+  "https://res.cloudinary.com/mrjdesh0/image/upload/v1787774123/dressme/products/Favicon_rpf38w.png";
 
 const STYLE_OPTIONS = [
   "Casual",
@@ -121,6 +125,7 @@ const QUICK_SEARCH_EXAMPLES = [
 export function AIStylistPage() {
   const { isAuthenticated } = useAuth();
   const [activeTab, setActiveTab] = useState<0 | 1>(0);
+  const { data: siteSettings } = usePublicSiteSettings();
 
   // Stylist Form States
   const [selectedGender, setSelectedGender] = useState<"" | "MALE" | "FEMALE" | "UNISEX">("");
@@ -266,26 +271,33 @@ export function AIStylistPage() {
             sx={{
               width: 76,
               height: 76,
-              bgcolor: "#00C896",
-              color: "#07130F",
+              bgcolor: "#FFFFFF",
               margin: "0 auto 16px",
-              boxShadow: "0 10px 30px rgba(0, 200, 150, 0.4)",
+              border: "1px solid rgba(15, 23, 42, 0.08)",
+              boxShadow: "0 10px 30px rgba(15, 23, 42, 0.14)",
             }}
           >
-            <AutoAwesomeIcon sx={{ fontSize: 40 }} />
+            <Box
+              component="img"
+              src={siteSettings?.faviconUrl || DEFAULT_DRESSME_FAVICON}
+              alt="DressMe"
+              sx={{ width: 48, height: 48, objectFit: "contain" }}
+            />
           </Avatar>
           <Typography
             variant="h3"
             component="h1"
+            className="font-display"
             sx={{
-              fontWeight: 800,
-              fontSize: { xs: "2rem", md: "2.75rem" },
+              fontWeight: 700,
+              fontSize: { xs: "2.15rem", md: "3.2rem" },
               mb: 1.5,
-              letterSpacing: "-0.02em",
-              color: "text.primary",
+              letterSpacing: "-0.04em",
+              lineHeight: 1.05,
+              color: "#0F172A",
             }}
           >
-            DressMe AI Shopping Assistant
+            DRESSME SHOPPING ASSISTANT
           </Typography>
           <Typography
             color="text.secondary"
