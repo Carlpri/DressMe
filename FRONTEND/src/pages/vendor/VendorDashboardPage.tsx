@@ -339,23 +339,23 @@ function VendorOverviewTab({
   ];
 
   return (
-    <Stack spacing={4}>
-      <Box display="flex" justifyContent="space-between" alignItems="center">
+    <Stack spacing={{ xs: 3, md: 4 }}>
+      <Box display="flex" justifyContent="space-between" alignItems={{ xs: "stretch", sm: "center" }} gap={2} flexDirection={{ xs: "column", sm: "row" }}>
         <Box>
-          <Typography variant="h4" sx={{ fontWeight: 800 }}>
+          <Typography variant="h4" sx={{ fontWeight: 800, fontSize: { xs: "1.7rem", sm: "2.125rem" } }}>
             Vendor Dashboard
           </Typography>
           <Typography color="text.secondary">
             Manage your product listings, inventory, and store performance.
           </Typography>
         </Box>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={onCreateProduct}>
+        <Button variant="contained" startIcon={<AddIcon />} onClick={onCreateProduct} fullWidth sx={{ minHeight: 44 }}>
           New Product
         </Button>
       </Box>
 
       {/* Stats */}
-      <Grid container spacing={3}>
+      <Grid container spacing={{ xs: 2, md: 3 }}>
         {stats.map((stat) => (
           <Grid key={stat.label} size={{ xs: 6, md: 3 }}>
             <Card
@@ -366,7 +366,7 @@ function VendorOverviewTab({
                 boxShadow: "none",
               }}
             >
-              <CardContent>
+              <CardContent sx={{ p: { xs: 2, sm: 2.5 } }}>
                 <Typography variant="h3" sx={{ fontWeight: 800, color: stat.color }}>
                   {stat.value}
                 </Typography>
@@ -402,7 +402,8 @@ function VendorOverviewTab({
           </Paper>
         ) : (
           <Paper variant="outlined" sx={{ overflow: "hidden", borderRadius: 3 }}>
-            <Table size="small">
+            <TableContainer sx={{ overflowX: "auto" }}>
+            <Table size="small" sx={{ minWidth: 520 }}>
               <TableHead sx={{ bgcolor: "#F8FAFC" }}>
                 <TableRow>
                   <TableCell>Product</TableCell>
@@ -478,6 +479,7 @@ function VendorOverviewTab({
                 })}
               </TableBody>
             </Table>
+            </TableContainer>
           </Paper>
         )}
       </Box>
@@ -800,18 +802,18 @@ function VendorProductsTab({
   };
 
   return (
-    <Stack spacing={4}>
+    <Stack spacing={{ xs: 3, md: 4 }}>
       {/* Header */}
-      <Box display="flex" justifyContent="space-between" alignItems="center">
+      <Box display="flex" justifyContent="space-between" alignItems={{ xs: "stretch", sm: "center" }} gap={2} flexDirection={{ xs: "column", sm: "row" }}>
         <Box>
-          <Typography variant="h4" sx={{ fontWeight: 800 }}>
+          <Typography variant="h4" sx={{ fontWeight: 800, fontSize: { xs: "1.7rem", sm: "2.125rem" } }}>
             My Products
           </Typography>
           <Typography color="text.secondary">
             Manage the products you have listed on DressMe.
           </Typography>
         </Box>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpenCreate}>
+        <Button variant="contained" startIcon={<AddIcon />} onClick={handleOpenCreate} fullWidth sx={{ minHeight: 44 }}>
           Create Product
         </Button>
       </Box>
@@ -825,7 +827,7 @@ function VendorProductsTab({
         ].map(([label, value, color]) => (
           <Grid key={label as string} size={{ xs: 6, md: 3 }}>
             <Card variant="outlined" sx={{ borderRadius: 2, boxShadow: "none" }}>
-              <CardContent sx={{ py: 2 }}>
+              <CardContent sx={{ py: { xs: 1.5, sm: 2 }, px: { xs: 1.5, sm: 2 } }}>
                 <Typography variant="h5" fontWeight={800} sx={{ color }}>{value}</Typography>
                 <Typography variant="body2" color="text.secondary">{label}</Typography>
               </CardContent>
@@ -836,13 +838,13 @@ function VendorProductsTab({
 
       <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
         <TextField fullWidth size="small" label="Search products..." value={search} onChange={(event) => { setSearch(event.target.value); setPage(1); }} />
-        <FormControl size="small" sx={{ minWidth: 180 }}>
+        <FormControl size="small" sx={{ minWidth: { md: 180 }, width: { xs: "100%", md: "auto" } }}>
           <InputLabel>Status</InputLabel>
           <Select value={statusFilter} label="Status" onChange={(event) => { setStatusFilter(event.target.value); setPage(1); }}>
             <MenuItem value="">All statuses</MenuItem><MenuItem value="ACTIVE">Active</MenuItem><MenuItem value="DRAFT">Draft</MenuItem><MenuItem value="HIDDEN">Hidden</MenuItem><MenuItem value="ARCHIVED">Archived</MenuItem>
           </Select>
         </FormControl>
-        <FormControl size="small" sx={{ minWidth: 180 }}>
+        <FormControl size="small" sx={{ minWidth: { md: 180 }, width: { xs: "100%", md: "auto" } }}>
           <InputLabel>Category</InputLabel>
           <Select value={categoryFilter} label="Category" onChange={(event) => { setCategoryFilter(event.target.value); setPage(1); }}>
             <MenuItem value="">All categories</MenuItem>
@@ -1561,11 +1563,11 @@ export function VendorDashboardPage() {
             color="inherit"
             edge="start"
             onClick={() => setMobileOpen(true)}
-            sx={{ mr: 2, display: { sm: "none" } }}
+            sx={{ mr: { xs: 1, sm: 2 }, display: { sm: "none" }, minWidth: 44, minHeight: 44 }}
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: 700 }}>
+          <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: 700, fontSize: { xs: "0.98rem", sm: "1.25rem" } }}>
             DressMe — Vendor Portal
           </Typography>
           <Chip
@@ -1573,6 +1575,7 @@ export function VendorDashboardPage() {
             color="primary"
             variant="outlined"
             size="small"
+            sx={{ maxWidth: { xs: 100, sm: 180 }, "& .MuiChip-label": { overflow: "hidden", textOverflow: "ellipsis" } }}
           />
         </Toolbar>
       </AppBar>
@@ -1593,7 +1596,7 @@ export function VendorDashboardPage() {
         component="main"
         sx={{
           flexGrow: 1,
-          p: 3,
+          p: { xs: 2, sm: 3 },
           width: { sm: `calc(100% - ${DRAWER_WIDTH}px)` },
           mt: 8,
         }}

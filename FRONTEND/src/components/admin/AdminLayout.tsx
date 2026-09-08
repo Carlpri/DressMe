@@ -276,15 +276,15 @@ export function AdminLayout() {
             color="inherit"
             edge="start"
             onClick={handleDrawerToggle}
-            sx={{ mr: 2, display: { sm: "none" } }}
+            sx={{ mr: { xs: 1, sm: 2 }, display: { sm: "none" }, minWidth: 44, minHeight: 44 }}
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: 700 }}>
+          <Typography variant="h6" sx={{ flexGrow: 1, fontWeight: 700, fontSize: { xs: "1rem", sm: "1.25rem" } }}>
             DressMe Admin CMS
           </Typography>
           <Stack direction="row" spacing={1} alignItems="center">
-            <Chip label={user?.name || "Admin"} color="primary" variant="outlined" size="small" />
+            <Chip label={user?.name || "Admin"} color="primary" variant="outlined" size="small" sx={{ maxWidth: { xs: 110, sm: 180 }, "& .MuiChip-label": { overflow: "hidden", textOverflow: "ellipsis" } }} />
           </Stack>
         </Toolbar>
       </AppBar>
@@ -320,7 +320,7 @@ export function AdminLayout() {
         component="main"
         sx={{
           flexGrow: 1,
-          p: 3,
+          p: { xs: 2, sm: 3 },
           width: { sm: `calc(100% - ${DRAWER_WIDTH}px)` },
           mt: 8,
         }}

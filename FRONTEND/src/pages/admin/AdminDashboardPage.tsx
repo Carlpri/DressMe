@@ -8,6 +8,7 @@ import {
   Typography,
   Stack,
   Table,
+  TableContainer,
   TableBody,
   TableCell,
   TableHead,
@@ -77,11 +78,11 @@ export function AdminDashboardPage() {
   const whatsappNumber = settings?.whatsappNumber || "254700000000";
 
   return (
-    <Stack spacing={4}>
+    <Stack spacing={{ xs: 3, md: 4 }}>
       {/* Title */}
-      <Box display="flex" justifyContent="space-between" alignItems="center">
+      <Box display="flex" justifyContent="space-between" alignItems={{ xs: "stretch", sm: "center" }} gap={2} flexDirection={{ xs: "column", sm: "row" }}>
         <Box>
-          <Typography variant="h4" sx={{ fontWeight: 800 }}>
+          <Typography variant="h4" sx={{ fontWeight: 800, fontSize: { xs: "1.7rem", sm: "2.125rem" } }}>
             Dashboard Overview
           </Typography>
           <Typography color="text.secondary">
@@ -93,16 +94,18 @@ export function AdminDashboardPage() {
           to="/admin/products"
           variant="contained"
           startIcon={<ShoppingBagIcon />}
+          fullWidth
+          sx={{ minHeight: 44 }}
         >
           Add Product
         </Button>
       </Box>
 
       {/* 5 Key Metric Cards */}
-      <Grid container spacing={3}>
+      <Grid container spacing={{ xs: 2, md: 3 }}>
         <Grid size={{ xs: 12, sm: 6, md: 2.4 }}>
           <Card variant="outlined">
-            <CardContent>
+            <CardContent sx={{ p: { xs: 2, sm: 2.5 } }}>
               <Stack direction="row" justifyContent="space-between" alignItems="center">
                 <Box>
                   <Typography variant="body2" color="text.secondary">
@@ -202,13 +205,13 @@ export function AdminDashboardPage() {
       </Grid>
 
       {/* Operational Widget: Pending Orders Requiring WhatsApp Follow-Up */}
-      <Paper elevation={0} sx={{ p: 3, border: "1.5px solid #25D366", borderRadius: 3, bgcolor: "#F0FDF4" }}>
+      <Paper elevation={0} sx={{ p: { xs: 2, sm: 3 }, border: "1.5px solid #25D366", borderRadius: 3, bgcolor: "#F0FDF4" }}>
         <Stack spacing={2}>
-          <Box display="flex" justifyContent="space-between" alignItems="center">
+          <Box display="flex" justifyContent="space-between" alignItems={{ xs: "stretch", sm: "center" }} gap={2} flexDirection={{ xs: "column", sm: "row" }}>
             <Stack direction="row" spacing={1.5} alignItems="center">
               <WhatsAppIcon sx={{ color: "#25D366", fontSize: 32 }} />
               <Box>
-                <Typography variant="h6" sx={{ fontWeight: 800, color: "#166534" }}>
+                <Typography variant="h6" sx={{ fontWeight: 800, color: "#166534", fontSize: { xs: "1rem", sm: "1.25rem" } }}>
                   Pending Orders Requiring WhatsApp Follow-Up ({pendingOrders.length})
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
@@ -222,6 +225,8 @@ export function AdminDashboardPage() {
               variant="outlined"
               color="success"
               endIcon={<ArrowForwardIcon />}
+              fullWidth
+              sx={{ minHeight: 44 }}
             >
               Manage All Pending
             </Button>
@@ -230,7 +235,8 @@ export function AdminDashboardPage() {
           {pendingOrders.length === 0 ? (
             <Alert severity="success">Great job! No pending orders requiring follow-up.</Alert>
           ) : (
-            <Table size="small">
+            <TableContainer sx={{ overflowX: "auto" }}>
+            <Table size="small" sx={{ minWidth: 720 }}>
               <TableHead>
                 <TableRow>
                   <TableCell>Order #</TableCell>
@@ -284,26 +290,28 @@ export function AdminDashboardPage() {
                 })}
               </TableBody>
             </Table>
+            </TableContainer>
           )}
         </Stack>
       </Paper>
 
       {/* Grid: Recent Orders & Low Stock Table */}
-      <Grid container spacing={3}>
+      <Grid container spacing={{ xs: 2, md: 3 }}>
         {/* Recent 5 Orders */}
         <Grid size={{ xs: 12, md: 7 }}>
           <Card variant="outlined">
-            <CardContent>
-              <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-                <Typography variant="h6" sx={{ fontWeight: 700 }}>
+            <CardContent sx={{ p: { xs: 2, sm: 2.5 } }}>
+              <Box display="flex" justifyContent="space-between" alignItems={{ xs: "stretch", sm: "center" }} gap={1.5} flexDirection={{ xs: "column", sm: "row" }} mb={2}>
+                <Typography variant="h6" sx={{ fontWeight: 700, fontSize: { xs: "1.05rem", sm: "1.25rem" } }}>
                   Recent Orders
                 </Typography>
-                <Button component={RouterLink} to="/admin/orders" size="small">
+                <Button component={RouterLink} to="/admin/orders" size="small" sx={{ alignSelf: { xs: "flex-start", sm: "auto" }, minHeight: 40 }}>
                   View All Orders
                 </Button>
               </Box>
 
-              <Table size="small">
+              <TableContainer sx={{ overflowX: "auto" }}>
+              <Table size="small" sx={{ minWidth: 440 }}>
                 <TableHead>
                   <TableRow>
                     <TableCell>Order #</TableCell>
@@ -335,6 +343,7 @@ export function AdminDashboardPage() {
                   ))}
                 </TableBody>
               </Table>
+              </TableContainer>
             </CardContent>
           </Card>
         </Grid>
@@ -342,12 +351,12 @@ export function AdminDashboardPage() {
         {/* Low Stock Warning Table */}
         <Grid size={{ xs: 12, md: 5 }}>
           <Card variant="outlined">
-            <CardContent>
-              <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-                <Typography variant="h6" sx={{ fontWeight: 700, color: "error.main" }}>
+            <CardContent sx={{ p: { xs: 2, sm: 2.5 } }}>
+              <Box display="flex" justifyContent="space-between" alignItems={{ xs: "stretch", sm: "center" }} gap={1.5} flexDirection={{ xs: "column", sm: "row" }} mb={2}>
+                <Typography variant="h6" sx={{ fontWeight: 700, color: "error.main", fontSize: { xs: "1.05rem", sm: "1.25rem" } }}>
                   Low Stock Warnings
                 </Typography>
-                <Button component={RouterLink} to="/admin/products" size="small">
+                <Button component={RouterLink} to="/admin/products" size="small" sx={{ alignSelf: { xs: "flex-start", sm: "auto" }, minHeight: 40 }}>
                   Manage Inventory
                 </Button>
               </Box>
@@ -357,7 +366,8 @@ export function AdminDashboardPage() {
                   No low stock warnings.
                 </Typography>
               ) : (
-                <Table size="small">
+                <TableContainer sx={{ overflowX: "auto" }}>
+                <Table size="small" sx={{ minWidth: 360 }}>
                   <TableHead>
                     <TableRow>
                       <TableCell>Product</TableCell>
@@ -379,6 +389,7 @@ export function AdminDashboardPage() {
                     ))}
                   </TableBody>
                 </Table>
+                </TableContainer>
               )}
             </CardContent>
           </Card>
