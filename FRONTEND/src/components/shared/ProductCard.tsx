@@ -380,23 +380,23 @@ export function ProductCard({
       }}
       sx={{
         position: "relative",
-        borderRadius: "20px",
+        borderRadius: "18px",
         bgcolor: "#FFFFFF",
         overflow: "hidden",
         cursor: "pointer",
         transition:
           "transform 260ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 260ms cubic-bezier(0.16, 1, 0.3, 1), border-color 220ms ease",
         border: isHovered
-          ? "1px solid rgba(22, 101, 52, 0.38)"
+          ? "1px solid rgba(22, 101, 52, 0.28)"
           : prominence.tier === "spotlight"
-          ? "1px solid rgba(22, 101, 52, 0.2)"
-          : "1px solid rgba(17, 24, 39, 0.08)",
+          ? "1px solid rgba(22, 101, 52, 0.14)"
+          : "1px solid rgba(17, 24, 39, 0.06)",
         boxShadow: isHovered
-          ? "0 20px 40px -10px rgba(17, 24, 39, 0.14), 0 0 0 1px rgba(34, 197, 94, 0.3)"
+          ? "0 18px 30px -10px rgba(17, 24, 39, 0.12), 0 0 0 1px rgba(34, 197, 94, 0.18)"
           : prominence.tier === "spotlight"
-          ? "0 4px 16px rgba(22, 101, 52, 0.06)"
-          : "0 2px 10px rgba(0, 0, 0, 0.03)",
-        transform: isHovered ? "scale(1.02)" : "scale(1)",
+          ? "0 6px 18px rgba(15, 23, 42, 0.05)"
+          : "0 2px 12px rgba(15, 23, 42, 0.04)",
+        transform: isHovered ? "scale(1.01)" : "scale(1)",
         willChange: "transform, box-shadow",
         display: "flex",
         flexDirection: "column",

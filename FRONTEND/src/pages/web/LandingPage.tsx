@@ -100,7 +100,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
       <Typography
         sx={{
           fontSize: "0.72rem",
-          fontWeight: 800,
+          fontWeight: 700,
           letterSpacing: "0.12em",
           color: GOLD_DARK,
           textTransform: "uppercase",
@@ -594,7 +594,15 @@ export function LandingPage() {
             <Stack direction="row" justifyContent="space-between" alignItems="flex-end">
               <Box>
                 <SectionLabel>Trending in 2026</SectionLabel>
-                <Typography variant="h3" sx={{ fontWeight: 800, color: DARK, letterSpacing: "-0.02em" }}>
+                <Typography
+                  variant="h3"
+                  sx={{
+                    fontWeight: 700,
+                    color: DARK,
+                    letterSpacing: "-0.02em",
+                    textTransform: "uppercase",
+                  }}
+                >
                   Trending in 2026
                 </Typography>
                 <Typography sx={{ color: "#64748B", mt: 0.5 }}>
@@ -620,7 +628,7 @@ export function LandingPage() {
             ) : (
               <MasonryGrid columns={{ xs: 1, sm: 2, md: 3, lg: 3 }}>
                 {trendingProducts?.items.slice(0, 6).map((product) => (
-                  <ProductCard key={product.id} product={product} variant="trending" size="large" />
+                  <ProductCard key={product.id} product={product} size="large" />
                 ))}
               </MasonryGrid>
             )}
@@ -642,7 +650,15 @@ export function LandingPage() {
           <Stack spacing={6}>
             <Box sx={{ textAlign: "center" }}>
               <SectionLabel>Categories</SectionLabel>
-              <Typography variant="h3" sx={{ fontWeight: 800, color: DARK, letterSpacing: "-0.02em" }}>
+              <Typography
+                variant="h3"
+                sx={{
+                  fontWeight: 700,
+                  color: DARK,
+                  letterSpacing: "-0.02em",
+                  textTransform: "uppercase",
+                }}
+              >
                 Shop by Style
               </Typography>
               <Typography sx={{ color: "#64748B", mt: 0.5 }}>
@@ -737,7 +753,15 @@ export function LandingPage() {
             <Stack direction="row" justifyContent="space-between" alignItems="flex-end">
               <Box>
                 <SectionLabel>Brands</SectionLabel>
-                <Typography variant="h3" sx={{ fontWeight: 800, color: DARK, letterSpacing: "-0.02em" }}>
+                <Typography
+                  variant="h3"
+                  sx={{
+                    fontWeight: 700,
+                    color: DARK,
+                    letterSpacing: "-0.02em",
+                    textTransform: "uppercase",
+                  }}
+                >
                   Curated Collections
                 </Typography>
                 <Typography sx={{ color: "#64748B", mt: 0.5 }}>
@@ -837,7 +861,15 @@ export function LandingPage() {
           <Stack spacing={6}>
             <Box sx={{ textAlign: "center" }}>
               <SectionLabel>Stores</SectionLabel>
-              <Typography variant="h3" sx={{ fontWeight: 800, color: DARK, letterSpacing: "-0.02em" }}>
+              <Typography
+                variant="h3"
+                sx={{
+                  fontWeight: 700,
+                  color: DARK,
+                  letterSpacing: "-0.02em",
+                  textTransform: "uppercase",
+                }}
+              >
                 Meet Our Vendors
               </Typography>
               <Typography sx={{ color: "#64748B", mt: 0.5 }}>
@@ -960,7 +992,15 @@ export function LandingPage() {
             <Stack direction="row" justifyContent="space-between" alignItems="flex-end">
               <Box>
                 <SectionLabel>New Arrivals</SectionLabel>
-                <Typography variant="h3" sx={{ fontWeight: 800, color: DARK, letterSpacing: "-0.02em" }}>
+                <Typography
+                  variant="h3"
+                  sx={{
+                    fontWeight: 700,
+                    color: DARK,
+                    letterSpacing: "-0.02em",
+                    textTransform: "uppercase",
+                  }}
+                >
                   Just Dropped
                 </Typography>
                 <Typography sx={{ color: "#64748B", mt: 0.5 }}>
@@ -986,7 +1026,7 @@ export function LandingPage() {
             ) : (
               <MasonryGrid columns={{ xs: 1, sm: 2, md: 3, lg: 4 }} gap={{ xs: "12px", sm: "14px", md: "16px" }}>
                 {newProducts?.items.slice(0, 8).map((product) => (
-                  <ProductCard key={product.id} product={product} variant="compact" size="medium" />
+                  <ProductCard key={product.id} product={product} size="large" />
                 ))}
               </MasonryGrid>
             )}
@@ -1115,7 +1155,15 @@ export function LandingPage() {
         <Container maxWidth="md">
           <Stack spacing={4} alignItems="center" textAlign="center">
             <SectionLabel>Newsletter</SectionLabel>
-            <Typography variant="h3" sx={{ fontWeight: 800, color: DARK, letterSpacing: "-0.02em" }}>
+            <Typography
+              variant="h3"
+              sx={{
+                fontWeight: 700,
+                color: DARK,
+                letterSpacing: "-0.02em",
+                textTransform: "uppercase",
+              }}
+            >
               Stay Ahead of the Trend
             </Typography>
             <Typography sx={{ color: "#64748B", maxWidth: 480, lineHeight: 1.7 }}>
