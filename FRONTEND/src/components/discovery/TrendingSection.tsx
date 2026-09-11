@@ -71,13 +71,14 @@ export function TrendingSection() {
               </Stack>
               <Typography
                 variant="h2"
-                className="font-display"
                 sx={{
-                  fontWeight: 800,
-                  fontSize: { xs: "2rem", sm: "2.6rem", md: "3.1rem" },
+                  fontWeight: 700,
+                  fontSize: { xs: "2rem", sm: "2.6rem", md: "2.8rem" },
                   color: CHARCOAL,
                   letterSpacing: "-0.03em",
-                  lineHeight: 1.15,
+                  lineHeight: 1.12,
+                  fontFamily: "'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+                  textTransform: "uppercase",
                 }}
               >
                 Trending in 2026

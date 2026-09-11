@@ -13,6 +13,7 @@ import {
   Chip,
   IconButton,
 } from "@mui/material";
+import { apiClient } from "../../api/client";
 import EditIcon from "@mui/icons-material/Edit";
 import PersonIcon from "@mui/icons-material/Person";
 import EmailIcon from "@mui/icons-material/Email";
@@ -20,17 +21,33 @@ import LocationOnIcon from "@mui/icons-material/LocationOn";
 import { useAuth } from "../../hooks/useAuth";
 import { ROUTES } from "../../constants/routes";
 import { Link as RouterLink } from "react-router-dom";
+import type { AuthUser } from "../../types/auth";
 
 export function ProfilePage() {
-  const { user } = useAuth();
+  const { user, token, login } = useAuth();
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     name: user?.name || "",
     email: user?.email || "",
+    avatar: user?.avatar || "",
   });
 
-  const handleSave = () => {
-    // TODO: Wire to PATCH /users/me when profile editing is implemented in Phase 1.
+  const handleSave = async () => {
+    if (!token || !user) return;
+
+    const payload = {
+      name: formData.name.trim(),
+      avatar: formData.avatar.trim() || undefined,
+    };
+
+    const response = await apiClient.patch<{ data: AuthUser }>("/users/me", payload);
+    const updatedUser = { ...user, ...response.data.data };
+
+    login({
+      token,
+      user: updatedUser,
+    });
+
     setIsEditing(false);
   };
 
@@ -38,6 +55,7 @@ export function ProfilePage() {
     setFormData({
       name: user?.name || "",
       email: user?.email || "",
+      avatar: user?.avatar || "",
     });
     setIsEditing(false);
   };
@@ -53,14 +71,15 @@ export function ProfilePage() {
               <CardContent>
                 <Stack spacing={3} alignItems="center">
                   <Avatar
+                    src={user?.avatar || undefined}
                     sx={{
                       width: 100,
                       height: 100,
-                      bgcolor: "primary.main",
+                      bgcolor: user?.avatar ? "#E5E7EB" : "primary.main",
                       fontSize: "2.5rem",
                     }}
                   >
-                    {user?.name?.charAt(0).toUpperCase()}
+                    {!user?.avatar && user?.name?.charAt(0).toUpperCase()}
                   </Avatar>
                   <Stack spacing={1} textAlign="center">
                     <Typography variant="h6" sx={{ fontWeight: 700 }}>
@@ -117,12 +136,20 @@ export function ProfilePage() {
                     <Stack spacing={3}>
                       <TextField
                         fullWidth
-                        label="Full Name"
+                        label="Username"
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         InputProps={{
                           startAdornment: <PersonIcon sx={{ mr: 1, color: "text.secondary" }} />,
                         }}
+                      />
+                      <TextField
+                        fullWidth
+                        label="Profile Picture URL"
+                        value={formData.avatar}
+                        onChange={(e) => setFormData({ ...formData, avatar: e.target.value })}
+                        placeholder="https://example.com/profile.jpg"
+                        helperText="Optional. Add a public image URL for your profile picture."
                       />
                       <TextField
                         fullWidth
@@ -148,7 +175,7 @@ export function ProfilePage() {
                         <PersonIcon color="action" />
                         <Box>
                           <Typography variant="body2" color="text.secondary">
-                            Full Name
+                            Username
                           </Typography>
                           <Typography sx={{ fontWeight: 500 }}>{user?.name}</Typography>
                         </Box>

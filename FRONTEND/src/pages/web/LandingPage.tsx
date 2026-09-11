@@ -599,8 +599,11 @@ export function LandingPage() {
                   sx={{
                     fontWeight: 700,
                     color: DARK,
-                    letterSpacing: "-0.02em",
+                    letterSpacing: "-0.03em",
                     textTransform: "uppercase",
+                    fontFamily: "'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+                    fontSize: "clamp(1.6rem, 2vw, 2.2rem)",
+                    lineHeight: 1.12,
                   }}
                 >
                   Trending in 2026
@@ -655,8 +658,11 @@ export function LandingPage() {
                 sx={{
                   fontWeight: 700,
                   color: DARK,
-                  letterSpacing: "-0.02em",
+                  letterSpacing: "-0.03em",
                   textTransform: "uppercase",
+                  fontFamily: "'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+                  fontSize: "clamp(1.6rem, 2vw, 2.2rem)",
+                  lineHeight: 1.12,
                 }}
               >
                 Shop by Style
@@ -758,8 +764,11 @@ export function LandingPage() {
                   sx={{
                     fontWeight: 700,
                     color: DARK,
-                    letterSpacing: "-0.02em",
+                    letterSpacing: "-0.03em",
                     textTransform: "uppercase",
+                    fontFamily: "'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+                    fontSize: "clamp(1.6rem, 2vw, 2.2rem)",
+                    lineHeight: 1.12,
                   }}
                 >
                   Curated Collections
@@ -866,8 +875,11 @@ export function LandingPage() {
                 sx={{
                   fontWeight: 700,
                   color: DARK,
-                  letterSpacing: "-0.02em",
+                  letterSpacing: "-0.03em",
                   textTransform: "uppercase",
+                  fontFamily: "'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+                  fontSize: "clamp(1.6rem, 2vw, 2.2rem)",
+                  lineHeight: 1.12,
                 }}
               >
                 Meet Our Vendors
@@ -997,8 +1009,11 @@ export function LandingPage() {
                   sx={{
                     fontWeight: 700,
                     color: DARK,
-                    letterSpacing: "-0.02em",
+                    letterSpacing: "-0.03em",
                     textTransform: "uppercase",
+                    fontFamily: "'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+                    fontSize: "clamp(1.6rem, 2vw, 2.2rem)",
+                    lineHeight: 1.12,
                   }}
                 >
                   Just Dropped
@@ -1160,8 +1175,11 @@ export function LandingPage() {
               sx={{
                 fontWeight: 700,
                 color: DARK,
-                letterSpacing: "-0.02em",
+                letterSpacing: "-0.03em",
                 textTransform: "uppercase",
+                fontFamily: "'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+                fontSize: "clamp(1.6rem, 2vw, 2.2rem)",
+                lineHeight: 1.12,
               }}
             >
               Stay Ahead of the Trend
