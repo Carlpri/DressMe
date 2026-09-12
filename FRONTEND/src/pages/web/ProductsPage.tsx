@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Link as RouterLink, useSearchParams } from "react-router-dom";
 import {
   Box,
@@ -19,6 +19,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import CheckroomRoundedIcon from "@mui/icons-material/CheckroomRounded";
 import { ROUTES } from "../../constants/routes";
+import { useCart } from "../../hooks/useCart";
 import { useProducts } from "../../hooks/useProducts";
 import { useCategories } from "../../hooks/useCategories";
 import { useBrands } from "../../hooks/useBrands";
@@ -52,6 +53,17 @@ const SORT_OPTIONS = [
   { value: "oldest", label: "Oldest" },
 ];
 
+const shuffleArray = <T,>(items: T[]) => {
+  const cloned = [...items];
+
+  for (let index = cloned.length - 1; index > 0; index -= 1) {
+    const randomIndex = Math.floor(Math.random() * (index + 1));
+    [cloned[index], cloned[randomIndex]] = [cloned[randomIndex], cloned[index]];
+  }
+
+  return cloned;
+};
+
 export function ProductsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -67,6 +79,7 @@ export function ProductsPage() {
   const featured = searchParams.get("featured") === "true";
 
   const [searchInput, setSearchInput] = useState(search);
+  const { data: cart } = useCart();
 
   const { data: products, isLoading, error, refetch } = useProducts({
     page,
@@ -83,6 +96,135 @@ export function ProductsPage() {
   const { data: categories } = useCategories();
   const { data: brands } = useBrands();
   const displayCategories = categories && categories.length > 0 ? categories : DEFAULT_CATEGORIES;
+
+  const cartProducts = useMemo(
+    () => (cart?.items ?? []).map((item) => item.product as any).filter(Boolean),
+    [cart]
+  );
+
+  const cartSignals = useMemo(() => {
+    const categorySlugs = new Set<string>();
+    const brandSlugs = new Set<string>();
+    const vendorIds = new Set<string>();
+    const searchableTerms = new Set<string>();
+
+    for (const product of cartProducts) {
+      const productData = product as any;
+
+      for (const category of productData.categories ?? []) {
+        const slug = category.slug?.trim().toLowerCase();
+        if (slug) categorySlugs.add(slug);
+      }
+
+      const brandSlug = productData.brand?.slug?.trim().toLowerCase();
+      if (brandSlug) brandSlugs.add(brandSlug);
+
+      const vendorId = productData.vendor?.id?.trim().toLowerCase();
+      if (vendorId) vendorIds.add(vendorId);
+
+      const itemText = [
+        productData.name,
+        productData.description,
+        ...(productData.categories ?? []).map((category: any) => category.name),
+        productData.brand?.name,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+
+      const tokens = itemText.match(/[a-z0-9]+/g) ?? [];
+      tokens
+        .filter((token) => token.length > 3)
+        .forEach((token) => searchableTerms.add(token));
+    }
+
+    return { categorySlugs, brandSlugs, vendorIds, searchableTerms };
+  }, [cartProducts]);
+
+  const displayedProducts = useMemo(() => {
+    const items = products?.items ?? [];
+
+    if (!items.length) {
+      return items;
+    }
+
+    const searchTerms = (search || "")
+      .trim()
+      .toLowerCase()
+      .match(/[a-z0-9]+/g)
+      ?.filter((term) => term.length > 2 && !["with", "from", "that", "this", "into", "your", "look"].includes(term))
+      ?? [];
+
+    const scoredItems = items.map((product) => {
+      const categorySlugs = (product.categories ?? [])
+        .map((category) => category.slug?.trim().toLowerCase())
+        .filter(Boolean) as string[];
+      const brandSlug = product.brand?.slug?.trim().toLowerCase();
+      const vendorId = product.vendor?.id?.trim().toLowerCase();
+      const searchableText = [
+        product.name,
+        product.description,
+        ...(product.categories ?? []).map((category) => category.name),
+        product.brand?.name,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+
+      let score = 0;
+
+      if (searchTerms.length > 0) {
+        for (const term of searchTerms) {
+          if (searchableText.includes(term)) {
+            score += 8;
+          }
+
+          if (categorySlugs.some((categorySlug) => categorySlug.includes(term))) {
+            score += 6;
+          }
+
+          if (brandSlug?.includes(term)) {
+            score += 4;
+          }
+        }
+      }
+
+      for (const categorySlug of categorySlugs) {
+        if (cartSignals.categorySlugs.has(categorySlug)) {
+          score += 6;
+        }
+      }
+
+      if (brandSlug && cartSignals.brandSlugs.has(brandSlug)) {
+        score += 8;
+      }
+
+      if (vendorId && cartSignals.vendorIds.has(vendorId)) {
+        score += 5;
+      }
+
+      const matchingTerms = [...cartSignals.searchableTerms].filter((term) => searchableText.includes(term));
+      score += matchingTerms.length * 2;
+
+      return { product, score };
+    });
+
+    const recommended = scoredItems
+      .filter((item) => item.score > 0)
+      .sort((a, b) => b.score - a.score || Math.random() - 0.5);
+
+    const remaining = scoredItems
+      .filter((item) => item.score === 0)
+      .sort(() => Math.random() - 0.5);
+
+    const ordered = [...recommended, ...remaining].map((item) => item.product);
+
+    if (searchTerms.length > 0) {
+      return ordered;
+    }
+
+    return shuffleArray(ordered);
+  }, [products, search, cartSignals]);
 
   const updateFilter = (key: string, value: string) => {
     const newParams = new URLSearchParams(searchParams);
@@ -549,7 +691,7 @@ export function ProductsPage() {
                   columns={{ xs: 1, sm: 2, md: 3, lg: 4, xl: 5 }}
                   gap={{ xs: "12px", sm: "14px", md: "16px" }}
                 >
-                  {products?.items.map((product) => (
+                  {displayedProducts.map((product) => (
                     <ProductCard key={product.id} product={product} />
                   ))}
                 </MasonryGrid>
